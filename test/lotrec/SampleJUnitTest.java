@@ -21,6 +21,7 @@ public class SampleJUnitTest {
 
     @Test
     public void hello() {
+        // Here are some changes to commit
         assertTrue(true);
     }
 }
