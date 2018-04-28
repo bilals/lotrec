@@ -1,0 +1,707 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<logic>
+    <parser-version>2.1</parser-version>
+    <description>The multi-modal logic Kn: n modal operators each one of them is a K-like operator
+Author: Lilac Team
+Last update: March 2009</description>
+    <connector>
+        <connector-name>not</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>~ _</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>and</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ &amp; _</output-format>
+        <priority>4</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>or</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ v _</output-format>
+        <priority>3</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>imp</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ -&gt; _</output-format>
+        <priority>2</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>equiv</connector-name>
+        <arity>2</arity>
+        <associative>false</associative>
+        <output-format>_ &lt;-&gt; _</output-format>
+        <priority>0</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>knows</connector-name>
+        <arity>2</arity>
+        <associative>false</associative>
+        <output-format>K(_) _</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>knowsHat</connector-name>
+        <arity>2</arity>
+        <associative>false</associative>
+        <output-format>K^(_) _</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>lf</connector-name>
+        <arity>2</arity>
+        <associative>false</associative>
+        <output-format>LF(_,_)</output-format>
+        <priority>0</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>ul</connector-name>
+        <arity>2</arity>
+        <associative>false</associative>
+        <output-format>UL(_,_)</output-format>
+        <priority>0</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>after</connector-name>
+        <arity>2</arity>
+        <associative>false</associative>
+        <output-format>&lt;_&gt;_</output-format>
+        <priority>0</priority>
+        <connector-comment/>
+    </connector>
+    <rule>
+        <rule-name>Stop</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label not variable a</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node</parameter>
+            <parameter>FALSE</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label FALSE</parameter>
+        </action>
+        <action>
+            <action-name>stop</action-name>
+            <parameter>node</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotTrue</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label not True</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node</parameter>
+            <parameter>FALSE</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label FALSE</parameter>
+        </action>
+        <action>
+            <action-name>stop</action-name>
+            <parameter>node</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotNot</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label not not variable a</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label variable a</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>And</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label and variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotOr</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label not or variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label not variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label not variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotImp</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label not imp variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label not variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotAnd</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label not and variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label or not variable a not variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotEquiv</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label not equiv variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label or variable a variable b</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label or not variable a not variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Imp</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label imp variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label or not variable a variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Equiv</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label equiv variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label or not variable a variable b</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label or not variable b variable a</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Or</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label or variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>premodel_copy</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node</parameter>
+            <parameter>lf variable label variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>premodel_copy.node</parameter>
+            <parameter>lf variable label variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>After</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>lf variable label after variable Ann variable Formula</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>lf ul variable Ann variable label variable Formula</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>lf variable label variable Ann</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Not_After</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>lf variable label not after variable Ann variable Formula</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>copy</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>lf variable label not variable Ann</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>copy.w</parameter>
+            <parameter>lf variable label variable Ann</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>copy.w</parameter>
+            <parameter>lf ul variable Ann variable label not variable Formula</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotKnows</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>lf variable label not knows variable AgentI variable Formula</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>lf variable label knowsHat variable AgentI not variable Formula</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotKnowsHat</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>lf variable label not knowsHat variable AgentI variable Formula</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>lf variable label knows variable AgentI not variable Formula</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Fulfilled_KnowsHat</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>knowsHat variable AgentI variable Formula</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+            <parameter>variable AgentI</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>u</parameter>
+            <parameter>variable Formula</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>knowsHat variable AgentI variable Formula</parameter>
+            <parameter>Fulfilled</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>KnowsHat_Empty_Label</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>lf Empty knowsHat variable AgentI variable Formula</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>lf Empty knowsHat variable AgentI variable Formula</parameter>
+            <parameter>Fulfilled</parameter>
+        </condition>
+        <action>
+            <action-name>createNewNode</action-name>
+            <parameter>u</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+            <parameter>variable AgentI</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>u</parameter>
+            <parameter>lf Empty variable Formula</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>KnowsHat</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>lf ul variable head variable tail knowsHat variable AgentI variable Formula</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>lf ul variable head variable tail knowsHat variable AgentI variable Formula</parameter>
+            <parameter>Fulfilled</parameter>
+        </condition>
+        <action>
+            <action-name>createNewNode</action-name>
+            <parameter>u</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+            <parameter>variable AgentI</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>u</parameter>
+            <parameter>lf variable tail after variable head variable Formula</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Symmetric_Arcs</rule-name>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+            <parameter>variable AgentI</parameter>
+        </condition>
+        <action>
+            <action-name>link</action-name>
+            <parameter>u</parameter>
+            <parameter>w</parameter>
+            <parameter>variable AgentI</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Transitive_Arcs</rule-name>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+            <parameter>variable AgentI</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>u</parameter>
+            <parameter>v</parameter>
+            <parameter>variable AgentI</parameter>
+        </condition>
+        <action>
+            <action-name>link</action-name>
+            <parameter>w</parameter>
+            <parameter>v</parameter>
+            <parameter>variable AgentI</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Reflexive_Arcs</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>lf variable label knows variable AgentI variable Formula</parameter>
+        </condition>
+        <action>
+            <action-name>link</action-name>
+            <parameter>w</parameter>
+            <parameter>w</parameter>
+            <parameter>variable AgentI</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Knows_Empty_Label</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>lf Empty knows variable AgentI variable Formula</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+            <parameter>variable AgentI</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>u</parameter>
+            <parameter>lf Empty variable Formula</parameter>
+        </action>
+        <rule-comment>Nec Propagation</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>Knows</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>lf ul variable head variable tail knows variable AgentI variable Formula</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+            <parameter>variable AgentI</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>u</parameter>
+            <parameter>lf variable tail not after variable head not variable Formula</parameter>
+        </action>
+        <rule-comment>Nec Propagation</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>StepBackward_Positive_Literal</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>lf ul variable head variable tail variable P</parameter>
+        </condition>
+        <condition>
+            <condition-name>isAtomic</condition-name>
+            <parameter>variable P</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>lf variable tail variable P</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>StepBackward_Negative_Literal</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>lf ul variable head variable tail not variable P</parameter>
+        </condition>
+        <condition>
+            <condition-name>isAtomic</condition-name>
+            <parameter>variable P</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>lf variable tail not variable P</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>StepForward_Positive_Literal</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>lf variable label variable P</parameter>
+        </condition>
+        <condition>
+            <condition-name>isAtomic</condition-name>
+            <parameter>variable P</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>lf ul variable head variable label variable Smthg</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>lf ul variable head variable label variable P</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>StepForward_Negative_Literal</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>lf variable label not variable P</parameter>
+        </condition>
+        <condition>
+            <condition-name>isAtomic</condition-name>
+            <parameter>variable P</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>lf ul variable head variable label variable Smthg</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>lf ul variable head variable label not variable P</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <strategy>
+        <strategy-name>CPLStrategy</strategy-name>
+        <strategy-code>repeat 
+  firstRule
+	Stop
+      NotTrue
+	NotNot
+     NotKnows
+     NotKnowsHat
+	And
+     After
+	StepBackward_Positive_Literal
+	StepBackward_Negative_Literal
+	StepForward_Positive_Literal
+	StepForward_Negative_Literal
+	NotOr
+	NotImp
+	NotAnd
+	NotEquiv
+	Imp
+	Equiv
+	Or
+     Not_After
+  end 
+end</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <strategy>
+        <strategy-name>PAL_Strategy</strategy-name>
+        <strategy-code>repeat
+     CPLStrategy
+	Symmetric_Arcs
+	Transitive_Arcs
+	Reflexive_Arcs
+     Knows_Empty_Label
+     Knows
+     Mark_Fulfilled_KnowsHat
+     KnowsHat_Empty_Label
+     KnowsHat
+end</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <main-strategy>PAL_Strategy</main-strategy>
+    <testing-formula>
+        <formula-name>Moore Sentence</formula-name>
+        <formula-code>lf Empty after and P not knows I P and P not knows I P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name>Lutz 1</formula-name>
+        <formula-code>lf Empty after after True knowsHat A True knowsHat B True</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name>Lutz 2</formula-name>
+        <formula-code>lf Empty after after after after True knowsHat A True knowsHat B True knowsHat A True knowsHat B True</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name>Lutz 3</formula-name>
+        <formula-code>lf Empty after after after after after after True knowsHat A True knowsHat B True knowsHat A True knowsHat B True knowsHat A True knowsHat B True</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>lf Empty after P knows A not P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name>Lutz 4</formula-name>
+        <formula-code>lf Empty after after after after after after after after True knowsHat A True knowsHat B True knowsHat A True knowsHat B True knowsHat A True knowsHat B True knowsHat A True knowsHat B True</formula-code>
+        <formula-comment/>
+    </testing-formula>
+</logic>

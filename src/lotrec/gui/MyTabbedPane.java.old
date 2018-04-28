@@ -1,0 +1,75 @@
+package lotrec.gui;
+import javax.swing.*;
+import javax.swing.JTabbedPane;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JFrame;
+import javax.swing.JComponent;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.KeyEvent;
+import java.net.*;
+
+/* Class omitted because of 0 occurences 
+ * Bilal - October 2007
+ */
+
+public class MyTabbedPane  extends JPanel{
+    JTabbedPane tabbedPane;
+    ImageIcon icon;
+    public MyTabbedPane(String url) {
+        tabbedPane= new JTabbedPane();
+        if(url!=null)
+            icon=createImageIcon(url+"images/middle.gif");
+        else icon=new ImageIcon("images/middle.gif");
+        
+    }
+    
+    
+    public JPanel builtTabbedPane(JPanel panel1,JPanel panel2,JPanel panel3) {
+        
+        tabbedPane.addTab("Connectors and Rules", icon, panel1);
+        //tabbedPane.setMnemonicAt(0, KeyEvent.VK_1);
+        
+        
+        tabbedPane.addTab("Strategies", icon, panel2);
+        // tabbedPane.setMnemonicAt(1, KeyEvent.VK_2);
+        
+        
+        tabbedPane.addTab("Formula", icon, panel3);
+        // tabbedPane.setMnemonicAt(2, KeyEvent.VK_3);
+        
+        //panel4.setPreferredSize(new Dimension(410, 50));
+        
+        //Add the tabbed pane to this panel.
+        JPanel panel= new JPanel(new GridLayout(1, 1));
+        panel.add(tabbedPane);
+        
+        //Uncomment the following line to use scrolling tabs.
+        // tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
+        return panel;
+    }
+    
+    
+    /** Returns an ImageIcon, or null if the path
+     * was invalid. */
+    protected  ImageIcon createImageIcon(String path) {
+        try{
+            URL imgURL =new URL(path);
+            imgURL.openStream();
+            return new ImageIcon(imgURL);
+        }
+        catch(Exception e) {
+            JOptionPane.showMessageDialog(this,
+            e.getMessage(),
+            "Error",
+            JOptionPane.ERROR_MESSAGE);
+            return null;
+        }
+    }
+    public JTabbedPane getTabbedPane(){
+        return this.tabbedPane;
+    }
+}

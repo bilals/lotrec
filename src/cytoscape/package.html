@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<!-- $Revision: 6462 $
+       $Date: 2005-02-24 08:04:38 -0800 (Thu, 24 Feb 2005) $
+       $Author: cerami $
+    -->
+</head>
+<body>
+Core Cytoscape Classes.
+</P>
+Cytoscape is a software pacakge designed to enable the vizualization
+and analysis of networks.&nbsp; While commonly used for biological
+networks, it is designed to be able to accomodate any field which
+requires a junction between graph theory and associated data.<br>
+<br>
+The Cytoscape API is designed to be easy to use, and intuitive.&nbsp;
+Which means that most method names are fairly boring, and follow Java
+standards, so there are a lot of get/set methods.&nbsp; More
+information on using the classes can be found at
+http://www.cytoscape.org/alpha.html .&nbsp; <br>
+<br>
+In general, the most commonly used classes will be found in the <span
+ style="font-style: italic;">cytoscape</span> package.&nbsp; So:<br>
+<span style="font-style: italic;"><br>
+import cytoscape.*;<br>
+<span style="font-style: italic;"><br>
+</span></span><span style="font-weight: bold;"></span>will be sufficent
+for many of your classes.&nbsp; The class <span
+ style="font-style: italic;">cytoscape.Cytoscape</span> is where <span
+ style="font-style: italic;">CyNodes&nbsp; </span>and <span
+ style="font-style: italic;">CyEdges</span> are created.&nbsp; This is
+done via the <span style="font-style: italic;">getCyNode&nbsp; </span>and
+<span style="font-style: italic;">getCyEdge</span> methods.&nbsp; Note
+that Cytoscape does its best to not create duplicate nodes and
+edges.&nbsp; All of the nodes and edges are then accessable from <span
+ style="font-style: italic;">Cytoscape.&nbsp; </span>To actually do
+things like run algorithms a <span style="font-style: italic;">CyNetwork
+</span>is required.&nbsp; The <span style="font-style: italic;">createNetwork&nbsp;
+</span>series of methods will get you started in that directions.<br>
+<br>
+Generally, working with <span style="font-style: italic;">CyNetworks</span>
+is the preffered method of interacting with Cytoscape.&nbsp; <span
+ style="font-style: italic;">CyNetwork</span> contains many methods for
+easily writing Graph algoroithms, and for the smooth integration of
+data.&nbsp; More information can be found in the Developer
+documentation.<br>
+</body>
+</html>

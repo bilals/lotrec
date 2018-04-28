@@ -1,0 +1,233 @@
+/*
+ * LoadedLogicPane.java
+ *
+ * Created on 26 octobre 2007, 16:17
+ *
+ * To change this template, choose Tools | Template Manager
+ * and open the template in the editor.
+ */
+
+package lotrec.gui;
+
+import java.awt.event.MouseAdapter;
+import java.util.ArrayList;
+import javax.swing.JTabbedPane;
+import lotrec.gui.logicspane.LogicDefTab;
+
+/**
+ *
+ * @author said
+ */
+public class LoadedLogicsPane extends JTabbedPane{
+    
+    private ArrayList logicDefTabs;
+    private final MainFrame mainFrame;
+    
+    /** Creates a new instance of LoadedLogicPane */
+    public LoadedLogicsPane(MainFrame theMainFrame) {
+        super(javax.swing.JTabbedPane.TOP, javax.swing.JTabbedPane.SCROLL_TAB_LAYOUT);
+        logicDefTabs = new ArrayList();
+        this.mainFrame = theMainFrame;
+        this.refresh();
+    }
+    
+//    public void addTab(TabContainer tab){
+//        this.addTab(" ", tab);
+//        this.setSelectedComponent(tab);
+//        refresh();
+//    }
+    
+//    public void removeTab(TabContainer tab){
+//        this.remove(tab);
+//    }
+//
+//    public void assignExit(TabContainer tab){
+//        final TabContainer copyOfTab = tab;
+//        tab.getExitLabel().addMouseListener(new MouseAdapter(){
+//            public void mouseClicked(java.awt.event.MouseEvent evt) {
+//                remove(copyOfTab);
+//            }
+//        });
+//    }
+    
+    public void addLogicTab(LogicDefTab logicTab){
+        this.addTab(logicTab.getLogic().getDisplayName()+" ("+logicTab.getLogicFileName()+")",logicTab);
+        this.logicDefTabs.add(logicTab);
+        assignExit(logicTab);
+        this.setSelectedComponent(logicTab);
+        refresh();
+    }
+    
+    public void removeLogicTab(LogicDefTab logicTab){
+        this.logicDefTabs.remove(logicTab);
+        this.remove(logicTab);
+    }
+    
+    public void removeLogicTab(LogicDefTab logicTab, int[] deletedSelectedLogicIndexes){
+        deletedSelectedLogicIndexes[0] = logicDefTabs.indexOf(logicTab);
+        this.logicDefTabs.remove(logicTab);
+        this.remove(logicTab);
+        deletedSelectedLogicIndexes[1] = this.getSelectedIndex();
+    }
+    
+    public void assignExit(LogicDefTab logicTab){
+        final LogicDefTab copyOfTab = logicTab;
+        logicTab.getExitLabel().addMouseListener(new MouseAdapter(){
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                int deletedLogicIndex=0;
+                int selectedLogicIndex=0;
+                int deletedSelectedLogicIndexes [] = new int[2];
+                removeLogicTab(copyOfTab,deletedSelectedLogicIndexes);
+                deletedLogicIndex = deletedSelectedLogicIndexes[0];
+                selectedLogicIndex = deletedSelectedLogicIndexes[1];
+                mainFrame.getControlsPanel().refreshLogicsList(deletedLogicIndex,selectedLogicIndex);
+            }
+        });
+    }
+    
+    public ArrayList getLoadedLogics(){
+        ArrayList loadedLogics = new ArrayList();
+        for(int i=0; i<this.logicDefTabs.size(); i++){
+            loadedLogics.add(((LogicDefTab)logicDefTabs.get(i)).getLogic());
+        }
+        return loadedLogics;
+    }
+    
+    public void refresh(){
+        java.util.ResourceBundle resource;
+        for(int i=0; i< this.logicDefTabs.size(); i++){
+            ((LogicDefTab)this.logicDefTabs.get(i)).refresh();
+        }
+        /*try{//we could use special bool indicators..
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.WelcomePage", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.welcomePageTab), resource.getString("WelcomePage.title"));
+            this.welcomePageTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.GeneralData", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.generalDataTab), resource.getString("GeneralData.title"));
+            this.generalDataTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.TeachingTimeSlotsDataTab", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.teachingTimeSlotsDataTab), resource.getString("TeachingTimeSlotsDataTab.title"));
+            this.teachingTimeSlotsDataTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.TeachersDataTab", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.teachersDataTab), resource.getString("TeachersDataTab.title"));
+            this.teachersDataTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.CyclesDataTab", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.cyclesDataTab), resource.getString("CyclesDataTab.title"));
+            this.cyclesDataTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.ClassesDataTab", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.classesDataTab), resource.getString("ClassesDataTab.title"));
+            this.classesDataTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.SectionsDataTab", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.sectionsDataTab), resource.getString("SectionsDataTab.title"));
+            this.sectionsDataTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.GeneralSubjectsDataTab", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.generalSubjectsDataTab), resource.getString("GeneralSubjectsDataTab.title"));
+            this.generalSubjectsDataTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.SubjectsDataTab", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.subjectsDataTab), resource.getString("SubjectsDataTab.title"));
+            this.subjectsDataTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.LessonsDataTab", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.lessonsDataTab), resource.getString("LessonsDataTab.title"));
+            this.lessonsDataTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.ActivitiesDataTab", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.activitiesDataTab), resource.getString("ActivitiesDataTab.title"));
+            this.activitiesDataTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.ViewTabs", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.activitiesViewTab), resource.getString("ViewTabs.activitiesViewTab"));
+            this.activitiesViewTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.ViewTabs", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.schedulesViewTab), resource.getString("ViewTabs.schedulesViewTab"));
+            this.schedulesViewTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.ViewTabs", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.sectionsViewTab), resource.getString("ViewTabs.sectionsViewTab"));
+            this.sectionsViewTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.ViewTabs", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.lessonsViewTab), resource.getString("ViewTabs.lessonsViewTab"));
+            this.lessonsViewTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.ViewTabs", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.teacherFavoritesViewTab), resource.getString("ViewTabs.teacherFavoritesViewTab"));
+            this.teacherFavoritesViewTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.ViewTabs", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.teachersViewTab), resource.getString("ViewTabs.teachersViewTab"));
+            this.teachersViewTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.ViewTabs", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.printPreviewTab), resource.getString("ViewTabs.print-previewTab"));
+            this.printPreviewTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.SolveMenu", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.validationSolverTab), resource.getString("SolveMenu.validation"));
+            this.validationSolverTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.SolveMenu", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.solverTab), resource.getString("SolveMenu.solver"));
+            this.solverTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.SolveMenu", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.interactiveSolverTab), resource.getString("SolveMenu.interactiveSolver"));
+            this.interactiveSolverTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.AboutTab", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.aboutTab), resource.getString("AboutTab.title"));
+            this.aboutTab.refresh();
+        }catch(Exception e){};
+         
+         try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.ViewTabs", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.teachersWithVacanciesViewTab), resource.getString("ViewTabs.teachersWithVacanciesViewTab"));
+            this.teachersWithVacanciesViewTab.refresh();
+        }catch(Exception e){};
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.ViewTabs", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.teachersWithVacanciesViewTab), resource.getString("ViewTabs.teachersWithVacanciesViewTab"));
+            this.teachersWithVacanciesViewTab.refresh();
+        }
+        catch(Exception e){};
+         
+        try{
+            resource = java.util.ResourceBundle.getBundle("resources.tabs.ViewTabs", resources.ResourcesProvider.getCurrentLocale());
+            this.setTitleAt(this.indexOfComponent(this.notAssignedLessonsViewTab), resource.getString("ViewTabs.notAssignedLessonsViewTab"));
+            this.notAssignedLessonsViewTab.refresh();
+        }catch(Exception e){};
+         */
+    }
+    
+}

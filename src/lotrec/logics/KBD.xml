@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<logic>
+    <parser-version>2.1</parser-version>
+    <description>The modal Logic KBD
+Author: Lilac Team
+Last update: June 2007</description>
+    <connector>
+        <connector-name>not</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>~_</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>and</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ &amp; _</output-format>
+        <priority>3</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>or</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ V _</output-format>
+        <priority>3</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>nec</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>[]_</output-format>
+        <priority>4</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>pos</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>&lt;&gt;_</output-format>
+        <priority>4</priority>
+        <connector-comment/>
+    </connector>
+    <rule>
+        <rule-name>Stop</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not variable a</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>FALSE</parameter>
+        </action>
+        <action>
+            <action-name>stop</action-name>
+            <parameter>node0</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotNot</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not not variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>And</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>and variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotAnd</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not and variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>or not variable a not variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Or</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>or variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>premodel_copy</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>premodel_copy.node0</parameter>
+            <parameter>variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotOr</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not or variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>or not variable a not variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotNec</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not nec variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>pos not variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotPos</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not pos variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>nec not variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>createSuccessor</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>pos variable a</parameter>
+        </condition>
+        <action>
+            <action-name>createNewNode</action-name>
+            <parameter>node1</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>propagateFormulas</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>nec variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>addFormula2Parent</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>nec variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>node1</parameter>
+            <parameter>node0</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>rewriteNec2Pos</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>nec variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>pos variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>implementSeriality</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable A</parameter>
+        </condition>
+        <action>
+            <action-name>createOneSuccessor</action-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <strategy>
+        <strategy-name>CPLStrategy</strategy-name>
+        <strategy-code>repeat
+  firstRule
+	Stop
+	NotNot
+	And
+	NotOr
+	NotAnd
+	Or
+  end
+end</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <strategy>
+        <strategy-name>KBDStrategy</strategy-name>
+        <strategy-code>repeat
+  firstRule
+	CPLStrategy
+	NotPos
+	NotNec
+	rewriteNec2Pos
+	addFormula2Parent
+	createSuccessor
+	propagateFormulas
+  end
+end</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <main-strategy>KBDStrategy</main-strategy>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and P not nec P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+</logic>

@@ -1,0 +1,84 @@
+package lotrec.dataStructure.tableau.condition;
+
+import java.util.*;
+import java.util.Vector;
+import lotrec.dataStructure.ParametersDescriptions;
+import lotrec.dataStructure.ParametersTypes;
+import lotrec.dataStructure.expression.*;
+import lotrec.process.*;
+
+/**
+Delivers knowledge about the link construction : the activator, the restriction and how they works.
+This class is used with the <code>Rule</code> class, it is a useful class.
+@see Rule
+@see LinkActivator
+@see LinkMatch
+@author David Fauthoux
+ */
+public class NotLinkCondition extends AbstractCondition {
+
+    private SchemeVariable nodeFromScheme;
+    private SchemeVariable nodeToScheme;
+    private Expression relationScheme;
+
+    /**
+    Creates a link condition, ready to deliver knowledge about the corresponding activator and restriction
+    @param nodeFromScheme the scheme representing the source node of the link
+    @param nodeToScheme the scheme representing the destination node of the link
+    @param relationScheme the scheme representing the relation of the edge between the two nodes
+     */
+    @ParametersTypes(types = {"node", "node", "relation"})
+    @ParametersDescriptions(descriptions = {"The (not-source) node to be tested if it is NOT linked to the other \"node\" parameter by the \"relation\" parameter",
+        "The (not-destination) node to be tested if it is NOT linked to the first \"node\" parameter by the \"relation\" parameter",
+        "Relation's expression to be teseted as NOT EXISTING relation's label between the two \"node\" parameters"
+    })
+    public NotLinkCondition(SchemeVariable nodeFromScheme, SchemeVariable nodeToScheme, Expression relationScheme) {
+        super();
+        this.nodeFromScheme = nodeFromScheme;
+        this.nodeToScheme = nodeToScheme;
+        this.relationScheme = relationScheme;
+    }
+
+    public BasicActivator createActivator() {
+        return null;
+    }
+
+    public Vector getActivationSchemes() {
+        return null;
+        /* Changed 13 MAY 2008
+         * Since this Condition class has no Activator class        
+        Vector v = new Vector();
+        v.add(nodeFromScheme);
+        v.add(nodeToScheme);
+        //relation osf
+        return v;*/
+    }
+
+    public Restriction createRestriction() {
+        return new NotLinkMatch(nodeFromScheme, nodeToScheme, relationScheme);
+    }
+
+    public Vector updateSchemes(Vector entry) {
+        if (entry.contains(nodeToScheme)) {
+            if (!entry.contains(nodeFromScheme)) {
+                Vector v = (Vector) entry.clone();
+                v.add(nodeFromScheme);
+                return v;
+            }
+            return entry;
+        }
+        if (entry.contains(nodeFromScheme)) {
+            if (!entry.contains(nodeToScheme)) {
+                Vector v = (Vector) entry.clone();
+                v.add(nodeToScheme);
+                return v;
+            }
+            return entry;
+        }
+        return null;
+    //%%	//si contient nodeTo et nodeFrom, rajout relation
+    //si contient nodeTo, rajout nodeFrom //%%+relation
+    //si contient nodeFrom, rajout nodeTo //%%+relation
+    //si contient ni nodeTo ni nodeFrom, ERREUR
+    }
+}

@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<logic>
+    <parser-version>2.1</parser-version>
+    <description>S4 with the minimal set of connectors: not, and, nec
+Author: Lilac Team
+Last update: June 2007</description>
+    <connector>
+        <connector-name>not</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>~_</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>and</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ &amp; _</output-format>
+        <priority>4</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>nec</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>[]_</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <rule>
+        <rule-name>Stop</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>FALSE</parameter>
+        </action>
+        <action>
+            <action-name>stop</action-name>
+            <parameter>node0</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotNot</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not not variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>And</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>and variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotAnd</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not and variable A variable B</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>CONTAINED</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>premodel_copy</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>not variable A</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>premodel_copy.node0</parameter>
+            <parameter>not variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>propagateNec2ActualWorld</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>nec variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>copyNec</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>nec variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>nec variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>createSuccessor</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not nec variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>CONTAINED</parameter>
+        </condition>
+        <action>
+            <action-name>createNewNode</action-name>
+            <parameter>node1</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>not variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>loopTest</rule-name>
+        <condition>
+            <condition-name>isNewNode</condition-name>
+            <parameter>node1</parameter>
+        </condition>
+        <condition>
+            <condition-name>isAncestor</condition-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+        </condition>
+        <condition>
+            <condition-name>contains</condition-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+        </condition>
+        <action>
+            <action-name>mark</action-name>
+            <parameter>node1</parameter>
+            <parameter>CONTAINED</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <strategy>
+        <strategy-name>CPLStrategy</strategy-name>
+        <strategy-code>repeat
+  firstRule
+	Stop
+	NotNot
+	And
+	NotAnd
+  end
+end</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <strategy>
+        <strategy-name>S4Strategy</strategy-name>
+        <strategy-code>repeat  
+  allRules
+	CPLStrategy
+	createSuccessor  
+	propagateNec2ActualWorld
+	copyNec
+	loopTest
+  end
+end</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <main-strategy>S4Strategy</main-strategy>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>nec not nec P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and and nec not nec not nec not and not P not Q nec not nec not not P not nec not nec not Q</formula-code>
+        <formula-comment>Gives 800 premodels instead of 28 when S4Strategy uses firstRule instead of allRules..
+We reach 12 premodels with an optimized version using Cut on left and right in CPLStrategy</formula-comment>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and not nec not nec P and nec not nec and P Q nec not nec not nec Q</formula-code>
+        <formula-comment/>
+    </testing-formula>
+</logic>

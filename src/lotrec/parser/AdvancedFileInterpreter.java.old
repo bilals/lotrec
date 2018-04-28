@@ -1,0 +1,127 @@
+package lotrec.parser;
+
+import java.io.*;
+import java.net.*;
+import java.util.Enumeration;
+import java.util.Vector;
+import lotrec.dataStructure.expression.*;
+import lotrec.dataStructure.graph.*;
+import lotrec.dataStructure.tableau.*;
+import lotrec.process.*;
+import lotrec.gui.tableau.*;
+import lotrec.gui.*;
+import java.awt.event.*;
+import javax.swing.JFrame;
+import lotrec.dataStructure.tableau.descriptor.*;
+import lotrec.dataStructure.tableau.action.*;
+import javax.swing.*;
+import java.util.StringTokenizer;
+/**
+ *
+ * @author David Fauthoux
+ */
+public class AdvancedFileInterpreter extends FileInterpreter {
+    JPanel panel;
+    public AdvancedFileInterpreter(Reader reader, URL imageLocation) {
+        super(reader, imageLocation);
+        
+    }
+    
+    public AdvancedFileInterpreter() {
+    }
+    
+    protected Expression recognizeExpression() {
+        String s = readStringToken();
+        if((s.length() > 0) && (s.charAt(0) != '_') && Character.isUpperCase(s.charAt(0))) {
+            return new ConstantExpression(s);        }
+        if(s.startsWith("_")) {
+            return new VariableExpression(s);
+        }        
+        if(s.equals("constant")) {
+            return recognizeConstant();
+        }
+        if(s.equals("variable")) {
+            return recognizeVariable();
+        }
+        Connector connector = findConnector(s);
+        ExpressionWithSubExpressions expression = new ExpressionWithSubExpressions(connector);
+        for(int i = 0; i < connector.getArity(); i++) expression.setExpression(recognizeExpression(), i);
+        return expression;
+    }
+    
+    
+    public static void main(String[] args) {
+        if(args.length < 1) {
+            System.err.println("Need one argument : the file to read");
+            System.exit(1);
+        }
+        String local;
+        try {
+            if(System.getProperty("file.separator").equals("/"))
+                local = "file:" + System.getProperty("user.dir") + "/";
+            else   local = "file:/" + System.getProperty("user.dir") + "/";
+            URL imageLocation;
+            if(!args[1].equals("")) imageLocation = new URL(args[1]);
+            else imageLocation = new URL(local + "images/");
+            
+            FileInterpreter i = new    AdvancedFileInterpreter(new FileReader(new File(args[0])), imageLocation);
+            
+            int flag=Integer.parseInt(args[2]);
+            i.recognizeAll(flag);
+        } catch(Exception e) {
+            System.err.println(e);
+        }
+    }
+    
+    
+    public JPanel run( String []args ,InternalFrame frame) throws ParseException {
+        if(args.length < 1) {
+            System.err.println("Need one argument : the file to read");
+            System.exit(1);
+        }
+        String local;
+        try {
+            if(System.getProperty("file.separator").equals("/"))
+                local = "file:" + System.getProperty("user.dir") + "/";
+            else   local = "file:/" + System.getProperty("user.dir") + "/";
+            URL imageLocation;
+            if(!args[1].equals("")) imageLocation = new
+                    URL(args[1]+"images/");
+            else
+                imageLocation = new URL(local + "images/");
+            
+            String name=System.getProperty("user.dir")+"/core";
+            
+            FileWriter fw=new FileWriter(name);
+            fw.write(args[0]);
+            fw.close();
+            // write(fw,args[0]);
+            
+            FileInterpreter i = new   AdvancedFileInterpreter(new FileReader(new File(name)), imageLocation);
+            i.setName(args[3]);
+            i.setFrame(frame);
+            int flag=Integer.parseInt(args[2]);
+            panel= i.recognizeAll(flag);
+            File file=new File(name);
+            file.delete();
+        } catch(Exception e) {
+            throw new ParseException(e.toString());
+            
+        }
+        return panel;
+    }
+    
+    
+    public void write(FileWriter out, String text)  throws Exception {
+        try{
+            StringTokenizer st = new StringTokenizer(text,"\n",true);
+            while (st.hasMoreTokens()) {
+                String s=st.nextToken();
+                if(!s.equals("\n"))
+                    out.write(s+"\n");
+            }
+            
+            out.close();
+        } catch(IOException e){throw e;}
+    }
+}

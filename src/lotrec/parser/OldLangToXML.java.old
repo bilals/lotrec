@@ -1,0 +1,690 @@
+/*
+ * OldLangLogicParser.java
+ *
+ * Created on 20 juin 2007, 15:10
+ *
+ * To change this template, choose Tools | Template Manager
+ * and open the template in the editor.
+ */
+
+package lotrec.parser;
+
+import java.io.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import lotrec.Lotrec;
+
+/**
+ *
+ * @author said
+ */
+
+public class OldLangToXML {
+    
+    public  String ErrorMessage=null;
+    private int line;
+    private int oldLine;
+    private int position; //These three variables are used to managed errors positions
+    private StringBuffer parserOutput;
+    private StringBuffer xmlOutput;
+    protected StreamTokenizer tokenizer;
+    private Reader coreReader;
+    private boolean maxStepsParsed = false;
+    
+    /**
+     * Creates a new instance of OldLangLogicParser
+     */
+    public OldLangToXML() {
+        line=0;
+        oldLine=0;
+        position=1;
+        parserOutput = new StringBuffer();
+        xmlOutput = new StringBuffer();
+    }
+    
+    public void translate(String logicName) throws ParseException {
+        prepareCoreFile(logicName);
+        xmlOutput.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        xmlOutput.append("<!DOCTYPE logic SYSTEM \"logic.dtd\">\n");
+        xmlOutput.append("<logic>\n");
+        xmlOutput.append("<display-name>"+logicName+"</display-name>\n");
+        xmlOutput.append("<description></description>\n");
+        xmlOutput.append("<def-comment>no comment</def-comment>\n");
+        xmlOutput.append("<author>Lilac Team</author>\n");
+        xmlOutput.append("<last-update>June 2007</last-update>\n");   
+        String coreFile = Lotrec.getWorkingPath()+"OldPredefinedLogics" + System.getProperty("file.separator") + "Lotrec.core";
+        try {
+            coreReader = new FileReader(new File(coreFile));
+            System.out.println("core file name is: " + coreFile);
+            analyse(coreReader);
+            translateCore();
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            throw new ParseException(e.toString());
+        }
+        xmlOutput.append("</logic>");
+        createXMLFile(logicName);
+    }
+    
+    private void translateCore() {
+        while(true){
+            ErrorMessage="";
+            String s = readStringToken();
+            if(s == null) break;
+            if(s.equals("connector")) {
+                translateConnector();
+            } else if(s.equals("rule")) {
+                translateRule();
+            }else if(s.equals("step")) {
+                this.translateMaxSteps();
+            }else if(s.equals("strategy")) {
+                if(position==1) oldLine=line;
+                position=2;
+                translateStrategy();
+            } else if(s.equals("END_OF_CORE_FILE")) {
+                position=3;
+                System.out.println("END_OF_CORE_FILE REACHED");
+                break;
+            }else{
+                if(position==1)ErrorMessage= "Unkown keyword::	"+s+ "\n Line:"+(line - oldLine)+"  in the theory Definition";
+                if(position==2) ErrorMessage= "Unkown keyword: :	"+s+"\n Line:"+line+"  in the Strategie Definition";
+                if(position==3) ErrorMessage= "Unkown keyword: :	"+s+" int the Formula";
+                throw new IllegalArgumentException(ErrorMessage);
+            }
+        }
+        if(!maxStepsParsed){
+            initialaizeMaxSteps();
+        }
+        addDefaultStrategyTag();
+    }
+    
+    public void prepareCoreFile(String logicName) throws ParseException{
+        String crFileName = Lotrec.getWorkingPath() + "OldPredefinedLogics" + System.getProperty("file.separator") + logicName + ".cr";
+        String strFileName = Lotrec.getWorkingPath() + "OldPredefinedLogics" + System.getProperty("file.separator") + logicName + ".str";
+        String coreFile = Lotrec.getWorkingPath()+"OldPredefinedLogics" + System.getProperty("file.separator") + "Lotrec.core";
+        String work = new String();
+        File crFile;
+        File strFile;
+        RandomAccessFile in;
+        String readLine;
+        try {
+            //Read cr file & write it to work
+            crFile = new File(crFileName);
+            in = new   RandomAccessFile(crFile,"rw");
+            readLine = new String();
+            while ((readLine=in.readLine())!=null)
+                work = work + readLine + "\n";
+            in.close();
+            //Read str file & write it to work
+            strFile = new File(strFileName);
+            in = new   RandomAccessFile(strFile,"rw");
+            readLine = new String();
+            while ((readLine=in.readLine())!=null)
+                work = work + readLine + "\n";
+            in.close();
+            // Add the tableau mark to indicate the end
+            work = work + "\nEND_OF_CORE_FILE";
+            // Write work in the coreFile
+            FileWriter fw=new FileWriter(coreFile);
+            fw.write(work);
+            fw.close();
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            throw new ParseException(e.toString());
+        }
+    }
+    
+    private void analyse(Reader reader) {
+        tokenizer = new StreamTokenizer(reader);
+        tokenizer.wordChars('_','_');
+        tokenizer.quoteChar('\"');
+        tokenizer.slashSlashComments(true);
+        tokenizer.slashStarComments(true);
+        tokenizer.eolIsSignificant(true);
+    }
+    
+    public void createXMLFile(String logicName) throws ParseException{
+        String xmlFileName = Lotrec.getWorkingPath() + "OldPredefinedLogics" + System.getProperty("file.separator") + logicName + ".xml";
+        try {
+            FileWriter xml = new FileWriter(xmlFileName);
+            String xmlCode = xmlOutput.toString();
+            //System.out.println(xmlCode);
+            xml.write(xmlCode);
+            xml.close();
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            throw new ParseException(e.toString());
+        }
+    }
+    
+    protected void warning(String message) {
+        System.err.println("WARNING: " + message);
+    }
+    
+    public String getPaserOutput(){
+        return parserOutput.toString();
+    }
+    
+    protected String readStringToken() {
+        try {
+            int ttype = tokenizer.nextToken();
+            
+            if(ttype == StreamTokenizer.TT_EOF) return null;   //throw new IllegalArgumentException("End of file. Need another token...");
+            if(ttype == StreamTokenizer.TT_NUMBER)  throw new IllegalArgumentException("A string value was expected!\nNumerical value found instead is : "+(int)tokenizer.nval);
+            if(ttype == StreamTokenizer.TT_EOL)   line=tokenizer.lineno();
+            if((ttype == StreamTokenizer.TT_WORD) || (ttype == '\"')) {
+                parserOutput.append("Read : " + tokenizer.sval+"\n");
+                //parserOutput.updateUI();
+                return tokenizer.sval;
+            }
+            return readStringToken();
+        } catch(IOException e) {
+            throw new IllegalArgumentException("End of file. Need another token...");
+        }
+    }
+    
+    protected int readIntToken() {
+        try {
+            int ttype = tokenizer.nextToken();
+            if(ttype == StreamTokenizer.TT_EOF) throw new IllegalArgumentException("End of file. Need a number...");
+            if(ttype == StreamTokenizer.TT_WORD) throw new IllegalArgumentException("A numerical value was expected!\nString value found instead is : "+tokenizer.sval);
+            if(ttype == StreamTokenizer.TT_EOL)   line=tokenizer.lineno();
+            
+            if(ttype == StreamTokenizer.TT_NUMBER) {
+                parserOutput.append("Read : " +	(int)tokenizer.nval+"\n");
+                return (int)tokenizer.nval;
+            }
+            return readIntToken();
+        } catch(IOException e) {
+            throw new IllegalArgumentException("End of file. Need another token...");
+        }
+    }
+    
+    private void translateConnector() {
+        String name=readStringToken();
+        xmlOutput.append("<connector>\n");
+        xmlOutput.append("\t<display-name>"+name+"</display-name>\n");
+        xmlOutput.append("\t<name>"+name+"</name>\n");
+        xmlOutput.append("\t<arity>"+readIntToken()+"</arity>\n");
+        xmlOutput.append("\t<associative>"+readStringToken()+"</associative>\n");
+        String REGEX = "&";
+        String INPUT = readStringToken();
+        String REPLACE = "&amp;";
+        Pattern p = Pattern.compile(REGEX);
+        Matcher m = p.matcher(INPUT); // get a matcher object
+        StringBuffer sb = new StringBuffer();
+        while(m.find()){
+            m.appendReplacement(sb,REPLACE);
+        }
+        m.appendTail(sb);
+        REGEX = ">";
+        INPUT = sb.toString();
+        REPLACE = "&gt;";
+        p = Pattern.compile(REGEX);
+        m = p.matcher(INPUT); // get a matcher object
+        StringBuffer sb2 = new StringBuffer();
+        while(m.find()){
+            m.appendReplacement(sb2,REPLACE);
+        }
+        m.appendTail(sb2);   
+        REGEX = "<";
+        INPUT = sb2.toString();
+        REPLACE = "&lt;";
+        p = Pattern.compile(REGEX);
+        m = p.matcher(INPUT); // get a matcher object
+        StringBuffer sbFinal = new StringBuffer();
+        while(m.find()){
+            m.appendReplacement(sbFinal,REPLACE);
+        }
+        m.appendTail(sbFinal);
+        xmlOutput.append("\t<output-format>"+sbFinal.toString()+"</output-format>\n");
+        xmlOutput.append("\t<priority>"+readIntToken()+"</priority>\n");
+        xmlOutput.append("\t<comment></comment>\n");
+        xmlOutput.append("</connector>\n");
+    }
+    
+    private void translateRule() {
+        String name=readStringToken();
+        xmlOutput.append("<rule>\n");
+        xmlOutput.append("\t<display-name>"+name+"</display-name>\n");
+        xmlOutput.append("\t<name>"+name+"</name>\n");
+        String s = readStringToken();
+        if(s.equals("true")){
+            xmlOutput.append("\t<commutative>true</commutative>\n");
+            s = readStringToken();
+        }else{
+            xmlOutput.append("\t<commutative>false</commutative>\n");
+        }
+        for(;;) {
+            if(s.equals("end")) {
+                parserOutput.append("Rule found : "+name +"\n");
+                break;
+            } else if(s.equals("if")){
+                xmlOutput.append("\t<condition>");
+                s = readStringToken();
+                while(!(s.equals("end") || s.equals("if") || s.equals("do"))){
+                    xmlOutput.append(s + " ");
+                    s = readStringToken();
+                }
+                xmlOutput.append("</condition>\n");
+            } else if(s.equals("do")){
+                xmlOutput.append("\t<action>");
+                s = readStringToken();
+                while(!(s.equals("end") || s.equals("if") || s.equals("do"))){
+                    if(s.equals("begin")){
+                        while(!(s.equals("end"))){
+                            xmlOutput.append(s + " ");
+                            s = readStringToken();
+                        }
+                    }
+                    xmlOutput.append(s + " ");
+                    s = readStringToken();
+                }
+                xmlOutput.append("</action>\n");
+            } else
+                throw new IllegalArgumentException("Unkown keyword:	"+s+ "\n Line:"+(line - oldLine)+"  in the Theory Definition");
+            
+        }
+        xmlOutput.append("\t<comment></comment>\n");
+        xmlOutput.append("</rule>\n");
+    }
+    
+    private void translateStrategy() {
+        String name = readStringToken();
+        xmlOutput.append("<strategy>\n");
+        xmlOutput.append("\t<display-name>"+name+"</display-name>\n");
+        xmlOutput.append("\t<name>"+name+"</name>\n");
+        xmlOutput.append("\t<usability>partial</usability>\n");
+        xmlOutput.append("\t<code>\n");
+        String token = readStringToken();
+        while(!token.equals("end")) {
+            if(token.equals("allRules")||token.equals("firstRule")||token.equals("repeat")) {
+                translateSubStrategy(token,2);
+            }else{
+                putTabs(3);
+                xmlOutput.append(token + "\n");
+            }
+            token = readStringToken();
+        }
+        xmlOutput.append("\t</code>\n");
+        xmlOutput.append("\t<comment></comment>\n");
+        xmlOutput.append("</strategy>\n");
+    }
+    
+    private void translateSubStrategy(String s,int tabLevel) {
+        putTabs(tabLevel);
+        xmlOutput.append(s+"\n");
+        String token = readStringToken();
+        while(!token.equals("end")) {
+            if(token.equals("allRules")||token.equals("firstRule")||token.equals("repeat")) {
+                translateSubStrategy(token,tabLevel+1);
+            }else{
+                putTabs(tabLevel+1);
+                xmlOutput.append(token + "\n");
+            }
+            token = readStringToken();
+        }
+        putTabs(tabLevel);
+        xmlOutput.append("end\n");
+    }
+    
+    private void putTabs(int n){
+        xmlOutput.append("\t");
+        for(int i=0; i<n; i++)
+            xmlOutput.append("  ");
+    }
+    
+    private void translateMaxSteps() {
+        maxStepsParsed = true;
+        xmlOutput.append("<max-steps-num>"+readIntToken()+"</max-steps-num>\n");
+    }
+    
+    //If there is no value given, so initialize it as -1
+    private void initialaizeMaxSteps() {
+        xmlOutput.append("<max-steps-num>"+-1+"</max-steps-num>\n");
+    }
+    private void addDefaultStrategyTag() {
+        xmlOutput.append("<default-strategy></default-strategy>\n");
+    }
+    
+   /* protected Connector findConnector(String name) {
+        ErrorMessage="";
+        for(Enumeration enumr = connectors.elements(); enumr.hasMoreElements();) {
+            Connector c = (Connector)enumr.nextElement();
+            if(c.getName().equals(name)) return c;
+        }
+        return null;
+    }
+    
+    protected Rule findRule(String name) {
+        for(Enumeration enumr = rules.elements(); enumr.hasMoreElements();) {
+            Rule r = (Rule)enumr.nextElement();
+            if(r.getName().equals(name)) return r;
+        }
+        return null;
+    
+    }
+    
+    protected Strategy findStrategy(String name) {
+        ErrorMessage="";
+        for(Enumeration enumr = strategies.elements(); enumr.hasMoreElements();) {
+            Strategy s = (Strategy)enumr.nextElement();
+            if(s.getName().equals(name)) return s;
+        }
+        return null;
+    
+    }
+    
+    protected Expression recognizeExpression() {
+        String s = readStringToken();
+        if((s.length() > 0) && (s.charAt(0) != '_') && Character.isUpperCase(s.charAt(0))) {
+            return new ConstantExpression(s);        }
+        if(s.startsWith("_")) {
+            return new VariableExpression(s);
+        }
+        if(s.equals("constant")) {
+            return recognizeConstant();
+        }
+        if(s.equals("variable")) {
+            return recognizeVariable();
+        }
+        Connector connector = findConnector(s);
+        ExpressionWithSubExpressions expression = new ExpressionWithSubExpressions(connector);
+        for(int i = 0; i < connector.getArity(); i++) expression.setExpression(recognizeExpression(), i);
+        return expression;
+    }
+    
+    protected ConstantExpression recognizeConstant() {
+        return new ConstantExpression(readStringToken());
+    }
+    
+    protected VariableExpression recognizeVariable() {
+        return new VariableExpression(readStringToken());
+    }
+    
+    private boolean isKeyWord(String token) {
+        if(token.equals("allRules")||token.equals("firstRule")||token.equals("repeat")||token.equals("rule")||token.equals("connector")
+        ||token.equals("strategy"))
+            return true;
+        else return false;
+    }
+    
+    protected Strategy recognizeStrategy() {
+        Strategy strategy;
+        String end,token="Not Yet",strategyName;
+        boolean empty=true;
+        Keep keep = new AllRules();
+        //I have to find the strategy name
+        strategyName = readStringToken();
+        strategy=findStrategy(strategyName);
+        if(strategy!=null) throw new IllegalArgumentException("Strategy : "+strategyName+" is already defined");
+        else   	if (isKeyWord(strategyName))
+            throw new IllegalArgumentException(token+" is a Key word. It can't be a name of a strategy. Must find the name of the strategy");
+        else{   token = readStringToken();
+        while(!token.equals("end")) {
+            if(token.equals("allRules")||token.equals("firstRule")||token.equals("repeat")) {
+                strategy = new Strategy(recognizeKeep(token));
+                keep.add(strategy, null);
+                empty=false;
+            } else{
+                Rule rule=findRule(token);
+                if (rule!=null) {
+                    EventMachine machine = rule.createMachine();
+                    keep.add(machine, null);
+                    empty=false;
+                } else {
+                    strategy=findStrategy(token);
+                    if(strategy!=null) {
+                        keep.add(strategy, null); 	empty=false;
+                    } else
+                        throw new IllegalArgumentException("Unknown argument: "+token+"\n Line:"+(line - oldLine)+"  in  the Strategy Definition. \n Maybe  your Strategy  is without end ");
+                }
+            }
+            token = readStringToken();
+        }
+        if(empty) throw new IllegalArgumentException(" Why empty strategy ?");
+        strategy = new Strategy(keep);
+        strategy.setName(strategyName);
+        strategies.add(strategy);
+        }
+        parserOutput.append("Strategy found : "+strategy+"\n");
+        return strategy;
+    }
+    
+    
+    protected Keep recognizeKeep(String s) {
+    
+        Keep keep;
+        if(s.equals("allRules")) {
+            keep = new AllRules();
+        } else
+            if(s.equals("firstRule")) {
+            keep = new FirstRule();
+            } else
+                if(s.equals("repeat")) {
+            keep = new Repeat(stepCount);
+                }
+    
+                else throw new IllegalArgumentException("Unknown keep : "+s);
+    
+        for(;;) {
+            String t = readStringToken();
+            if(t.equals("end")) {
+                parserOutput.append("Keep found : "+keep+"\n");
+                return keep;
+            } else if(t.equals("allRules")||t.equals("firstRule")||t.equals("repeat")) {
+                Keep other = recognizeKeep(t);
+                keep.add(other, null);
+            } else {
+                Rule rule = findRule(t);
+                if(rule!=null) {
+                    EventMachine machine = rule.createMachine();
+                    keep.add(machine, null);
+                } else {
+                    Strategy strategy = findStrategy(t);
+                    if(strategy!=null) keep.add(strategy, null);
+                    else throw new IllegalArgumentException("UnKnown argument: "+t+"\n Line:"+(line - oldLine)+"  in the Strategy Definition");
+                }
+            }
+        }
+    }
+    
+    protected Rule recognizeRule() {
+        ErrorMessage="";
+        Rule rule;
+        boolean commutative=false;
+    
+        String name=readStringToken();
+    
+        rule=findRule(name);
+    
+        if(rule==null) {
+            String s = readStringToken();
+            if(s.equals("true")) {
+                commutative=true;
+                rule= new Rule(name,commutative);
+            } else{rule= new Rule(name,commutative);
+            if(s.equals("end")) throw new IllegalArgumentException("Why Empty Rule?");
+            else if(s.equals("if"))  rule.add(recognizeDescriptor());
+            else if(s.equals("do"))  rule.add(recognizeAction());
+            else
+                throw new IllegalArgumentException("Unkown keyword:	"+s+ "\n Line:"+(line - oldLine)+"  in the Theory Definition");
+    
+            }
+    
+            for(;;) {
+                s = readStringToken();
+                if(s.equals("end")) {
+                    parserOutput.append("Rule found :	"+rule +"\n");
+                    rules.add(rule);
+                    return rule;
+                } else if(s.equals("if"))  rule.add(recognizeDescriptor());
+                else if(s.equals("do"))  rule.add(recognizeAction());
+                else
+                    throw new IllegalArgumentException("Unkown keyword:	"+s+ "\n Line:"+(line - oldLine)+"  in the Theory Definition");
+    
+            }
+        } else
+            throw new IllegalArgumentException("Rule : "+name+" is already defined");
+    
+    }
+    
+    protected Descriptor recognizeDescriptor() {
+        String s = readStringToken();
+        ErrorMessage="";
+        if(s.equals("hasElement")) {
+    
+            return new ExpressionDescriptor(new StringSchemeVariable(readStringToken()),
+                    recognizeExpression());
+    
+        }
+    
+        else
+            if(s.equals("hasNotElement")) {
+    
+            return new NotExpressionDescriptor(new 	    StringSchemeVariable(readStringToken()),	    recognizeExpression());
+            } else if(s.equals("isLinked")) {
+    
+            return new LinkDescriptor(new    StringSchemeVariable(readStringToken()), new    StringSchemeVariable(readStringToken()),   recognizeExpression());
+            }
+    
+            else if(s.equals("isNotLinked")) {
+    
+            return new NotLinkDescriptor(new   StringSchemeVariable(readStringToken()), new  StringSchemeVariable(readStringToken()),
+                    recognizeExpression());
+            }
+    
+            else if(s.equals("isAncestor")) {
+            SchemeVariable ancestor = new StringSchemeVariable(readStringToken());
+            SchemeVariable child = new StringSchemeVariable(readStringToken());
+            // Expression relation =recognizeExpression();
+            return new AncestorDescriptor(child, ancestor);
+            } else if(s.equals("areIdentical")) {
+    
+            return new IdenticalDescriptor(new
+                    StringSchemeVariable(readStringToken()), new
+                    StringSchemeVariable(readStringToken()));
+            } else if(s.equals("areNotIdentical")) {
+    
+            return new NotIdenticalDescriptor(new
+                    StringSchemeVariable(readStringToken()), new
+                    StringSchemeVariable(readStringToken()));
+            } else if(s.equals("isMarked")) {
+    
+            return new MarkDescriptor(new    StringSchemeVariable(readStringToken()),   readStringToken(), testMarkActivationValidity);
+            } else if(s.equals("isNotMarked")) {
+            return new NotMarkDescriptor(new
+                    StringSchemeVariable(readStringToken()),
+                    readStringToken(), testMarkActivationValidity);
+            } else if(s.equals("isNotMarkedExpression")) {
+            return new
+                    NotMarkExpressionDescriptor(new
+    
+                    StringSchemeVariable(readStringToken()),recognizeExpression(),
+                    readStringToken(), testMarkActivationValidity);
+            } else if(s.equals("isMarkedExpression")) {
+            return new
+                    MarkExpressionDescriptor(new
+    
+                    StringSchemeVariable(readStringToken()),recognizeExpression(),readStringToken(), testMarkActivationValidity);
+            } else if(s.equals("isNewNode")) {
+    
+            return new NodeCreatedDescriptor(new StringSchemeVariable(readStringToken()));
+            }
+    
+            else if(s.equals("hasNoSuccessor")) {
+    
+            return new HasNotSuccessorDescriptor(new StringSchemeVariable(readStringToken()), recognizeExpression() );
+            } else if(s.equals("contains")) {
+    
+            return new ContainsDescriptor(new
+                    StringSchemeVariable(readStringToken()), new
+    
+                    StringSchemeVariable(readStringToken()));
+            } else if(s.equals("younger")) {
+    
+            return new CompareDescriptor(new   StringSchemeVariable(readStringToken()), new
+                    StringSchemeVariable(readStringToken()));
+            } else if(s.equals("MSPASSCall")) {
+    
+            return new MSPASSDescriptor(new   StringSchemeVariable(readStringToken()), recognizeExpression(), readIntToken());
+            } else if(s.equals("haveAllSuccessorExpression")) {
+    
+            return new HaveAllSuccessorExpressionDescriptor(new   StringSchemeVariable(readStringToken()), recognizeExpression(), recognizeExpression());
+            }
+    
+            else if(s.equals("haveNotAllSuccessorExpression")) {
+    
+            return new HaveNotAllSuccessorExpressionDescriptor(new   StringSchemeVariable(readStringToken()), recognizeExpression(), recognizeExpression());
+            } else if(s.equals("isProposition")) {
+    
+            return new AtomicDescriptor(new   StringSchemeVariable(readStringToken()), recognizeExpression());
+            }else if(s.equals("isMarkedInAllSuccessor")) {
+    
+            return new MarkAllSuccessorExpressionDescriptor(new   StringSchemeVariable(readStringToken()), recognizeExpression(), recognizeExpression(),readStringToken(), testMarkActivationValidity);
+            } else if(s.equals("isNotMarkedInAllSuccessor")) {
+    
+            return new NotMarkAllSuccessorExpressionDescriptor(new   StringSchemeVariable(readStringToken()), recognizeExpression(), recognizeExpression(),readStringToken(), testMarkActivationValidity);
+            } else {
+            if(position==1)ErrorMessage= "Unkown if :"+s+ "\n Line:"+(line - oldLine)+"  in the Connectors and Rules Definitions";
+            throw new IllegalArgumentException(ErrorMessage);}
+    }
+    
+    protected Action recognizeAction() {
+        ErrorMessage="";
+        String s = readStringToken();
+        if(s.equals("add")) {
+            return new AddExpressionAction(new StringSchemeVariable(readStringToken()), recognizeExpression());
+        } else
+            if(s.equals("run")) {
+            return new ProcessAction(new StringSchemeVariable(readStringToken()),readStringToken());
+            } else
+                if(s.equals("createNewNode")) {
+            return new AddNodeAction(new   StringSchemeVariable(readStringToken()), new StringSchemeVariable(readStringToken()));
+                } else if(s.equals("link")) {
+            return new LinkAction(new StringSchemeVariable(readStringToken()), new StringSchemeVariable(readStringToken()), recognizeExpression());
+                }
+    
+                else if(s.equals("hide")) {
+            return new HideAction(new StringSchemeVariable(readStringToken()), recognizeExpression());
+                } else if(s.equals("linkIfNotExist")) {
+            return new LinkIfNotExistAction(new StringSchemeVariable(readStringToken()), new StringSchemeVariable(readStringToken()), recognizeExpression());
+                }
+    
+                else if(s.equals("duplicate")) {
+            duplicateAction = new DuplicateAction(new StringSchemeVariable(readStringToken()), globalStrategy);
+            recognizeDuplication(duplicateAction);
+            return duplicateAction;
+                } else if(s.equals("kill")) {
+            return new KillAction(new StringSchemeVariable(readStringToken()), globalStrategy);
+                } else if(s.equals("stop")) {
+            return new StopStrategyAction(new StringSchemeVariable(readStringToken()));
+                } else if(s.equals("mark")) {
+            return new MarkAction(new StringSchemeVariable(readStringToken()), readStringToken());
+                } else if(s.equals("unmark")) {
+            return new UnmarkAction(new StringSchemeVariable(readStringToken()), readStringToken());
+                } else if(s.equals("markExpressions")) {
+            return new MarkExpressionsAction(new StringSchemeVariable(readStringToken()), recognizeExpression(), readStringToken());
+                } else if(s.equals("unmarkExpressions")) {
+            return new UnmarkExpressionsAction(new StringSchemeVariable(readStringToken()), recognizeExpression(), readStringToken());
+                } else if(s.equals("createNewConstant")) {
+            return new CreateNewConstantAction(recognizeExpression());
+                } else if(s.equals("callOracle")) {
+            return new OracleAction(new StringSchemeVariable(readStringToken()), readStringToken());
+                } else if(s.equals("createOneSuccessor")) {
+            return new AddOneNodeAction(new StringSchemeVariable(readStringToken()),new
+                    StringSchemeVariable(readStringToken()), recognizeExpression());
+                } else {
+            if(position==1)ErrorMessage= "Unkown action:"+s+ "\n Line:"+(line - oldLine)+"  in the Connectors and Rules Definitions";
+            throw new IllegalArgumentException(ErrorMessage);}
+    }
+    
+    protected void recognizeStep() {
+        try {
+            stepCount = Integer.parseInt(readStringToken());
+        } catch(NumberFormatException e) {
+            throw new IllegalArgumentException("Put an integer after the 'step' keyword");
+        }
+    }
+    */
+}

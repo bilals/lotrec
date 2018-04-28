@@ -1,0 +1,896 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<logic>
+    <parser-version>2.1</parser-version>
+    <description>The basic modal logic K: [] phi, &lt;&gt; phi modal operators with krepke semantics
+AND
+[U] phi, &lt;U&gt; phi where:
+M,x |= [U] phi      iff     All y, M,y |= phi
+M,x |= &lt;U&gt; phi   iff     Exists y, M,y |= phi
+Semantically, this logics looks like a logic with two modalities 1 and 2:
+1 is a K operator
+2 is a S5 operator, plus the axiom: [2] phi -&gt; [1] phi
+Recall:
+S5 := S4 + B or T + E (i.e. 5)
+Author: Lilac Team
+Last update: April 2008</description>
+    <connector>
+        <connector-name>not</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>~_</output-format>
+        <priority>5</priority>
+        <connector-comment>the classical negation operator</connector-comment>
+    </connector>
+    <connector>
+        <connector-name>and</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ &amp; _</output-format>
+        <priority>4</priority>
+        <connector-comment>the classical conjunction operator</connector-comment>
+    </connector>
+    <connector>
+        <connector-name>or</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ V _</output-format>
+        <priority>3</priority>
+        <connector-comment>the classical disjuction operator</connector-comment>
+    </connector>
+    <connector>
+        <connector-name>imp</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ -&gt; _</output-format>
+        <priority>2</priority>
+        <connector-comment>the classical implication operator</connector-comment>
+    </connector>
+    <connector>
+        <connector-name>nec</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>[]_</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>pos</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>&lt;&gt;_</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>posU</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>&lt;U&gt;_</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>necU</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>[U]_</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <rule>
+        <rule-name>Stop</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNotElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>HISTORY_ROOT</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>FALSE</parameter>
+        </action>
+        <action>
+            <action-name>stop</action-name>
+            <parameter>node0</parameter>
+        </action>
+        <rule-comment>the condition "hasNotElement node0 HISTORY_ROOT" is optional. It's just a matter of elegance to avoid having the falsum in the historyRoot node which doesn't belong to the model.</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>NotNot</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not not variable a</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <rule-comment>Replace (not (not (A))) by (A)</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>And</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>and variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotOr</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not or variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>not variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>not variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotImp</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not imp variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>not variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutOrLeft</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>or variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not variable a</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutOrRight</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>or variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutNotAndLeft</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not and variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>not variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutNotAndRight</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not and variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>not variable a</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutImpLeft</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>imp variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutImpRight</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>imp variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>not variable a</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotAnd</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not and variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNotElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNotElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>CONTAINED</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>premodel_copy</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>not variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>premodel_copy.node0</parameter>
+            <parameter>not variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Or</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>or variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNotElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNotElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>CONTAINED</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>premodel_copy</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>premodel_copy.node0</parameter>
+            <parameter>variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Imp</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>imp variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNotElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNotElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>CONTAINED</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>premodel_copy</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>not variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>premodel_copy.node0</parameter>
+            <parameter>variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>notNecSuccessors</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not nec variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>CONTAINED</parameter>
+        </condition>
+        <action>
+            <action-name>createNewNode</action-name>
+            <parameter>node1</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>not variable a</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>posSuccessors</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>pos variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>CONTAINED</parameter>
+        </condition>
+        <action>
+            <action-name>createNewNode</action-name>
+            <parameter>node1</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>nec2R_Successors</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>nec variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>notPos2R_Successors</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not pos variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>not variable a</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>initializeModel_2</rule-name>
+        <condition>
+            <condition-name>isNewNode</condition-name>
+            <parameter>root</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>root</parameter>
+            <parameter>INITIALIZED</parameter>
+        </condition>
+        <action>
+            <action-name>createNewNode</action-name>
+            <parameter>historyRoot</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>historyRoot</parameter>
+            <parameter>root</parameter>
+            <parameter>U</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>historyRoot</parameter>
+            <parameter>HISTORY_ROOT</parameter>
+        </action>
+        <rule-comment>the mark INITIALIZED will avoid re-applying this rule in duplicatas tableaux. each created node (in the other rules) should be marked directly INITIALIZED to avoid reconsidering it when the strategy will re-run on duplicatas tableaux.
+Marking root as INITIALIZED could be replace by calling the rule "markNewNodes_INITIALIZED" after the "initializeModel" rule.
+Marking historyRoot as INITIALIZED is not neccessary at all, cause it will never be considered as newNode ;)</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>initializeModel</rule-name>
+        <condition>
+            <condition-name>isNewNode</condition-name>
+            <parameter>root</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNoParents</condition-name>
+            <parameter>root</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNotElement</condition-name>
+            <parameter>root</parameter>
+            <parameter>HISTORY_ROOT</parameter>
+        </condition>
+        <action>
+            <action-name>createNewNode</action-name>
+            <parameter>historyRoot</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>historyRoot</parameter>
+            <parameter>root</parameter>
+            <parameter>U</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>historyRoot</parameter>
+            <parameter>HISTORY_ROOT</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>markNewNodes_INITIALIZED</rule-name>
+        <condition>
+            <condition-name>isNewNode</condition-name>
+            <parameter>n</parameter>
+        </condition>
+        <action>
+            <action-name>mark</action-name>
+            <parameter>n</parameter>
+            <parameter>INITIALIZED</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>posU2HistoryRoot</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>n</parameter>
+            <parameter>posU variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>n</parameter>
+            <parameter>CONTAINED</parameter>
+        </condition>
+        <condition>
+            <condition-name>isAncestor</condition-name>
+            <parameter>historyRoot</parameter>
+            <parameter>n</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>historyRoot</parameter>
+            <parameter>HISTORY_ROOT</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>historyRoot</parameter>
+            <parameter>posU variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>posUSuccessors</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>historyRoot</parameter>
+            <parameter>HISTORY_ROOT</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>historyRoot</parameter>
+            <parameter>posU variable A</parameter>
+        </condition>
+        <action>
+            <action-name>createNewNode</action-name>
+            <parameter>uSuccessor</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>historyRoot</parameter>
+            <parameter>uSuccessor</parameter>
+            <parameter>U</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>uSuccessor</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>necU2HistoryRoot</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>n</parameter>
+            <parameter>necU variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>isAncestor</condition-name>
+            <parameter>historyRoot</parameter>
+            <parameter>n</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>historyRoot</parameter>
+            <parameter>HISTORY_ROOT</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>historyRoot</parameter>
+            <parameter>necU variable A</parameter>
+        </action>
+        <rule-comment>It's optional here to test if n is not marked CONTAINED...</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>necU2AllSuccessors</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>n</parameter>
+            <parameter>necU variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>n</parameter>
+            <parameter>whatEverSuccessor</parameter>
+            <parameter>variable WhatEverRelation</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>whatEverSuccessor</parameter>
+            <parameter>necU variable A</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>whatEverSuccessor</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <rule-comment>Note1:
+Propagating [U] A existing in n to all successors related to n by any relation (R or U) allow us to avoid propagating by R and by U seperatly..
+Note2:
+Adding [U] A and A to all successors allow us to avoid another rule to propagate [U] A to the nodes containing them by puting in these nodes A (EXCEPT the historyRoot node)</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>loopTest</rule-name>
+        <condition>
+            <condition-name>isNewNode</condition-name>
+            <parameter>child</parameter>
+        </condition>
+        <condition>
+            <condition-name>isAncestor</condition-name>
+            <parameter>parent</parameter>
+            <parameter>child</parameter>
+        </condition>
+        <condition>
+            <condition-name>contains</condition-name>
+            <parameter>parent</parameter>
+            <parameter>child</parameter>
+        </condition>
+        <action>
+            <action-name>mark</action-name>
+            <parameter>child</parameter>
+            <parameter>CONTAINED</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>notNecU2HistoryRoot</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>n</parameter>
+            <parameter>not necU variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>isAncestor</condition-name>
+            <parameter>historyRoot</parameter>
+            <parameter>n</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>historyRoot</parameter>
+            <parameter>HISTORY_ROOT</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>n</parameter>
+            <parameter>CONTAINED</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>historyRoot</parameter>
+            <parameter>posU not variable A</parameter>
+        </action>
+        <rule-comment>~ [U] A could've been treated diffrently: by replacing it in the same node by &lt;U&gt; ~ A... But at the end it's the same effect.
+The ugly way is to put it as it in the historyRoot and add a rule to treat it there... :s</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>notPosU2HistoryRoot</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>n</parameter>
+            <parameter>not posU variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>isAncestor</condition-name>
+            <parameter>historyRoot</parameter>
+            <parameter>n</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>historyRoot</parameter>
+            <parameter>HISTORY_ROOT</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>historyRoot</parameter>
+            <parameter>necU not variable A</parameter>
+        </action>
+        <rule-comment>same note as for "notNecU2HistoryRoot" rule.</rule-comment>
+    </rule>
+    <strategy>
+        <strategy-name>CPLStrategy</strategy-name>
+        <strategy-code>repeat 
+  firstRule
+	Stop
+	NotNot
+	And
+	NotOr
+	NotImp
+	//optimisation rules
+	CutOrLeft
+	CutOrRight
+	CutNotAndLeft
+	CutNotAndRight
+	CutImpLeft
+	CutImpRight
+	//duplication rules
+	NotAnd
+	Or
+	Imp
+  end 
+end</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <strategy>
+        <strategy-name>K_U_Strategy</strategy-name>
+        <strategy-code>initializeModel
+repeat 
+  allRules
+	//to avoid re-applying the rule "initializeModel"
+	//on the duplicatas tableaux..
+	//markNewNodes_INITIALIZED
+	CPLStrategy
+	// create R successors
+	notNecSuccessors
+	posSuccessors
+	// propagate [] phi
+	nec2R_Successors
+	notPos2R_Successors
+	// create &lt;U&gt; phi and ~[U] phi successors
+	posU2HistoryRoot
+	posUSuccessors
+	notNecU2HistoryRoot
+	// propagate [U] phi and ~&lt;U&gt; phi
+	necU2HistoryRoot
+	necU2AllSuccessors
+	notPosU2HistoryRoot
+	// perform loop test before next iteration
+	loopTest
+  end 
+end</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <main-strategy>K_U_Strategy</main-strategy>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and P not nec P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and pos P and nec imp P pos Q pos not P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and and pos P nec imp P pos Q nec not Q</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and and nec pos not P pos nec not Q nec pos nec or P Q</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>posU pos P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>necU pos P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and necU pos P posU pos P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>necU and posU P pos P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and pos and posU P P pos and posU P Q</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and pos and posU P P pos and posU Q Q</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and pos and posU P R and pos and posU P P pos and posU Q Q</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and pos or posU P posU P pos or posU P posU Q</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name>U: [U]P -&gt; []P</formula-name>
+        <formula-code>imp necU P nec P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name>E (i.e. 5): &lt;U&gt;P -&gt; [U](&lt;U&gt;P)</formula-name>
+        <formula-code>imp posU P necU posU P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name>B: P -&gt; [U](&lt;U&gt;P)</formula-name>
+        <formula-code>imp P necU posU P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+</logic>

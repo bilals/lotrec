@@ -1,0 +1,41 @@
+/*
+ * OldFashionToXML.java
+ *
+ * Created on 19 novembre 2007, 14:48
+ *
+ * To change this template, choose Tools | Template Manager
+ * and open the template in the editor.
+ */
+
+package lotrec.parser;
+
+import lotrec.Lotrec;
+import lotrec.PLLoader;
+
+/**
+ *
+ * @author said
+ */
+public class OldFashionToXML {
+    
+    /** Creates a new instance of OldFashionToXML */
+    public OldFashionToXML() {
+    }
+    
+    public static void test(){
+        Lotrec.setWorkingPath(System.getProperty("user.dir") + System.getProperty("file.separator"));
+        String logicName = "xstit";
+        OldLangToXML xmlTranslator = new OldLangToXML();
+        try {
+            xmlTranslator.translate(logicName);
+        } catch (ParseException ex) {
+            ex.printStackTrace();
+            System.out.println(ex.getMessage());
+        }     
+    }
+    
+    public static void main(String [] args){
+        test();
+    }
+    
+}

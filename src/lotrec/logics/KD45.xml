@@ -1,0 +1,663 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<logic>
+    <parser-version>2.1</parser-version>
+    <description>KD45 with ~, &amp;, v, -&gt;, [], &lt;&gt;. We must add the constant Root to the tested formula in order to be able to identify the root node.
+For example, to test the formule "nec P" we should put "and Root nec P".
+Author: Lilac Team
+Last update: Novembre 2008</description>
+    <connector>
+        <connector-name>not</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>~_</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>and</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ &amp; _</output-format>
+        <priority>4</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>or</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ v _</output-format>
+        <priority>3</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>imp</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ -&gt; _</output-format>
+        <priority>2</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>nec</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>[]_</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>pos</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>&lt;&gt;_</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <rule>
+        <rule-name>Stop</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not variable a</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>FALSE</parameter>
+        </action>
+        <action>
+            <action-name>stop</action-name>
+            <parameter>node0</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotNot</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not not variable a</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>And</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>and variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotOr</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not or variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>not variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>not variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotImp</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not imp variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>not variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutOrLeft</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>or variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not variable a</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutOrRight</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>or variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutNotAndLeft</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not and variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>not variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutNotAndRight</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not and variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>not variable a</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutImpLeft</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>imp variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutImpRight</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>imp variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>not variable a</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotAnd</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not and variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNotElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNotElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>CONTAINED</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>premodel_copy</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>not variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>premodel_copy.node0</parameter>
+            <parameter>not variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Or</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>or variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNotElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNotElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>CONTAINED</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>premodel_copy</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>premodel_copy.node0</parameter>
+            <parameter>variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Imp</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>imp variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNotElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNotElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>CONTAINED</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>premodel_copy</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>not variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>premodel_copy.node0</parameter>
+            <parameter>variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>PosCreateSuccessor</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>pos variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>CONTAINED</parameter>
+        </condition>
+        <action>
+            <action-name>createNewNode</action-name>
+            <parameter>node1</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotNecCreateSuccessor</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not nec variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>CONTAINED</parameter>
+        </condition>
+        <action>
+            <action-name>createNewNode</action-name>
+            <parameter>node1</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>not variable a</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CreateEmptySuccessor</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>Root</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNoSuccessor</condition-name>
+            <parameter>node0</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <action>
+            <action-name>createNewNode</action-name>
+            <parameter>node1</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </action>
+        <rule-comment>CreateEmptySuccessor is for the D axiom. "if isNotMarked  node0 CONTAINED" is not necessary cause the Root node could not be CONTAINED.</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>PropagateNecToSuccessors</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>nec variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>nec variable A</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <rule-comment>Propagation rules represent the 2 axioms K and 4</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>PropagateNotPosToSuccessors</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not pos variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>nec not variable A</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>not variable A</parameter>
+        </action>
+        <rule-comment>Propagation rules represent the 2 axioms K and 4. We could have added (not (pos (variable A)))</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>CopyNecToParent</rule-name>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node1</parameter>
+            <parameter>nec variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNotElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>nec variable a</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>nec variable a</parameter>
+        </action>
+        <rule-comment>[CopyNec|CopyNotPos]ToParent rules represent the axiom 5</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>CopyNotPosToParent</rule-name>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node1</parameter>
+            <parameter>not pos variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNotElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>nec not variable a</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>nec not variable a</parameter>
+        </action>
+        <rule-comment>CopyNec|CopyNotPos]ToParent rules represent the axiom 5. We could have added (not (pos (variable A)))</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>LoopTest</rule-name>
+        <condition>
+            <condition-name>isNewNode</condition-name>
+            <parameter>node1</parameter>
+        </condition>
+        <condition>
+            <condition-name>isAncestor</condition-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNotElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>Root</parameter>
+        </condition>
+        <condition>
+            <condition-name>contains</condition-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+        </condition>
+        <action>
+            <action-name>mark</action-name>
+            <parameter>node1</parameter>
+            <parameter>CONTAINED</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <strategy>
+        <strategy-name>CPLStrategy</strategy-name>
+        <strategy-code>repeat
+  firstRule
+	Stop
+	NotNot
+	And
+	NotOr
+	NotImp
+	CutOrLeft
+	CutOrRight
+	CutNotAndLeft
+	CutNotAndRight
+	CutImpLeft
+	CutImpRight
+	NotAnd
+	Or
+	Imp
+  end
+end</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <strategy>
+        <strategy-name>KD45Strategy</strategy-name>
+        <strategy-code>repeat
+  allRules
+// Make Sat-saturation
+	CPLStrategy
+// Create Successors
+	PosCreateSuccessor
+	NotNecCreateSuccessor
+	CreateEmptySuccessor
+// Then propagate [] like modalities
+repeat
+  repeat
+	CopyNecToParent
+	CopyNotPosToParent
+  end
+  repeat
+	PropagateNecToSuccessors
+	PropagateNotPosToSuccessors
+  end
+end
+// before loop testing
+	LoopTest
+  end
+end</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <main-strategy>KD45Strategy</main-strategy>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and Root and and nec pos nec or P Q nec pos not P pos nec not Q</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and Root imp nec imp A B imp nec A nec B</formula-code>
+        <formula-comment>theorem</formula-comment>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and Root imp pos nec P P</formula-code>
+        <formula-comment>non-theorem</formula-comment>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and Root imp and pos P pos Q pos and P pos Q</formula-code>
+        <formula-comment>theorem</formula-comment>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and Root nec and imp or P and Q R and or P Q or P R imp and or P Q or P R or P and Q R</formula-code>
+        <formula-comment/>
+    </testing-formula>
+</logic>

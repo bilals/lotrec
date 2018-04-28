@@ -1,0 +1,486 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<logic>
+    <parser-version>2.1</parser-version>
+    <description>Intuitionistic Logic
+Author: Marcio Moretto Ribeiro, Bilal Said
+Last update: July 2009</description>
+    <connector>
+        <connector-name>not</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>~_</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>and</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ &amp; _</output-format>
+        <priority>4</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>or</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ V _</output-format>
+        <priority>3</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>imp</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ -&gt; _</output-format>
+        <priority>2</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>true</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>_ [true]</output-format>
+        <priority>0</priority>
+        <connector-comment/>
+    </connector>
+    <rule>
+        <rule-name>Falsify</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarkedExpression</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+            <parameter>false</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNotElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>true variable b</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+            <parameter>false</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>TAnd</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>true and variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>true variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>true variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>FAnd</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>node0</parameter>
+            <parameter>and variable a variable b</parameter>
+            <parameter>false</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>mark</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>mark.node0</parameter>
+            <parameter>variable b</parameter>
+        </action>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+            <parameter>false</parameter>
+        </action>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>mark.node0</parameter>
+            <parameter>variable b</parameter>
+            <parameter>false</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>TOr</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>true or variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>mark</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>true variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>mark.node0</parameter>
+            <parameter>true variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>FOr</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>node0</parameter>
+            <parameter>or variable a variable b</parameter>
+            <parameter>false</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable b</parameter>
+        </action>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+            <parameter>false</parameter>
+        </action>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable b</parameter>
+            <parameter>false</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>TNot</rule-name>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>true not variable a</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>true not variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>node1</parameter>
+            <parameter>variable a</parameter>
+            <parameter>false</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>FNot</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not variable a</parameter>
+            <parameter>false</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>CONTAINED</parameter>
+        </condition>
+        <action>
+            <action-name>createNewNode</action-name>
+            <parameter>node1</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>true variable a</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>TImp</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>true imp variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>mark</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+            <parameter>false</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>mark.node0</parameter>
+            <parameter>true variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>FImp</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>node0</parameter>
+            <parameter>imp variable a variable b</parameter>
+            <parameter>false</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>CONTAINED</parameter>
+        </condition>
+        <action>
+            <action-name>createNewNode</action-name>
+            <parameter>node1</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>true variable a</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>variable b</parameter>
+        </action>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>node1</parameter>
+            <parameter>variable b</parameter>
+            <parameter>false</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>PropTImp</rule-name>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>true imp variable a variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>true imp variable a variable b</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>PropAtomic</rule-name>
+        <condition>
+            <condition-name>isAtomic</condition-name>
+            <parameter>variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>true variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node1</parameter>
+            <parameter>true variable a</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Reflexivity</rule-name>
+        <condition>
+            <condition-name>isNewNode</condition-name>
+            <parameter>node0</parameter>
+        </condition>
+        <action>
+            <action-name>link</action-name>
+            <parameter>node0</parameter>
+            <parameter>node0</parameter>
+            <parameter>R</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Transitivity</rule-name>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>node1</parameter>
+            <parameter>node2</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <action>
+            <action-name>link</action-name>
+            <parameter>node0</parameter>
+            <parameter>node2</parameter>
+            <parameter>R</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>LoopTest</rule-name>
+        <condition>
+            <condition-name>contains</condition-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <condition>
+            <condition-name>areNotIdentical</condition-name>
+            <parameter>node0</parameter>
+            <parameter>node1</parameter>
+        </condition>
+        <action>
+            <action-name>mark</action-name>
+            <parameter>node1</parameter>
+            <parameter>CONTAINED</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>node1</parameter>
+            <parameter>node0</parameter>
+            <parameter>Loop</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Stop</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>true variable a</parameter>
+        </condition>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+            <parameter>false</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>FALSE</parameter>
+        </action>
+        <action>
+            <action-name>stop</action-name>
+            <parameter>node0</parameter>
+        </action>
+        <rule-comment>non-duplicating rules</rule-comment>
+    </rule>
+    <strategy>
+        <strategy-name>LjStrategy</strategy-name>
+        <strategy-code>Falsify
+repeat
+	LoopTest
+	Stop
+	Reflexivity
+	Transitivity
+	TAnd
+	FAnd
+	TOr
+	FOr
+	TNot
+	FNot
+	TImp
+	PropTImp
+	FImp
+	PropAtomic
+end</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <main-strategy>LjStrategy</main-strategy>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and P not and P Q</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>imp not not P P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>imp P not not P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+</logic>

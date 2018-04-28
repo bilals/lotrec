@@ -1,0 +1,134 @@
+/*
+ * MainFrame.java
+ *
+ * Created on 24 octobre 2007, 21:19
+ *
+ * To change this template, choose Tools | Template Manager
+ * and open the template in the editor.
+ */
+
+package lotrec.gui;
+
+import java.awt.Container;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import javax.swing.JFrame;
+import javax.swing.JSplitPane;
+import lotrec.gui.menubar.MainMenuBar;
+
+/**
+ *
+ * @author said
+ */
+public class MainFrame extends JFrame{
+    
+    final static int hight = 800;
+    final static int width = 450;
+    private java.awt.Container container;
+    private MainMenuBar mainMenuBar;
+    private TableauxEnginePanel tableauxEnginePanel;
+    private LoadedLogicsPanel loadedLogicsPanel;
+    private JSplitPane splitPane;
+    private static java.util.Locale currentLocale;
+    private Container savedContentPane;
+    private boolean noLeftComponent = false;
+    
+    /** Creates a new instance of MainFrame */
+    public MainFrame(String title) {
+        super();
+        final MainFrame copyOfThis = this;
+        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        this.mainMenuBar = new MainMenuBar(this);
+        this.setJMenuBar(mainMenuBar);
+        
+        loadedLogicsPanel = new LoadedLogicsPanel(this);
+        this.tableauxEnginePanel = new TableauxEnginePanel(this);
+        this.tableauxEnginePanel.getTableauxPanel().initializeCyFrame();
+        this.splitPane = new JSplitPane();
+        this.splitPane.setEnabled(true);
+        this.splitPane.setLeftComponent(this.loadedLogicsPanel);
+        this.splitPane.setRightComponent(tableauxEnginePanel);
+        container = this.getContentPane();
+        container.add(splitPane);
+        
+        java.awt.Dimension screenSize = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        screenSize.setSize(screenSize.getWidth(), screenSize.getHeight()-22);
+        this.setSize(screenSize);
+        this.refresh();
+        this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        this.addWindowListener(new java.awt.event.WindowAdapter(){
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent e) {
+                copyOfThis.terminate();
+            }
+        });
+        this.addComponentListener(
+                new ComponentAdapter(){
+            @Override
+            public void componentResized(ComponentEvent e){
+                refreshSplitPosition();
+            }
+        });
+    }
+    
+    public void refreshSplitPosition(){
+        //this.loadedLogicsPanel.setPreferredSize(new java.awt.Dimension(this.getWidth()*50/100, 0));
+        if(!noLeftComponent){
+            this.splitPane.setDividerLocation(this.getWidth()*50/100);
+        }
+    }
+    
+    public void refresh(){
+        java.util.ResourceBundle resource = java.util.ResourceBundle.getBundle("lotrec.resources.MainFrame",  lotrec.resources.ResourcesProvider.getCurrentLocale());
+        this.setTitle(resource.getString("MainFrame.title"));
+        this.mainMenuBar.refresh();
+        this.loadedLogicsPanel.refresh();
+        this.tableauxEnginePanel.refresh();
+        refreshSplitPosition();
+    }
+    
+    public void terminate(){
+//        Lotrec.exitLotrec();
+//        Cytoscape.exit();
+        System.exit(0);
+    }
+    
+    public JSplitPane getSplitPane() {
+        return splitPane;
+    }
+    
+    public LoadedLogicsPanel getLoadedLogicsPanel(){
+        return this.loadedLogicsPanel;
+    }
+    
+    public TableauxEnginePanel getTableauxEnginePanel() {
+        return tableauxEnginePanel;
+    }
+    
+    public void maximizeTableauxPanel() {
+        this.savedContentPane = this.getContentPane();
+        this.setContentPane(tableauxEnginePanel.getTableauxPanel());
+    }
+    
+    public void minimizeTableauxPanel() {
+        this.setContentPane(savedContentPane);
+        tableauxEnginePanel.add(tableauxEnginePanel.getTableauxPanel(),java.awt.BorderLayout.CENTER);
+    }
+    
+    public void hideLogicPanel() {
+        noLeftComponent = true;
+        this.splitPane.setEnabled(false);
+//        JPanel tmpPanel = new JPanel();
+//        tmpPanel.setLayout(new BorderLayout());
+//        tmpPanel.add(this.loadedLogicsPanel.getNorthPanel(),BorderLayout.NORTH);
+        this.splitPane.setLeftComponent(null);
+    }
+    
+    public void showLogicPanel() {
+        noLeftComponent = false;
+        this.splitPane.setEnabled(true);
+        this.splitPane.setLeftComponent(this.loadedLogicsPanel);
+//        this.loadedLogicsPanel.add(this.loadedLogicsPanel.getNorthPanel(),BorderLayout.NORTH);
+        refreshSplitPosition();
+    }
+}

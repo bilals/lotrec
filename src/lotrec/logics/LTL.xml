@@ -1,0 +1,1112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<logic>
+    <parser-version>2.1</parser-version>
+    <description>Linear-time Temporal Logic
+Syntax: p,~p, A &amp; B, A v B, A-&gt; B, A &lt;-&gt; B, &lt;&gt; A, [] A, X A, A U B
+Semantics: a worlds is labelled with a natural number i € |N
+for all i&gt;=0, the world i is linked to i+1
+M,i |= &lt;&gt; A iff there exists j&gt;=i s.t. M,j |= A
+M,i |= [] A iff for all j&gt;=i  M,j |= A
+M,i |= X A iff M,i+1 |= A
+M,i |= A U B iff M,i |= &lt;&gt; B and for all j&gt;=i ( M,j |= B or M,j |= A &amp; X (A U B) )
+Author: Lilac Team
+Last update: February 2009</description>
+    <connector>
+        <connector-name>not</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>~ _</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>and</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ &amp; _</output-format>
+        <priority>4</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>or</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ v _</output-format>
+        <priority>3</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>imp</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ -&gt; _</output-format>
+        <priority>2</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>equiv</connector-name>
+        <arity>2</arity>
+        <associative>false</associative>
+        <output-format>_ &lt;-&gt; _</output-format>
+        <priority>0</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>globally</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>G _</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>finally</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>F _</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>next</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>X _</output-format>
+        <priority>0</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>until</connector-name>
+        <arity>2</arity>
+        <associative>false</associative>
+        <output-format>_ U _</output-format>
+        <priority>0</priority>
+        <connector-comment/>
+    </connector>
+    <rule>
+        <rule-name>Stop</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>FALSE</parameter>
+        </action>
+        <action>
+            <action-name>stop</action-name>
+            <parameter>w</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotNot</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not not variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>And</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>and variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotOr</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not or variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>and not variable A not variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotImp</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not imp variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>and variable A not variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotAnd</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not and variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>or not variable A not variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotEquiv</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not equiv variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>or and variable A not variable B and not variable A variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Imp</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>imp variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>or not variable A variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Equiv</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>equiv variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>or and not variable A not variable B and variable A variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutOr_A_A</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>or variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>node0</parameter>
+            <parameter>or variable a variable b</parameter>
+            <parameter>Cut</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutOr_B_B</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>or variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable b</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>node0</parameter>
+            <parameter>or variable a variable b</parameter>
+            <parameter>Cut</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutOr_A_not_A</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>or variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not variable a</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable b</parameter>
+        </action>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>node0</parameter>
+            <parameter>or variable a variable b</parameter>
+            <parameter>Cut</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutOr_B_not_B</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>or variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>not variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>node0</parameter>
+            <parameter>or variable a variable b</parameter>
+            <parameter>Cut</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutOr_not_A_A</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>or not variable a variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable b</parameter>
+        </action>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>node0</parameter>
+            <parameter>or not variable a variable b</parameter>
+            <parameter>Cut</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutOr_not_B_B</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>or variable a not variable b</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>node0</parameter>
+            <parameter>variable b</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>node0</parameter>
+            <parameter>variable a</parameter>
+        </action>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>node0</parameter>
+            <parameter>or variable a not variable b</parameter>
+            <parameter>Cut</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Or_With_Cut</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>or variable A variable B</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>w</parameter>
+            <parameter>Loop_Node</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>or variable A variable B</parameter>
+            <parameter>Cut</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>premodel_copy</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>premodel_copy.w</parameter>
+            <parameter>variable B</parameter>
+        </action>
+        <rule-comment>Once omitted the condition "isNotMarked w CONTAINED" the strategy will not remain complete,
+and the tableau duplicata number will explose for some given formulas..</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>Or</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>or variable A variable B</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>w</parameter>
+            <parameter>Loop_Node</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>premodel_copy</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>premodel_copy.w</parameter>
+            <parameter>variable B</parameter>
+        </action>
+        <rule-comment>Once omitted the condition "isNotMarked w CONTAINED" the strategy will not remain complete,
+and the tableau duplicata number will explose for some given formulas..</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>NotGlobally</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not globally variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>finally not variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotFinally</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not finally variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>globally not variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotNext</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not next variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>next not variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Globally</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>globally variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>next globally variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Finally</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>finally variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>w</parameter>
+            <parameter>Loop_Node</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>premodel_copy</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>premodel_copy.w</parameter>
+            <parameter>next finally variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Finally_To_Or</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>finally variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>or variable A next finally variable A</parameter>
+        </action>
+        <rule-comment>To be used with the CutOr- versions of rules and strategies</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>Until</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>until variable A variable B</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>w</parameter>
+            <parameter>Loop_Node</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>premodel_copy</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable B</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>premodel_copy.w</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>premodel_copy.w</parameter>
+            <parameter>next until variable A variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Until_To_Or</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>until variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>or variable B and variable A next until variable A variable B</parameter>
+        </action>
+        <rule-comment>To be used with the CutOr- versions of rules and strategies</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>NotUntil</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not until variable A variable B</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>w</parameter>
+            <parameter>Loop_Node</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>premodel_copy</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>and not variable B not variable A</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>premodel_copy</parameter>
+            <parameter>and not variable B next not until variable A variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotUntil_To_Or</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not until variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>or and not variable B not variable A and not variable B next not until variable A variable B</parameter>
+        </action>
+        <rule-comment>To be used with the CutOr- versions of rules and strategies</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>Create_One_Successor</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>next variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasNoSuccessor</condition-name>
+            <parameter>w</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>w</parameter>
+            <parameter>Loop_Node</parameter>
+        </condition>
+        <action>
+            <action-name>createNewNode</action-name>
+            <parameter>u</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+            <parameter>R</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Next</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>next variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>u</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Node_Included_In_An_Ancestor_Node</rule-name>
+        <condition>
+            <condition-name>isNewNode</condition-name>
+            <parameter>u</parameter>
+        </condition>
+        <condition>
+            <condition-name>isAncestor</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+        </condition>
+        <condition>
+            <condition-name>contains</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+        </condition>
+        <action>
+            <action-name>mark</action-name>
+            <parameter>u</parameter>
+            <parameter>Loop_Node</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>u</parameter>
+            <parameter>w</parameter>
+            <parameter>Loop</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Node_Equal_To_An_Ancestor_Node</rule-name>
+        <condition>
+            <condition-name>isNewNode</condition-name>
+            <parameter>u</parameter>
+        </condition>
+        <condition>
+            <condition-name>isAncestor</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+        </condition>
+        <condition>
+            <condition-name>contains</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+        </condition>
+        <condition>
+            <condition-name>contains</condition-name>
+            <parameter>u</parameter>
+            <parameter>w</parameter>
+        </condition>
+        <action>
+            <action-name>mark</action-name>
+            <parameter>u</parameter>
+            <parameter>Loop_Node</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>u</parameter>
+            <parameter>w</parameter>
+            <parameter>Loop</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Finally_Fulfilled_At_The_Same_World</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>finally variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>finally variable A</parameter>
+            <parameter>Fulfilled</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Finally_Fulfilled_At_A_Successor</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>finally variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>isAncestor</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>u</parameter>
+            <parameter>variable A</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>finally variable A</parameter>
+            <parameter>Fulfilled</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Finally_Fulfilled_At_Loop_Ancestor_Node</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>u</parameter>
+            <parameter>finally variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>u</parameter>
+            <parameter>w</parameter>
+            <parameter>Loop</parameter>
+        </condition>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>finally variable A</parameter>
+            <parameter>Fulfilled</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>u</parameter>
+            <parameter>finally variable A</parameter>
+            <parameter>Fulfilled</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Until_Fulfilled_At_The_Same_World</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>until variable A variable B</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>variable B</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>until variable A variable B</parameter>
+            <parameter>Fulfilled</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Until_Fulfilled_At_A_Successor</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>until variable A variable B</parameter>
+        </condition>
+        <condition>
+            <condition-name>isAncestor</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>u</parameter>
+            <parameter>variable B</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>until variable A variable B</parameter>
+            <parameter>Fulfilled</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Until_Fulfilled_At_Loop_Ancestor_Node</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>u</parameter>
+            <parameter>until variable A variable B</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>u</parameter>
+            <parameter>w</parameter>
+            <parameter>Loop</parameter>
+        </condition>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>until variable A variable B</parameter>
+            <parameter>Fulfilled</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>u</parameter>
+            <parameter>until variable A variable B</parameter>
+            <parameter>Fulfilled</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Unfulfilled_Finally_Means_Inextensible_Premodel</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>finally variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>finally variable A</parameter>
+            <parameter>Fulfilled</parameter>
+        </condition>
+        <action>
+            <action-name>mark</action-name>
+            <parameter>w</parameter>
+            <parameter>Inextensible_Premodel</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Unfulfilled_Until_Means_Inextensible_Premodel</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>until variable A variable B</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>until variable A variable B</parameter>
+            <parameter>Fulfilled</parameter>
+        </condition>
+        <action>
+            <action-name>mark</action-name>
+            <parameter>w</parameter>
+            <parameter>Inextensible_Premodel</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Propagate_Inextensible_Premodel_Mark_Up</rule-name>
+        <condition>
+            <condition-name>isMarked</condition-name>
+            <parameter>w</parameter>
+            <parameter>Inextensible_Premodel</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>u</parameter>
+            <parameter>w</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <action>
+            <action-name>mark</action-name>
+            <parameter>u</parameter>
+            <parameter>Inextensible_Premodel</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Propagate_Inextensible_Premodel_Mark_Down</rule-name>
+        <condition>
+            <condition-name>isMarked</condition-name>
+            <parameter>w</parameter>
+            <parameter>Inextensible_Premodel</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <action>
+            <action-name>mark</action-name>
+            <parameter>u</parameter>
+            <parameter>Inextensible_Premodel</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <strategy>
+        <strategy-name>CPL_Strategy</strategy-name>
+        <strategy-code>repeat
+  firstRule
+	Stop
+	NotNot
+	And
+	NotOr
+	NotImp
+	NotAnd
+	NotEquiv
+	Imp
+	Equiv
+	Or
+  end
+end</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <strategy>
+        <strategy-name>LTL_Strategy</strategy-name>
+        <strategy-code>repeat
+   repeat
+	CPL_Strategy
+     NotFinally
+     NotGlobally
+     NotNext
+	Globally	
+     Finally
+     Until
+	NotUntil
+  end
+  Mark_Node_Equal_To_An_Ancestor_Node 
+  applyOnce Create_One_Successor
+  Next
+end
+repeat
+  Finally_Fulfilled_At_The_Same_World
+  Finally_Fulfilled_At_A_Successor
+  Finally_Fulfilled_At_Loop_Ancestor_Node
+  Until_Fulfilled_At_The_Same_World
+  Until_Fulfilled_At_A_Successor
+  Until_Fulfilled_At_Loop_Ancestor_Node
+end
+repeat
+  Unfulfilled_Finally_Means_Inextensible_Premodel
+  Unfulfilled_Until_Means_Inextensible_Premodel
+  Propagate_Inextensible_Premodel_Mark_Up
+  Propagate_Inextensible_Premodel_Mark_Down
+end</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <strategy>
+        <strategy-name>CPL_Strategy_With_Cut</strategy-name>
+        <strategy-code>repeat
+  firstRule
+	Stop
+	NotNot
+	And
+	NotOr
+	NotImp
+	NotAnd
+	NotEquiv
+	Imp
+	Equiv
+     CutOr_A_A
+	CutOr_B_B
+	CutOr_A_not_A
+	CutOr_B_not_B
+	CutOr_not_A_A
+	CutOr_not_B_B
+	Or_With_Cut
+  end
+end</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <strategy>
+        <strategy-name>LTL_Strategy_With_Cut</strategy-name>
+        <strategy-code>repeat
+   repeat
+	CPL_Strategy_With_Cut
+     NotFinally
+     NotGlobally
+     NotNext
+	Globally	
+     Finally_To_Or
+     Until_To_Or
+	NotUntil_To_Or
+  end
+  Mark_Node_Equal_To_An_Ancestor_Node  
+  applyOnce Create_One_Successor
+  Next
+end
+repeat
+  Finally_Fulfilled_At_The_Same_World
+  Finally_Fulfilled_At_A_Successor
+  Finally_Fulfilled_At_Loop_Ancestor_Node
+  Until_Fulfilled_At_The_Same_World
+  Until_Fulfilled_At_A_Successor
+  Until_Fulfilled_At_Loop_Ancestor_Node
+end
+repeat
+  Unfulfilled_Finally_Means_Inextensible_Premodel
+  Unfulfilled_Until_Means_Inextensible_Premodel
+  Propagate_Inextensible_Premodel_Mark_Up
+  Propagate_Inextensible_Premodel_Mark_Down
+end</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <main-strategy>LTL_Strategy</main-strategy>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>globally next P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>globally finally P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>globally and finally P not P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name>Requested but not Done</formula-name>
+        <formula-code>and globally imp Requested finally Received and globally imp Received next Processed and globally imp Processed finally globally Done and globally Requested globally not Done</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>globally or and P T not F</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>imp and finally globally P finally not P finally and not P globally imp P globally P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and and finally globally P finally not P globally or P finally and P finally not P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and globally not P finally P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and finally P and not P next not P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+</logic>

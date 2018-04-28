@@ -1,0 +1,378 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<logic>
+    <parser-version>2.1</parser-version>
+    <description>The basic modal logic K
+Author: Lilac Team
+Last update: March 2009</description>
+    <connector>
+        <connector-name>not</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>~ _</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>and</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ &amp; _</output-format>
+        <priority>4</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>or</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ v _</output-format>
+        <priority>3</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>imp</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ -&gt; _</output-format>
+        <priority>2</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>equiv</connector-name>
+        <arity>2</arity>
+        <associative>false</associative>
+        <output-format>_ &lt;-&gt; _</output-format>
+        <priority>0</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>nec</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>[] _</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>pos</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>&lt;&gt; _</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <rule>
+        <rule-name>Stop</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>FALSE</parameter>
+        </action>
+        <action>
+            <action-name>stop</action-name>
+            <parameter>w</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotNot</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not not variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>And</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>and variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotOr</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not or variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>not variable A</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>not variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotImp</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not imp variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>not variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotAnd</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not and variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>or not variable A not variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotEquiv</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not equiv variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>or variable A variable B</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>or not variable A not variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Imp</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>imp variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>or not variable A variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Equiv</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>equiv variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>or not variable A variable B</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>or not variable B variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Or</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>or variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>premodel_copy</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>premodel_copy.w</parameter>
+            <parameter>variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotNec</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not nec variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>pos not variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotPos</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not pos variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>nec not variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Pos</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>pos variable A</parameter>
+        </condition>
+        <action>
+            <action-name>createNewNode</action-name>
+            <parameter>u</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+            <parameter>R</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>u</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <rule-comment>Successor child creation</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>Nec</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>nec variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+            <parameter>R</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>u</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <rule-comment>Nec Propagation</rule-comment>
+    </rule>
+    <strategy>
+        <strategy-name>CPLStrategy</strategy-name>
+        <strategy-code>repeat 
+  firstRule
+	Stop
+	NotNot
+	NotNec
+	NotPos 
+	And
+	NotOr
+	NotImp
+	NotAnd
+	NotEquiv
+	Imp
+	Equiv
+	Or
+  end 
+end</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <strategy>
+        <strategy-name>KStrategy</strategy-name>
+        <strategy-code>repeat
+	CPLStrategy
+	Pos
+	Nec
+end</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <main-strategy>KStrategy</main-strategy>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and nec P and pos Q pos or R not P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and and not not pos P pos Q nec or S not P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and P not nec P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and pos P and nec imp P pos Q pos not P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and and pos P nec imp P pos Q nec not Q</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and and nec pos not P pos nec not Q nec pos nec or P Q</formula-code>
+        <formula-comment/>
+    </testing-formula>
+</logic>

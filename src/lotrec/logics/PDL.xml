@@ -1,0 +1,1488 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<logic>
+    <parser-version>2.1</parser-version>
+    <description>Propositional Dynamic Logic with sequence, union, and star. It lacks the test. As an overview, we construct the tableaux as usual (rules defined before loopTest). We avoid endless loops by performing equality test between a leaf w and one of its ancestors (loopTest rule). For looping open tableaux, we test if all "&lt;phi*&gt; psi" are satisfied by post-processing the tableau in a model-checking way. Author: Lilac Team Last update: November 2008</description>
+    <connector>
+        <connector-name>and</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ &amp; _</output-format>
+        <priority>3</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>not</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>~_</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>or</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ V _</output-format>
+        <priority>3</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>imp</connector-name>
+        <arity>2</arity>
+        <associative>false</associative>
+        <output-format>_ -&gt; _</output-format>
+        <priority>0</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>equiv</connector-name>
+        <arity>2</arity>
+        <associative>false</associative>
+        <output-format>_ &lt;-&gt; _</output-format>
+        <priority>0</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>nec</connector-name>
+        <arity>2</arity>
+        <associative>false</associative>
+        <output-format>[_]_</output-format>
+        <priority>4</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>pos</connector-name>
+        <arity>2</arity>
+        <associative>false</associative>
+        <output-format>&lt;_&gt;_</output-format>
+        <priority>4</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>test</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>(_)?</output-format>
+        <priority>0</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>seq</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_ ; _</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>union</connector-name>
+        <arity>2</arity>
+        <associative>true</associative>
+        <output-format>_U_</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <connector>
+        <connector-name>star</connector-name>
+        <arity>1</arity>
+        <associative>false</associative>
+        <output-format>_ *</output-format>
+        <priority>5</priority>
+        <connector-comment/>
+    </connector>
+    <rule>
+        <rule-name>Stop</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>FALSE</parameter>
+        </action>
+        <action>
+            <action-name>stop</action-name>
+            <parameter>w</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotNot</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not not variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotImp</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not imp variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>and variable A not variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotOr</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not or variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>and not variable A not variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>And</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>and variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotAnd</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not and variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>or not variable A not variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Imp</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>imp variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>or not variable A variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Equiv</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>equiv variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>or and not variable A not variable B and variable A variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>NotEquiv</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not equiv variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>or and variable A not variable B and not variable A variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Or</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>or variable A variable B</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>w</parameter>
+            <parameter>Loop_Node</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>premodel_copy</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>premodel_copy.w</parameter>
+            <parameter>variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutOr_A_A</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>or variable A variable B</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>or variable A variable B</parameter>
+            <parameter>Cut</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutOr_B_B</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>or variable A variable B</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>variable B</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>or variable A variable B</parameter>
+            <parameter>Cut</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutOr_A_not_A</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>or variable A variable B</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable B</parameter>
+        </action>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>or variable A variable B</parameter>
+            <parameter>Cut</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutOr_B_not_B</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>or variable A variable B</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>or variable A variable B</parameter>
+            <parameter>Cut</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutOr_not_A_A</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>or not variable A variable B</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable B</parameter>
+        </action>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>or not variable A variable B</parameter>
+            <parameter>Cut</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>CutOr_not_B_B</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>or variable A not variable B</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>or variable A not variable B</parameter>
+            <parameter>Cut</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Or_With_Cut</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>or variable A variable B</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>w</parameter>
+            <parameter>Loop_Node</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>or variable A variable B</parameter>
+            <parameter>Cut</parameter>
+        </condition>
+        <action>
+            <action-name>duplicate</action-name>
+            <parameter>premodel_copy</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>premodel_copy.w</parameter>
+            <parameter>variable B</parameter>
+        </action>
+        <rule-comment>Once omitted the condition "isNotMarked w CONTAINED" the strategy will not remain complete,
+and the tableau duplicata number will explose for some given formulas..</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>Not_Pos</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not pos variable X variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>nec variable X not variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Not_Nec</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not nec variable X variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>pos variable X not variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Pos_Seq</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>pos seq variable X variable Y variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>pos variable X pos variable Y variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Nec_Seq</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>nec seq variable X variable Y variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>nec variable X nec variable Y variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Pos_Union</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>pos union variable X variable Y variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>or pos variable X variable A pos variable Y variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Nec_Union</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>nec union variable X variable Y variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>and nec variable X variable A nec variable Y variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Pos_Test</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>pos test variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>and variable A variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Nec_Test</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>nec test variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>or not variable A variable B</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Pos_Star</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>pos star variable X variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>or variable A pos variable X pos star variable X variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Nec_Star</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>nec star variable X variable A</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>w</parameter>
+            <parameter>and variable A nec variable X nec star variable X variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Node_Included_In_An_Ancestor_Node</rule-name>
+        <condition>
+            <condition-name>isNewNode</condition-name>
+            <parameter>u</parameter>
+        </condition>
+        <condition>
+            <condition-name>isAncestor</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+        </condition>
+        <condition>
+            <condition-name>contains</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+        </condition>
+        <action>
+            <action-name>mark</action-name>
+            <parameter>u</parameter>
+            <parameter>Loop_Node</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>u</parameter>
+            <parameter>w</parameter>
+            <parameter>Loop</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Node_Equal_To_An_Ancestor_Node</rule-name>
+        <condition>
+            <condition-name>isNewNode</condition-name>
+            <parameter>u</parameter>
+        </condition>
+        <condition>
+            <condition-name>isAncestor</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+        </condition>
+        <condition>
+            <condition-name>contains</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+        </condition>
+        <condition>
+            <condition-name>contains</condition-name>
+            <parameter>u</parameter>
+            <parameter>w</parameter>
+        </condition>
+        <action>
+            <action-name>mark</action-name>
+            <parameter>u</parameter>
+            <parameter>Loop_Node</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>u</parameter>
+            <parameter>w</parameter>
+            <parameter>Loop</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Pos_Atomic_Program</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>pos variable I variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>isNotMarked</condition-name>
+            <parameter>w</parameter>
+            <parameter>Loop_Node</parameter>
+        </condition>
+        <condition>
+            <condition-name>isAtomic</condition-name>
+            <parameter>variable I</parameter>
+        </condition>
+        <action>
+            <action-name>createNewNode</action-name>
+            <parameter>u</parameter>
+        </action>
+        <action>
+            <action-name>link</action-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+            <parameter>variable I</parameter>
+        </action>
+        <action>
+            <action-name>add</action-name>
+            <parameter>u</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Nec_Atomic_Program</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>nec variable I variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+            <parameter>variable I</parameter>
+        </condition>
+        <action>
+            <action-name>add</action-name>
+            <parameter>u</parameter>
+            <parameter>variable A</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Positive_Literals</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>variable P</parameter>
+        </condition>
+        <condition>
+            <condition-name>isAtomic</condition-name>
+            <parameter>variable P</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>variable P</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Negative_Literals</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not variable P</parameter>
+        </condition>
+        <condition>
+            <condition-name>isAtomic</condition-name>
+            <parameter>variable P</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>not variable P</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Not_Not</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not not variable A</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>not not variable A</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_And</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>variable B</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>and variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>and variable A variable B</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Or_Left</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>or variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>or variable A variable B</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Or_Right</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>variable B</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>or variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>or variable A variable B</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Imp</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>or not variable A variable B</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>imp variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>imp variable A variable B</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Equiv</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>or and not variable A not variable B and variable A variable B</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>equiv variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>equiv variable A variable B</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Not_Equiv</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>or and variable A not variable B and not variable A variable B</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not equiv variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>not equiv variable A variable B</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Not_Imp</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>and variable A not variable B</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not imp variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>not imp variable A variable B</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Not_And</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>or not variable A not variable B</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not and variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>not and variable A variable B</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Not_Or</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>and not variable A not variable B</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not or variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>not or variable A variable B</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Not_Nec</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>pos variable X not variable A</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not nec variable X variable A</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>not nec variable X variable A</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Not_Pos</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>nec variable X not variable A</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>not pos variable X variable A</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>not pos variable X variable A</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Pos_Test</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>and variable A variable B</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>pos test variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>pos test variable A variable B</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Nec_Test</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>or not variable A variable B</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>nec test variable A variable B</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>nec test variable A variable B</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Pos_Seq</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>pos variable X pos variable Y variable A</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>pos seq variable X variable Y variable A</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>pos seq variable X variable Y variable A</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Nec_Seq</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>nec variable X nec variable Y variable A</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>nec seq variable X variable Y variable A</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>nec seq variable X variable Y variable A</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Pos_Union</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>or pos variable X variable A pos variable Y variable A</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>pos union variable X variable Y variable A</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>pos union variable X variable Y variable A</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Nec_Union</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>and nec variable X variable A nec variable Y variable A</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>nec union variable X variable Y variable A</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>nec union variable X variable Y variable A</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Pos_Star</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>or variable A pos variable X pos star variable X variable A</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>pos star variable X variable A</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>pos star variable X variable A</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Nec_Star</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>and variable A nec variable X nec star variable X variable A</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>nec star variable X variable A</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>nec star variable X variable A</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Pos_Atomic_Program</rule-name>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>u</parameter>
+            <parameter>variable A</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+            <parameter>variable I</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>pos variable I variable A</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>pos variable I variable A</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Nec_Atomic_Program</rule-name>
+        <condition>
+            <condition-name>isMarkedExpressionInAllChildren</condition-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+            <parameter>variable I</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>nec variable I variable A</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>nec variable I variable A</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Mark_Formulas_In_Loop_Nodes</rule-name>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+            <parameter>Loop</parameter>
+        </condition>
+        <condition>
+            <condition-name>isMarkedExpression</condition-name>
+            <parameter>u</parameter>
+            <parameter>variable A</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <action>
+            <action-name>markExpressions</action-name>
+            <parameter>w</parameter>
+            <parameter>variable A</parameter>
+            <parameter>True</parameter>
+        </action>
+        <rule-comment>The formulas in loop nodes (including eventuality formulas) will be marked according to their marks in the loop parent node.</rule-comment>
+    </rule>
+    <rule>
+        <rule-name>Not_True_Eventuality_Means_Inextensible_Premodel</rule-name>
+        <condition>
+            <condition-name>isNotMarkedExpression</condition-name>
+            <parameter>w</parameter>
+            <parameter>pos star variable X variable A</parameter>
+            <parameter>True</parameter>
+        </condition>
+        <condition>
+            <condition-name>hasElement</condition-name>
+            <parameter>w</parameter>
+            <parameter>pos star variable X variable A</parameter>
+        </condition>
+        <action>
+            <action-name>mark</action-name>
+            <parameter>w</parameter>
+            <parameter>Inextensible_Premodel</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Propagate_Inextensible_Premodel_Down</rule-name>
+        <condition>
+            <condition-name>isMarked</condition-name>
+            <parameter>w</parameter>
+            <parameter>Inextensible_Premodel</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>w</parameter>
+            <parameter>u</parameter>
+            <parameter>variable Relation</parameter>
+        </condition>
+        <action>
+            <action-name>mark</action-name>
+            <parameter>u</parameter>
+            <parameter>Inextensible_Premodel</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <rule>
+        <rule-name>Propagate_Inextensible_Premodel_Up</rule-name>
+        <condition>
+            <condition-name>isMarked</condition-name>
+            <parameter>w</parameter>
+            <parameter>Inextensible_Premodel</parameter>
+        </condition>
+        <condition>
+            <condition-name>isLinked</condition-name>
+            <parameter>u</parameter>
+            <parameter>w</parameter>
+            <parameter>variable Relation</parameter>
+        </condition>
+        <action>
+            <action-name>mark</action-name>
+            <parameter>u</parameter>
+            <parameter>Inextensible_Premodel</parameter>
+        </action>
+        <rule-comment/>
+    </rule>
+    <strategy>
+        <strategy-name>CPLStrategy</strategy-name>
+        <strategy-code>repeat
+ firstRule
+   Stop
+   NotNot
+   NotOr
+   NotImp
+   And
+   NotAnd
+   Imp
+   Equiv
+   NotEquiv
+   Or
+ end
+end</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <strategy>
+        <strategy-name>Bottom_Up_Check</strategy-name>
+        <strategy-code>repeat 
+  Mark_Positive_Literals 
+  Mark_Negative_Literals 
+  Mark_Not_Not 
+  Mark_And 
+  Mark_Or_Left 
+  Mark_Or_Right 
+  Mark_Imp 
+  Mark_Equiv 
+  Mark_Not_Equiv 
+  Mark_Not_Imp 
+  Mark_Not_And 
+  Mark_Not_Or 
+  Mark_Not_Nec 
+  Mark_Not_Pos 
+  Mark_Pos_Test 
+  Mark_Nec_Test 
+  Mark_Pos_Seq 
+  Mark_Nec_Seq 
+  Mark_Pos_Union 
+  Mark_Nec_Union 
+  Mark_Pos_Star 
+  Mark_Nec_Star 
+  Mark_Pos_Atomic_Program
+  Mark_Nec_Atomic_Program
+  Mark_Formulas_In_Loop_Nodes
+end
+repeat
+  Not_True_Eventuality_Means_Inextensible_Premodel
+  Propagate_Inextensible_Premodel_Down
+  Propagate_Inextensible_Premodel_Up
+end</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <strategy>
+        <strategy-name>PDLStrategy</strategy-name>
+        <strategy-code>repeat       
+  repeat
+    CPLStrategy   
+    Not_Nec
+    Not_Pos
+    Pos_Test
+    Nec_Test
+    Pos_Star
+    Nec_Star
+    Pos_Union
+    Nec_Union
+    Pos_Seq
+    Nec_Seq
+  end
+  Mark_Node_Equal_To_An_Ancestor_Node     
+  Pos_Atomic_Program     
+  Nec_Atomic_Program     
+end 
+Bottom_Up_Check
+</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <strategy>
+        <strategy-name>CPLStrategy_With_Cut</strategy-name>
+        <strategy-code>repeat
+ firstRule
+   Stop
+   NotNot
+   NotOr
+   NotImp
+   And
+   NotAnd
+   Imp
+   Equiv
+   NotEquiv
+   CutOr_A_A
+   CutOr_B_B
+   CutOr_A_not_A
+   CutOr_B_not_B
+   CutOr_not_A_A
+   CutOr_not_B_B
+   Or_With_Cut
+ end
+end</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <strategy>
+        <strategy-name>PDLStrategy_With_Cut</strategy-name>
+        <strategy-code>repeat         
+  repeat
+    CPLStrategy_With_Cut   
+    Not_Nec
+    Not_Pos
+    Pos_Test
+    Nec_Test
+    Pos_Star
+    Nec_Star
+    Pos_Union
+    Nec_Union
+    Pos_Seq
+    Nec_Seq
+  end
+  Mark_Node_Equal_To_An_Ancestor_Node     
+  Pos_Atomic_Program     
+  Nec_Atomic_Program     
+end 
+Bottom_Up_Check</strategy-code>
+        <strategy-comment/>
+    </strategy>
+    <main-strategy>PDLStrategy</main-strategy>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>pos star I not P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and P and nec I and P nec I P pos star I not P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and P and nec I and P nec I P pos star I and P not P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>pos star star I P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>imp nec seq I J P nec I nec J P</formula-code>
+        <formula-comment>Its negation should be unstaisfiable.</formula-comment>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>pos union I J not P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>pos star seq I J not P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and P and nec seq I J and P nec seq I J P pos star seq I J not P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and nec star I P pos star seq I I not P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>pos star union I J not P</formula-code>
+        <formula-comment>gives all 5 possible models, but Creates 6 unnecessay tableaux :s</formula-comment>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>nec star I and pos star I P pos I P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and pos star I P pos I P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name>Requested but not Done</formula-name>
+        <formula-code>and nec star I imp Requested pos star I Received and nec star I imp Received pos I Processed and nec star I imp Processed pos star I nec star I Done and nec star I Requested nec star I not Done</formula-code>
+        <formula-comment/>
+    </testing-formula>
+    <testing-formula>
+        <formula-name/>
+        <formula-code>and pos star I P and not P nec I not P</formula-code>
+        <formula-comment/>
+    </testing-formula>
+</logic>

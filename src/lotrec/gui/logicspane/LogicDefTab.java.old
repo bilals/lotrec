@@ -1,0 +1,76 @@
+/*
+ * LogicTab.java
+ *
+ * Created on 29 octobre 2007, 18:06
+ *
+ * To change this template, choose Tools | Template Manager
+ * and open the template in the editor.
+ */
+
+package lotrec.gui.logicspane;
+
+import java.awt.BorderLayout;
+import java.util.ResourceBundle;
+import javax.swing.JLabel;
+import javax.swing.JTabbedPane;
+import lotrec.dataStructure.Logic;
+import lotrec.gui.TabContainer;
+import lotrec.resources.ResourcesProvider;
+
+/**
+ *
+ * @author said
+ */
+public class LogicDefTab extends TabContainer{
+    
+    private String logicFileName;
+    private Logic logic;
+    private JTabbedPane connRulTabs;
+    private ConnTabPanel connTabPanel;
+    private RulesTabPanel rulesTabPanel;
+    private StratTabPanel stratTabPanel;
+    private TestingFormulaePanel testingFormulaePanel;
+    private ResourceBundle resource;
+    
+    /** Creates a new instance of LogicTab */
+    public LogicDefTab(String logicFileName, Logic logic) {
+        this.logicFileName = logicFileName;
+        this.logic = logic;
+        this.getCenterPanel().setLayout(new BorderLayout());
+        this.getCenterPanel().add(new LogicInfoPanel(logic), BorderLayout.NORTH);
+        connRulTabs = new JTabbedPane();
+        connTabPanel = new ConnTabPanel(logic);
+        connRulTabs.add("Connectors", connTabPanel);
+        rulesTabPanel = new RulesTabPanel(logic);
+        connRulTabs.add("Rules", rulesTabPanel);
+        stratTabPanel = new StratTabPanel(logic);
+        connRulTabs.add("Strategies", stratTabPanel);
+        testingFormulaePanel = new TestingFormulaePanel(logic);
+        connRulTabs.add("Testing Formulae",testingFormulaePanel);
+        this.getCenterPanel().add(connRulTabs,BorderLayout.CENTER);
+    }
+    
+    public String getLogicFileName() {
+        return logicFileName;
+    }
+    
+    public void setLogicFileName(String logicFileName) {
+        this.logicFileName = logicFileName;
+    }
+    
+    public Logic getLogic() {
+        return logic;
+    }
+    
+    public void setLogic(Logic logic) {
+        this.logic = logic;
+    }
+    
+    public void refresh(){
+//         resource = ResourceBundle.getBundle("lotrec.resources.logicDefTab", ResourcesProvider.getCurrentLocale());
+        connTabPanel.refresh();
+        rulesTabPanel.refresh();
+        stratTabPanel.refresh();
+        testingFormulaePanel.refresh();
+    }
+}

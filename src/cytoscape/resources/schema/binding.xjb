@@ -1,0 +1,15 @@
+<jxb:bindings version="2.0" xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  
+  <!-- This file is for avoiding name conflict between RDF and Dublin Core -->
+  
+  <jxb:bindings schemaLocation="rdf.xsd" node="/xs:schema">
+    <jxb:schemaBindings>
+      <jxb:package name="cytoscape.generated2"/>
+      <jxb:nameXmlTransform>
+        <jxb:elementName prefix="Rdf"/>
+        <jxb:anonymousTypeName prefix="Rdf" suffix="Type"/>
+      </jxb:nameXmlTransform>
+    </jxb:schemaBindings>
+  </jxb:bindings>
+</jxb:bindings>

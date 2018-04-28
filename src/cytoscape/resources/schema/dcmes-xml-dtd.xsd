@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  
+  DTD 2002-04-22 for
+    Expressing Simple Dublin Core in RDF/XML
+    http://dublincore.org/documents/2002/07/31/dcmes-xml/
+  
+  Public ID: "-//DUBLIN CORE//DCMES DTD 2002/07/31//EN"
+  
+  Authors:
+    Dave Beckett <dave.beckett@bristol.ac.uk>
+    Eric Miller <emiller@w3.org>
+    Dan Brickley <danbri@w3.org>
+  
+  Based on
+    Dublin Core Metadata Element Set, Version 1.1: Reference Description
+    http://dublincore.org/documents/1999/07/02/dces/
+  
+  This DTD is for information only and NON-NORMATIVE.
+  
+-->
+<!-- The namespaces for RDF and DCMES 1.1 respectively -->
+<!-- Declare convenience entities for XML namespace declarations -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+  targetNamespace="http://purl.org/dc/elements/1.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+  jxb:version="1.0">
+  <xs:import namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#" schemaLocation="rdf.xsd"/>
+  
+  
+  <xs:import namespace="http://www.w3.org/XML/1998/namespace"
+    schemaLocation="xml.xsd"/>
+  
+  
+  <!-- The wrapper element -->
+  <xs:element name="dcmes" abstract="true"/>
+  <!-- The resource description container element -->
+  <xs:attributeGroup name="attlist.rdf.Description">
+    <xs:attribute ref="rdf:about"/>
+  </xs:attributeGroup>
+  <!-- The elements from DCMES 1.1 -->
+  <!-- The name given to the resource. -->
+  <xs:element name="title" substitutionGroup="dc:dcmes">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="dc:attlist.dc.title"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.dc.title">
+    <xs:attribute ref="xml:lang"/>
+    <xs:attribute ref="rdf:resource"/>
+  </xs:attributeGroup>
+  <!--
+    An entity primarily responsible for making the content of the
+    resource.
+  -->
+  <xs:element name="creator" substitutionGroup="dc:dcmes">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="dc:attlist.dc.creator"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.dc.creator">
+    <xs:attribute ref="xml:lang"/>
+    <xs:attribute ref="rdf:resource"/>
+  </xs:attributeGroup>
+  <!-- The topic of the content of the resource. -->
+  <xs:element name="subject" substitutionGroup="dc:dcmes">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="dc:attlist.dc.subject"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.dc.subject">
+    <xs:attribute ref="xml:lang"/>
+    <xs:attribute ref="rdf:resource"/>
+  </xs:attributeGroup>
+  <!-- An account of the content of the resource. -->
+  <xs:element name="description" substitutionGroup="dc:dcmes">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="dc:attlist.dc.description"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.dc.description">
+    <xs:attribute ref="xml:lang"/>
+    <xs:attribute ref="rdf:resource"/>
+  </xs:attributeGroup>
+  <!-- The entity responsible for making the resource available. -->
+  <xs:element name="publisher" substitutionGroup="dc:dcmes">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="dc:attlist.dc.publisher"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.dc.publisher">
+    <xs:attribute ref="xml:lang"/>
+    <xs:attribute ref="rdf:resource"/>
+  </xs:attributeGroup>
+  <!--
+    An entity responsible for making contributions to the content of
+    the resource.
+  -->
+  <xs:element name="contributor" substitutionGroup="dc:dcmes">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="dc:attlist.dc.contributor"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.dc.contributor">
+    <xs:attribute ref="xml:lang"/>
+    <xs:attribute ref="rdf:resource"/>
+  </xs:attributeGroup>
+  <!-- A date associated with an event in the life cycle of the resource. -->
+  <xs:element name="date" substitutionGroup="dc:dcmes">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="dc:attlist.dc.date"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.dc.date">
+    <xs:attribute ref="xml:lang"/>
+    <xs:attribute ref="rdf:resource"/>
+  </xs:attributeGroup>
+  <!-- The nature or genre of the content of the resource. -->
+  <xs:element name="type" substitutionGroup="dc:dcmes">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="dc:attlist.dc.type"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.dc.type">
+    <xs:attribute ref="xml:lang"/>
+    <xs:attribute ref="rdf:resource"/>
+  </xs:attributeGroup>
+  <!-- The physical or digital manifestation of the resource. -->
+  <xs:element name="format" substitutionGroup="dc:dcmes">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="dc:attlist.dc.format"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.dc.format">
+    <xs:attribute ref="xml:lang"/>
+    <xs:attribute ref="rdf:resource"/>
+  </xs:attributeGroup>
+  <!-- An unambiguous reference to the resource within a given context. -->
+  <xs:element name="identifier" substitutionGroup="dc:dcmes">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="dc:attlist.dc.identifier"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.dc.identifier">
+    <xs:attribute ref="xml:lang"/>
+    <xs:attribute ref="rdf:resource"/>
+  </xs:attributeGroup>
+  <!-- A Reference to a resource from which the present resource is derived. -->
+  <xs:element name="source" substitutionGroup="dc:dcmes">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="dc:attlist.dc.source"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.dc.source">
+    <xs:attribute ref="xml:lang"/>
+    <xs:attribute ref="rdf:resource"/>
+  </xs:attributeGroup>
+  <!-- A language of the intellectual content of the resource. -->
+  <xs:element name="language" substitutionGroup="dc:dcmes">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="dc:attlist.dc.language"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.dc.language">
+    <xs:attribute ref="xml:lang"/>
+    <xs:attribute ref="rdf:resource"/>
+  </xs:attributeGroup>
+  <!-- A reference to a related resource. -->
+  <xs:element name="relation" substitutionGroup="dc:dcmes">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="dc:attlist.dc.relation"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.dc.relation">
+    <xs:attribute ref="xml:lang"/>
+    <xs:attribute ref="rdf:resource"/>
+  </xs:attributeGroup>
+  <!-- The extent or scope of the content of the resource. -->
+  <xs:element name="coverage" substitutionGroup="dc:dcmes">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="dc:attlist.dc.coverage"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.dc.coverage">
+    <xs:attribute ref="xml:lang"/>
+    <xs:attribute ref="rdf:resource"/>
+  </xs:attributeGroup>
+  <!-- Information about rights held in and over the resource. -->
+  <xs:element name="rights" substitutionGroup="dc:dcmes">
+    <xs:complexType mixed="true">
+      <xs:attributeGroup ref="dc:attlist.dc.rights"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attributeGroup name="attlist.dc.rights">
+    <xs:attribute ref="xml:lang"/>
+    <xs:attribute ref="rdf:resource"/>
+  </xs:attributeGroup>
+</xs:schema>

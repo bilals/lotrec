@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+
+<!DOCTYPE toc
+  PUBLIC "-//Sun Microsystems Inc.//DTD JavaHelp TOC Version 1.0//EN" "http://java.sun.com/products/javahelp/toc_1_0.dtd">
+<toc version="1.0">
+   <tocitem target="d0e1" text="Cytoscape User Manual">
+      <tocitem target="Cytoscape 2.4.0 User Manual" text="Cytoscape 2.4.0 User Manual"/>
+      <tocitem target="Introduction" text="Introduction"/>
+      <tocitem target="Launching Cytoscape" text="Launching Cytoscape">
+         <tocitem target="(1) If necessary, install Java" text="(1) If necessary, install Java"/>
+         <tocitem target="(2) Install Cytoscape" text="(2) Install Cytoscape"/>
+         <tocitem target="(3) Launch the application" text="(3) Launch the application">
+            <tocitem target="Note on Memory Consumption" text="Note on Memory Consumption"/>
+            <tocitem target="Note on Directory Location" text="Note on Directory Location"/>
+         </tocitem>
+      </tocitem>
+      <tocitem target="Quick Tour of Cytoscape" text="Quick Tour of Cytoscape">
+         <tocitem target="The Menus" text="The Menus"/>
+         <tocitem target="Network Management" text="Network Management"/>
+         <tocitem target="The Network Overview Window" text="The Network Overview Window"/>
+      </tocitem>
+      <tocitem target="Command Line Arguments" text="Command Line Arguments"/>
+      <tocitem target="Cytoscape Preferences" text="Cytoscape Preferences">
+         <tocitem target="Managing Properties" text="Managing Properties"/>
+         <tocitem target="Managing Bookmarks" text="Managing Bookmarks"/>
+         <tocitem target="Managing Proxy Servers" text="Managing Proxy Servers"/>
+      </tocitem>
+      <tocitem target="Creating Networks" text="Creating Networks">
+         <tocitem target="Import Fixed-Format Network Files" text="Import Fixed-Format Network Files">
+            <tocitem target="Load Networks from Local Computer" text="Load Networks from Local Computer"/>
+            <tocitem target="Load Network from a Remote Computer (URL import)" text="Load Network from a Remote Computer (URL import)"/>
+         </tocitem>
+         <tocitem target="Import Free-Format Table Files" text="Import Free-Format Table Files">
+            <tocitem target="Supported Files" text="Supported Files"/>
+            <tocitem target="Basic Operations" text="Basic Operations"/>
+         </tocitem>
+         <tocitem target="Edit a New Network" text="Edit a New Network"/>
+      </tocitem>
+      <tocitem target="Supported Network File Formats" text="Supported Network File Formats">
+         <tocitem target="SIF Format" text="SIF Format"/>
+         <tocitem target="GML Format" text="GML Format"/>
+         <tocitem target="XGMML Format" text="XGMML Format"/>
+         <tocitem target="SBML (Systems Biology Markup Language) Format" text="SBML (Systems Biology Markup Language) Format"/>
+         <tocitem target="BioPAX (Biological PAthways eXchange) Format" text="BioPAX (Biological PAthways eXchange) Format"/>
+         <tocitem target="PSI-MI Format" text="PSI-MI Format"/>
+         <tocitem target="Delimited Text Table and Excel Workbook" text="Delimited Text Table and Excel Workbook">
+            <tocitem target="NODE NAMING ISSUES IN CYTOSCAPE" text="NODE NAMING ISSUES IN CYTOSCAPE"/>
+         </tocitem>
+      </tocitem>
+      <tocitem target="Node and Edge Attributes" text="Node and Edge Attributes">
+         <tocitem target="Cytoscape Attribute File Format" text="Cytoscape Attribute File Format">
+            <tocitem target="Detailed file format (Advanced users)" text="Detailed file format (Advanced users)"/>
+            <tocitem target="Newline Feature" text="Newline Feature"/>
+         </tocitem>
+         <tocitem target="Import Attribute Table Files" text="Import Attribute Table Files">
+            <tocitem target="Basic Operation" text="Basic Operation"/>
+            <tocitem target="Advanced Options" text="Advanced Options">
+               <tocitem target="Advanced Mapping Options" text="Advanced Mapping Options"/>
+               <tocitem target="Text File Import Options" text="Text File Import Options"/>
+            </tocitem>
+            <tocitem target="Attribute Browser" text="Attribute Browser"/>
+         </tocitem>
+      </tocitem>
+      <tocitem target="Loading Gene Expression (Attribute Matrix) Data" text="Loading Gene Expression (Attribute Matrix) Data">
+         <tocitem target="Data File Format" text="Data File Format"/>
+         <tocitem target="Example" text="Example"/>
+      </tocitem>
+      <tocitem target="Navigation and Layout" text="Navigation and Layout">
+         <tocitem target="Basic Network Navigation" text="Basic Network Navigation">
+            <tocitem target="Other Mouse Behaviors" text="Other Mouse Behaviors"/>
+         </tocitem>
+         <tocitem target="Automatic Layout Algorithms" text="Automatic Layout Algorithms"/>
+         <tocitem target="Manual Layout" text="Manual Layout">
+            <tocitem target="Node Movement and Placement" text="Node Movement and Placement"/>
+         </tocitem>
+      </tocitem>
+      <tocitem target="Visual Styles" text="Visual Styles">
+         <tocitem target="Introduction to Visual Styles" text="Introduction to Visual Styles"/>
+         <tocitem target="Visual Attributes, Graph Attributes and Visual Mappers" text="Visual Attributes, Graph Attributes and Visual Mappers"/>
+         <tocitem target="Visual Styles Tutorials" text="Visual Styles Tutorials">
+            <tocitem target="Tutorial 1: Creating a Basic Visual Style" text="Tutorial 1: Creating a Basic Visual Style"/>
+            <tocitem target="Tutorial 2: Creating a New Visual Style with a Discrete Mapper" text="Tutorial 2: Creating a New Visual Style with a Discrete Mapper"/>
+            <tocitem target="Tutorial 3: Visualizing Expression Data on a Network" text="Tutorial 3: Visualizing Expression Data on a Network"/>
+         </tocitem>
+         <tocitem target="Managing Visual Styles" text="Managing Visual Styles">
+            <tocitem target="Saving Visual Styles" text="Saving Visual Styles"/>
+            <tocitem target="Importing Visual Styles" text="Importing Visual Styles"/>
+            <tocitem target="Default Visual Styles" text="Default Visual Styles"/>
+         </tocitem>
+         <tocitem target="Bypassing Visual Styles" text="Bypassing Visual Styles"/>
+      </tocitem>
+      <tocitem target="Finding and Filtering Nodes and Edges" text="Finding and Filtering Nodes and Edges">
+         <tocitem target="QuickFind" text="QuickFind">
+            <tocitem target="Configuring Quick Find" text="Configuring Quick Find"/>
+            <tocitem target="Dynamic Filtering via Quick Find" text="Dynamic Filtering via Quick Find"/>
+         </tocitem>
+         <tocitem target="Filters" text="Filters">
+            <tocitem target="Using Filters" text="Using Filters">
+               <tocitem target="Filter Panels:" text="Filter Panels:"/>
+            </tocitem>
+            <tocitem target="Creating Filters" text="Creating Filters">
+               <tocitem target="String Filter:" text="String Filter:"/>
+               <tocitem target="Numerical Filter:" text="Numerical Filter:"/>
+               <tocitem target="Node Topology Filter:" text="Node Topology Filter:"/>
+               <tocitem target="Boolean Filter:" text="Boolean Filter:"/>
+               <tocitem target="Saving Filters" text="Saving Filters"/>
+               <tocitem target="Running filters" text="Running filters"/>
+            </tocitem>
+         </tocitem>
+         <tocitem target="Select Menu" text="Select Menu"/>
+      </tocitem>
+      <tocitem target="Editing Networks" text="Editing Networks"/>
+      <tocitem target="CytoPanels" text="CytoPanels"/>
+      <tocitem target="Rendering Engine" text="Rendering Engine"/>
+      <tocitem target="Annotation" text="Annotation">
+         <tocitem target="Ontology and Annotation File Format" text="Ontology and Annotation File Format">
+            <tocitem target="OBO File" text="OBO File"/>
+            <tocitem target="Gene Association File" text="Gene Association File"/>
+         </tocitem>
+         <tocitem target="Import Ontology and Annotation" text="Import Ontology and Annotation">
+            <tocitem target="Import Gene Ontology and Gene Association Files" text="Import Gene Ontology and Gene Association Files"/>
+         </tocitem>
+         <tocitem target="Custom Annotation Files for Ontologies Other than GO (for Advanced Users)" text="Custom Annotation Files for Ontologies Other than GO (for Advanced Users)"/>
+      </tocitem>
+      <tocitem target="Linkout" text="Linkout"/>
+      <tocitem target="Acknowledgements" text="Acknowledgements"/>
+      <tocitem target="Appendix A: Old Annotation Server Format" text="Appendix A: Old Annotation Server Format">
+         <tocitem target="Building your own annotation files" text="Building your own annotation files">
+            <tocitem target="The Ontology Format" text="The Ontology Format"/>
+            <tocitem target="The Annotation Format" text="The Annotation Format"/>
+         </tocitem>
+         <tocitem target="Load Data into Cytoscape" text="Load Data into Cytoscape">
+            <tocitem target="The Annotation Manifest" text="The Annotation Manifest"/>
+         </tocitem>
+         <tocitem target="Getting and Reformatting GO Data" text="Getting and Reformatting GO Data"/>
+      </tocitem>
+      <tocitem target="Appendix B: GNU Lesser General Public License" text="Appendix B: GNU Lesser General Public License"/>
+   </tocitem>
+</toc>

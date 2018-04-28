@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified"
+  targetNamespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:dc="http://purl.org/dc/elements/1.1/"
+  xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" 
+  xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" 
+  jaxb:version="2.0" jaxb:extensionBindingPrefixes="xjc">
+  
+  <xs:import namespace="http://purl.org/dc/elements/1.1/" schemaLocation="dcmes-xml-dtd.xsd"/>
+  <xs:element name="RDF">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="rdf:Description"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Description">
+    
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="dc:dcmes"/>
+      </xs:sequence>
+      <xs:attributeGroup ref="dc:attlist.rdf.Description"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:attribute name="about"/>
+  <xs:attribute name="resource"/>
+</xs:schema>

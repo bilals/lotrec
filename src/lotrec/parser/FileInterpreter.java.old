@@ -1,0 +1,939 @@
+package lotrec.parser;
+
+import java.io.*;
+//import lotrec.parseur.*;
+import java.net.*;
+import java.util.Enumeration;
+import java.util.Vector;
+import lotrec.dataStructure.expression.*;
+import lotrec.dataStructure.graph.*;
+import lotrec.dataStructure.tableau.*;
+import lotrec.process.*;
+import lotrec.gui.tableau.*;
+import lotrec.gui.*;
+import javax.swing.JOptionPane;
+import lotrec.dataStructure.tableau.descriptor.*;
+import lotrec.dataStructure.tableau.action.*;
+import javax.swing.JPanel;
+import lotrec.Lotrec;
+/**
+ *
+ * @author Sahade Mohamad
+ */
+public class FileInterpreter {
+    
+    static private int ifNomber=0;
+    private String NodeSource;//These two variables are used by the new node action
+    
+    private StringBuffer parserOutput;
+    public  String nameoffile=null;//The name of the file when I put the resul. It is public because it is used by other class
+    private MarkedExpression formula;
+    
+    public  String ErrorMessage=null;
+    public  JPanel panel=new JPanel();
+    DuplicateAction duplicateAction=null;
+    public  static InternalFrame frame = LocalInterface.getCurrentInternalFrame();
+    
+    private int line;
+    private int oldLine;
+    private int position; //These three variables are used to managed errors
+    
+    private boolean ruleFound;
+    
+    private URL imageLocation;
+    
+    protected StreamTokenizer tokenizer;
+    protected Vector connectors;
+    protected Vector strategies;
+    protected Vector rules;
+    protected Strategy globalStrategy;
+    protected int stepCount;
+    protected boolean testMarkActivationValidity;    // ADDED 00/12/21 and all about it in this file
+    
+    public static void main(String[] args) {
+        if(args.length < 1) {
+            System.err.println("Need one argument : the file to read");
+            System.exit(1);
+        }
+        
+        try {
+            String local = "file:/" + System.getProperty("user.dir") + "/";
+            
+            URL imageLocation;
+            if(args.length > 1) imageLocation = new URL(args[1]);
+            else imageLocation = new URL(local + "images/");
+            
+            FileInterpreter i = new FileInterpreter(new FileReader(new File(args[0])), imageLocation);
+            i.recognizeAll(0);
+        } catch(Exception e) {
+            System.err.println(e);
+        }
+    }
+    
+    
+    //simple construcor
+   /* public FileInterpreter() {
+        panel=null;
+        line=0;
+        oldLine=0;
+        position=1;
+    }
+    */
+    
+    /** Creates new FileInterpreter with imageLocation for old Lotrec*/
+    public FileInterpreter(Reader reader, URL imageLocation) {
+        
+        stepCount = -1;
+        testMarkActivationValidity = true;
+        line=0;
+        oldLine=0;
+        position=1;
+        this.imageLocation = imageLocation;
+        panel=null;
+        connectors = new Vector();
+        strategies = new Vector();
+        rules = new Vector();
+        
+        analyse(reader);
+      /*
+        tokenizer = new StreamTokenizer(reader);
+        tokenizer.wordChars('_','_');
+        tokenizer.quoteChar('\"');
+        tokenizer.slashSlashComments(true);
+        tokenizer.slashStarComments(true);
+                tokenizer.eolIsSignificant(true);*/
+        globalStrategy = new Strategy(new AllRules());
+        ruleFound=true;
+    }
+    /** Creates new FileInterpreter */
+    public FileInterpreter() {
+        stepCount = -1;
+        testMarkActivationValidity = true;
+        line=0;
+        oldLine=0;
+        position=1;
+        //this.imageLocation = imageLocation;
+        //panel=null;
+        connectors = new Vector();
+        strategies = new Vector();
+        rules = new Vector();
+        globalStrategy = new Strategy(new AllRules());
+        ruleFound=true;
+        parserOutput = new StringBuffer();
+    }
+    
+    private void analyse(Reader reader) {
+        tokenizer = new StreamTokenizer(reader);
+        tokenizer.wordChars('_','_');
+        tokenizer.quoteChar('\"');
+        tokenizer.slashSlashComments(true);
+        tokenizer.slashStarComments(true);
+        tokenizer.eolIsSignificant(true);
+    }
+    
+    protected void warning(String message) {
+        System.err.println("WARNING: " + message);
+    }
+    
+    /*the int flag is used tu know how I will give the result.
+     If the mode is grafic the result is in the Panel
+        else the result is in file and panel is null
+     */
+    public JPanel recognizeAll(int flag) {
+        while(recognize(flag));
+        return panel;
+    }
+    
+    public MarkedExpression parseFormula(String formula){
+        return this.formula;
+    }
+    
+    public Wallet run(String logic, String formula)throws ParseException {
+        Wallet resultWallet;
+        String work = logic + " tableau " + formula;
+        String coreFile=Lotrec.getWorkingPath()+"Lotrec.core";
+        try {
+            FileWriter fw=new FileWriter(coreFile);
+            fw.write(work);
+            fw.close();
+            Reader reader = new FileReader(new File(coreFile));
+            analyse(reader);
+            resultWallet = recognizeAll();
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+            throw new ParseException(e.toString());
+        }
+        return resultWallet;
+    }
+    
+    public String getPaserOutput(){
+        return parserOutput.toString();
+    }
+    
+    public Wallet recognizeAll(){
+        Wallet resultWallet=null;
+        while(true){
+            ErrorMessage="";
+            String s = readStringToken();
+            if(s == null) break;
+            if(s.equals("connector")) {
+                recognizeConnector();
+            } else if(s.equals("strategy")) {
+                if(position==1) oldLine=line;
+                position=2;
+                recognizeStrategy();
+            } else if(s.equals("rule")) {
+                recognizeRule();
+            } else if(s.equals("tableau")) {
+                position=3;
+                resultWallet = recognizeTableau();
+                if(resultWallet == null)
+                    System.out.println("wallet is empty after recognize tableau");
+            } else if(s.equals("step")) {
+                recognizeStep();
+            } else if(s.equals("checkMarkActivationValidity")) {
+                recognizeTestMarkActivationValidity();
+            } else if(s.equals("include")) {
+                StreamTokenizer st=tokenizer;
+                String file = readStringToken();
+                String name="";
+                try {
+                    if(System.getProperty("file.separator").equals("/"))
+                        name= System.getProperty("user.dir") + "/"+ file;
+                    else
+                        name =System.getProperty("user.dir") + "\\"+ file;
+                    
+                    analyse(new FileReader(new File(name)));
+                    while(recognize(0));
+                    tokenizer=st;
+                } catch(Exception e) {
+                    throw new IllegalArgumentException(e.toString()+" \n in the file :"+name);
+                }
+            } else{
+                if(position==1)ErrorMessage= "Unkown keyword::	"+s+ "\n Line:"+(line - oldLine)+"  in the theory Definition";
+                if(position==2) ErrorMessage= "Unkown keyword: :	"+s+"\n Line:"+line+"  in the Strategie Definition";
+                if(position==3) ErrorMessage= "Unkown keyword: :	"+s+" int the Formula";
+                throw new IllegalArgumentException(ErrorMessage);
+            }
+        }
+        if(resultWallet == null)
+            System.out.println("wallet is empty at end of recognize all");
+        return resultWallet;
+    }
+    
+    
+    protected Connector findConnector(String name) {
+        ErrorMessage="";
+        for(Enumeration enumr = connectors.elements(); enumr.hasMoreElements();) {
+            Connector c = (Connector)enumr.nextElement();
+            if(c.getName().equals(name)) return c;
+        }
+        return null;
+    }
+    
+    protected Rule findRule(String name) {
+        for(Enumeration enumr = rules.elements(); enumr.hasMoreElements();) {
+            Rule r = (Rule)enumr.nextElement();
+            if(r.getName().equals(name)) return r;
+        }
+        return null;
+        
+    }
+    
+    protected Strategy findStrategy(String name) {
+        ErrorMessage="";
+        for(Enumeration enumr = strategies.elements(); enumr.hasMoreElements();) {
+            Strategy s = (Strategy)enumr.nextElement();
+            if(s.getName().equals(name)) return s;
+        }
+        return null;
+        
+    }
+    
+    
+    protected String readStringToken() {
+        try {
+            int ttype = tokenizer.nextToken();
+            
+            if(ttype == StreamTokenizer.TT_EOF) return null;   //throw new IllegalArgumentException("End of file. Need another token...");
+            if(ttype == StreamTokenizer.TT_NUMBER)  throw new IllegalArgumentException("A string value was expected!\nNumerical value found instead is : "+(int)tokenizer.nval);
+            if(ttype == StreamTokenizer.TT_EOL)   line=tokenizer.lineno();
+            if((ttype == StreamTokenizer.TT_WORD) || (ttype == '\"')) {
+                parserOutput.append("Read : " + tokenizer.sval+"\n");
+                //parserOutput.updateUI();
+                return tokenizer.sval;
+            }
+            return readStringToken();
+        } catch(IOException e) {
+            throw new IllegalArgumentException("End of file. Need another token...");
+        }
+    }
+    
+    protected int readIntToken() {
+        try {
+            int ttype = tokenizer.nextToken();
+            if(ttype == StreamTokenizer.TT_EOF) throw new IllegalArgumentException("End of file. Need a number...");
+            if(ttype == StreamTokenizer.TT_WORD) throw new IllegalArgumentException("A numerical value was expected!\nString value found instead is : "+tokenizer.sval);
+            if(ttype == StreamTokenizer.TT_EOL)   line=tokenizer.lineno();
+            
+            if(ttype == StreamTokenizer.TT_NUMBER) {
+                parserOutput.append("Read : " +	(int)tokenizer.nval+"\n");
+                return (int)tokenizer.nval;
+            }
+            return readIntToken();
+        } catch(IOException e) {
+            throw new IllegalArgumentException("End of file. Need another token...");
+        }
+    }
+    
+    protected boolean recognize(int flag) {
+        ErrorMessage="";
+        String s = readStringToken();
+        if(s == null) return false;
+        
+        if(s.equals("connector")) {
+            recognizeConnector();
+        } else if(s.equals("strategy")) {
+            if(position==1) oldLine=line;
+            position=2;
+            recognizeStrategy();
+        } else if(s.equals("rule")) {
+            recognizeRule();
+        } else if(s.equals("tableau")) {
+            position=3;
+            recognizeTableau(flag);
+        } else if(s.equals("step")) {
+            recognizeStep();
+        } else if(s.equals("checkMarkActivationValidity")) {
+            recognizeTestMarkActivationValidity();
+        } else if(s.equals("include")) {
+            StreamTokenizer st=tokenizer;
+            String file = readStringToken();
+            String name="";
+            try {
+                if(System.getProperty("file.separator").equals("/"))
+                    name= System.getProperty("user.dir") + "/"+ file;
+                else
+                    name =System.getProperty("user.dir") + "\\"+ file;
+                
+                analyse(new FileReader(new File(name)));
+                while(recognize(0));
+                tokenizer=st;
+            } catch(Exception e) {
+                throw new IllegalArgumentException(e.toString()+" \n in the file :"+name);
+            }
+        } else{
+            if(position==1)ErrorMessage= "Unkown keyword::	"+s+ "\n Line:"+(line - oldLine)+"  in the theory Definition";
+            if(position==2) ErrorMessage= "Unkown keyword: :	"+s+"\n Line:"+line+"  in the Strategie Definition";
+            if(position==3) ErrorMessage= "Unkown keyword: :	"+s+" int the Formula";
+            throw new IllegalArgumentException(ErrorMessage);
+        }
+        return true;
+    }
+    
+    protected Connector recognizeConnector() {
+        
+        Connector connector;
+        String name=readStringToken();
+        
+        connector=findConnector(name);
+        if(connector==null) {
+            connector = new Connector();
+            connector.setName(name);
+            connector.setArity(readIntToken());
+            connector.setAssociative(new Boolean(readStringToken()).booleanValue());
+            connector.setOutString(readStringToken());
+            connector.setPriority(readIntToken());
+            parserOutput.append("Connector found : "+connector+"\n");
+            connectors.add(connector);
+            return connector;
+        } else throw new IllegalArgumentException("Connector : "+name+" is already defined");
+        
+    }
+    
+    /*protected Expression recognizeExpression() {
+        String s = readStringToken();
+        if(s.equals("constant")) {
+            return recognizeConstant();
+        }
+        if(s.equals("variable")) {
+            return recognizeVariable();
+        }
+        Connector connector = findConnector(s);
+        if(connector!=null) {
+            ExpressionWithSubExpressions expression = new ExpressionWithSubExpressions(connector);
+            for(int i = 0; i < connector.getArity(); i++) expression.setExpression(recognizeExpression(), i);
+            return expression;
+        } else
+            if(position==1)ErrorMessage= "Cannot find connector :	"+s+ "\n Line:"+(line - oldLine)+"  in the theory Definition";
+        if(position==3)ErrorMessage= "Cannot find connector :	"+s+" in the Formula";
+        throw new IllegalArgumentException(ErrorMessage);
+     
+    }
+     */
+    
+    protected Expression recognizeExpression() {
+        String s = readStringToken();
+        if((s.length() > 0) && (s.charAt(0) != '_') && Character.isUpperCase(s.charAt(0))) {
+            return new ConstantExpression(s);        }
+        if(s.startsWith("_")) {
+            return new VariableExpression(s);
+        }
+        if(s.equals("constant")) {
+            return recognizeConstant();
+        }
+        if(s.equals("variable")) {
+            return recognizeVariable();
+        }
+        Connector connector = findConnector(s);
+        ExpressionWithSubExpressions expression = new ExpressionWithSubExpressions(connector);
+        for(int i = 0; i < connector.getArity(); i++) expression.setExpression(recognizeExpression(), i);
+        return expression;
+    }
+    
+    protected ConstantExpression recognizeConstant() {
+        return new ConstantExpression(readStringToken());
+    }
+    
+    protected VariableExpression recognizeVariable() {
+        return new VariableExpression(readStringToken());
+    }
+    
+    private boolean isKeyWord(String token) {
+        if(token.equals("allRules")||token.equals("firstRule")||token.equals("repeat")||token.equals("rule")||token.equals("connector")
+        ||token.equals("strategy"))
+            return true;
+        else return false;
+    }
+    
+    protected Strategy recognizeStrategy() {
+        Strategy strategy;
+        String end,token="Not Yet",strategyName;
+        boolean empty=true;
+        Keep keep = new AllRules();
+        //I have to find the strategy name
+        strategyName = readStringToken();
+        strategy=findStrategy(strategyName);
+        if(strategy!=null) throw new IllegalArgumentException("Strategy : "+strategyName+" is already defined");
+        else   	if (isKeyWord(strategyName))
+            throw new IllegalArgumentException(token+" is a Key word. It can't be a name of a strategy. Must find the name of the strategy");
+        else{   token = readStringToken();
+        while(!token.equals("end")) {
+            if(token.equals("allRules")||token.equals("firstRule")||token.equals("repeat")) {
+                strategy = new Strategy(recognizeKeep(token));
+                keep.add(strategy, null);
+                empty=false;
+            } else{
+                Rule rule=findRule(token);
+                if (rule!=null) {
+                    EventMachine machine = rule.createMachine();
+                    keep.add(machine, null);
+                    empty=false;
+                } else {
+                    strategy=findStrategy(token);
+                    if(strategy!=null) {
+                        keep.add(strategy, null); 	empty=false;
+                    } else
+                        throw new IllegalArgumentException("Unknown argument: "+token+"\n Line:"+(line - oldLine)+"  in  the Strategy Definition. \n Maybe  your Strategy  is without end ");
+                }
+            }
+            token = readStringToken();
+        }
+        if(empty) throw new IllegalArgumentException(" Why empty strategy ?");
+        strategy = new Strategy(keep);
+        strategy.setName(strategyName);
+        strategies.add(strategy);
+        }
+        parserOutput.append("Strategy found : "+strategy+"\n");
+        return strategy;
+    }
+    
+    
+    protected Keep recognizeKeep(String s) {
+        
+        Keep keep;
+        if(s.equals("allRules")) {
+            keep = new AllRules();
+        } else
+            if(s.equals("firstRule")) {
+            keep = new FirstRule();
+            } else
+                if(s.equals("repeat")) {
+            keep = new Repeat(stepCount);
+                }
+        
+                else throw new IllegalArgumentException("Unknown keep : "+s);
+        
+        for(;;) {
+            String t = readStringToken();
+            if(t.equals("end")) {
+                parserOutput.append("Keep found : "+keep+"\n");
+                return keep;
+            } else if(t.equals("allRules")||t.equals("firstRule")||t.equals("repeat")) {
+                Keep other = recognizeKeep(t);
+                keep.add(other, null);
+            } else {
+                Rule rule = findRule(t);
+                if(rule!=null) {
+                    EventMachine machine = rule.createMachine();
+                    keep.add(machine, null);
+                } else {
+                    Strategy strategy = findStrategy(t);
+                    if(strategy!=null) keep.add(strategy, null);
+                    else throw new IllegalArgumentException("UnKnown argument: "+t+"\n Line:"+(line - oldLine)+"  in the Strategy Definition");
+                }
+            }
+        }
+    }
+    
+    protected Rule recognizeRule() {
+        ifNomber=0;
+        ErrorMessage="";
+        Rule rule;
+        boolean commutative=false;
+        
+        String name=readStringToken();
+        
+        rule=findRule(name);
+        
+        if(rule==null) {
+            String s = readStringToken();
+            if(s.equals("true")) {
+                commutative=true;
+                rule= new Rule(name,commutative);
+            } else{rule= new Rule(name,commutative);
+            if(s.equals("end")) throw new IllegalArgumentException("Why Empty Rule?");
+            else if(s.equals("if"))  rule.add(recognizeDescriptor());
+            else if(s.equals("do"))  rule.add(recognizeAction());
+            else
+                throw new IllegalArgumentException("Unkown keyword:	"+s+ "\n Line:"+(line - oldLine)+"  in the Theory Definition");
+            
+            }
+            
+            for(;;) {
+                s = readStringToken();
+                if(s.equals("end")) {
+                    parserOutput.append("Rule found :	"+rule +"\n");
+                    rules.add(rule);
+                    return rule;
+                } else if(s.equals("if"))  rule.add(recognizeDescriptor());
+                else if(s.equals("do"))  rule.add(recognizeAction());
+                else
+                    throw new IllegalArgumentException("Unkown keyword:	"+s+ "\n Line:"+(line - oldLine)+"  in the Theory Definition");
+                
+            }
+        } else
+            throw new IllegalArgumentException("Rule : "+name+" is already defined");
+        
+    }
+    
+    protected Descriptor recognizeDescriptor() {
+        String s = readStringToken();
+        ErrorMessage="";
+        if(s.equals("hasElement")) {
+            
+            return new ExpressionDescriptor(new StringSchemeVariable(readStringToken()),
+                    recognizeExpression());
+            
+        }
+        
+        else
+            if(s.equals("hasNotElement")) {
+            
+            return new NotExpressionDescriptor(new 	    StringSchemeVariable(readStringToken()),	    recognizeExpression());
+            } else if(s.equals("isLinked")) {
+            
+            return new LinkDescriptor(new    StringSchemeVariable(readStringToken()), new    StringSchemeVariable(readStringToken()),   recognizeExpression());
+            }
+        
+            else if(s.equals("isNotLinked")) {
+            
+            return new NotLinkDescriptor(new   StringSchemeVariable(readStringToken()), new  StringSchemeVariable(readStringToken()),
+                    recognizeExpression());
+            }
+        
+            else if(s.equals("isAncestor")) {
+            SchemeVariable ancestor = new StringSchemeVariable(readStringToken());
+            SchemeVariable child = new StringSchemeVariable(readStringToken());
+            // Expression relation =recognizeExpression();
+            return new AncestorDescriptor(child, ancestor);
+            } else if(s.equals("areIdentical")) {
+            
+            return new IdenticalDescriptor(new
+                    StringSchemeVariable(readStringToken()), new
+                    StringSchemeVariable(readStringToken()));
+            } else if(s.equals("areNotIdentical")) {
+            
+            return new NotIdenticalDescriptor(new
+                    StringSchemeVariable(readStringToken()), new
+                    StringSchemeVariable(readStringToken()));
+            } else if(s.equals("isMarked")) {
+            // REMOVED 00/21/21 /* ADDED 00/12/10 */ warning("'isMarked' keyword is deprecated. Please use 'isBound' instead.");
+            ///XXX ATTENTION : POUR L'iINSTANT, ON NE MARQUE QU'AVEC DES STRINGS = CONSTANTES (sinon, ce sera instancie dans NotMarkConstraint, et une variable non instanciable est instanciee par une constante
+            //      return new MarkDescriptor(new StringSchemeVariable(readStringToken()), new StringSchemeVariable(readStringToken()));
+            // MODIFIED 00/12/21
+            
+            return new MarkDescriptor(new    StringSchemeVariable(readStringToken()),   readStringToken(), testMarkActivationValidity);
+            } else if(s.equals("isNotMarked")) {
+            // REMOVED 00/21/21 /* ADDED 00/12/10 */ warning("'isNotMarked' keyword is deprecated. Please use 'isBound' instead.");
+            ///XXX cf autres XXX
+            //      return new NotMarkDescriptor(new StringSchemeVariable(readStringToken()), new StringSchemeVariable(readStringToken()));
+            // MODIFIED 00/12/21
+            return new NotMarkDescriptor(new
+                    StringSchemeVariable(readStringToken()),
+                    readStringToken(), testMarkActivationValidity);
+            } else if(s.equals("isNotMarkedExpression")) {
+            return new
+                    NotMarkExpressionDescriptor(new
+                    
+                    StringSchemeVariable(readStringToken()),recognizeExpression(),
+                    readStringToken(), testMarkActivationValidity);
+            } else if(s.equals("isMarkedExpression")) {
+            return new
+                    MarkExpressionDescriptor(new
+                    
+                    StringSchemeVariable(readStringToken()),recognizeExpression(),readStringToken(), testMarkActivationValidity);
+            }
+        
+        /* REMOVED 00/12/21
+        else if(s.equals("isBound")) {
+            return new BindDescriptor(new StringSchemeVariable(readStringToken()), readStringToken(), recognizeExpression());
+        }
+         */
+            else if(s.equals("isNewNode")) {
+            
+            return new NodeCreatedDescriptor(new StringSchemeVariable(readStringToken()));
+            }
+        
+            else if(s.equals("hasNoSuccessor")) {
+            
+            return new HasNotSuccessorDescriptor(new StringSchemeVariable(readStringToken()), recognizeExpression() );
+            }
+        
+        /* ADDED 1 octobre 2000 */
+            else if(s.equals("contains")) {
+            
+            return new ContainsDescriptor(new
+                    StringSchemeVariable(readStringToken()), new
+                    
+                    StringSchemeVariable(readStringToken()));
+            }
+        /*                      */
+        
+            else if(s.equals("younger")) {
+            
+            return new CompareDescriptor(new   StringSchemeVariable(readStringToken()), new
+                    StringSchemeVariable(readStringToken()));
+            } else if(s.equals("MSPASSCall")) {
+            
+            return new MSPASSDescriptor(new   StringSchemeVariable(readStringToken()), recognizeExpression(), readIntToken());
+            } else if(s.equals("haveAllSuccessorExpression")) {
+            
+            return new HaveAllSuccessorExpressionDescriptor(new   StringSchemeVariable(readStringToken()), recognizeExpression(), recognizeExpression());
+            }
+        
+            else if(s.equals("haveNotAllSuccessorExpression")) {
+            
+            return new HaveNotAllSuccessorExpressionDescriptor(new   StringSchemeVariable(readStringToken()), recognizeExpression(), recognizeExpression());
+            } else if(s.equals("isProposition")) {
+            
+            return new AtomicDescriptor(new   StringSchemeVariable(readStringToken()), recognizeExpression());
+            }else if(s.equals("isMarkedInAllSuccessor")) {
+            
+            return new MarkAllSuccessorExpressionDescriptor(new   StringSchemeVariable(readStringToken()), recognizeExpression(), recognizeExpression(),readStringToken(), testMarkActivationValidity);
+            } else if(s.equals("isNotMarkedInAllSuccessor")) {
+            
+            return new NotMarkAllSuccessorExpressionDescriptor(new   StringSchemeVariable(readStringToken()), recognizeExpression(), recognizeExpression(),readStringToken(), testMarkActivationValidity);
+            } else {
+            if(position==1)ErrorMessage= "Unkown if :"+s+ "\n Line:"+(line - oldLine)+"  in the Connectors and Rules Definitions";
+            throw new IllegalArgumentException(ErrorMessage);}
+    }
+    
+    protected Action recognizeAction() {
+        ErrorMessage="";
+        String s = readStringToken();
+        if(s.equals("add")) {
+            return new AddExpressionAction(new StringSchemeVariable(readStringToken()), recognizeExpression());
+        } else
+            if(s.equals("run")) {
+            return new ProcessAction(new StringSchemeVariable(readStringToken()),readStringToken());
+            } else
+                if(s.equals("createNewNode")) {
+            return new AddNodeAction(new   StringSchemeVariable(readStringToken()), new StringSchemeVariable(readStringToken()));
+                } else if(s.equals("link")) {
+            return new LinkAction(new StringSchemeVariable(readStringToken()), new StringSchemeVariable(readStringToken()), recognizeExpression());
+                }
+        
+                else if(s.equals("hide")) {
+            return new HideAction(new StringSchemeVariable(readStringToken()), recognizeExpression());
+                } else if(s.equals("linkIfNotExist")) {
+            return new LinkIfNotExistAction(new StringSchemeVariable(readStringToken()), new StringSchemeVariable(readStringToken()), recognizeExpression());
+                }
+        
+                else if(s.equals("duplicate")) {
+            duplicateAction = new DuplicateAction(new StringSchemeVariable(readStringToken()), globalStrategy);
+            recognizeDuplication(duplicateAction);
+            return duplicateAction;
+                } else if(s.equals("kill")) {
+            return new KillAction(new StringSchemeVariable(readStringToken()), globalStrategy);
+                } else if(s.equals("stop")) {
+            return new StopStrategyAction(new StringSchemeVariable(readStringToken()));
+                } else if(s.equals("mark")) {
+            // REMOVED 00/12/21 /* ADDED 00/12/10 */ warning("'mark' keyword is deprecated. Please use 'bind' instead.");
+            //XXX cf autres XXX
+            //      return new MarkAction(new StringSchemeVariable(readStringToken()), new StringSchemeVariable(readStringToken()));
+            return new MarkAction(new StringSchemeVariable(readStringToken()), readStringToken());
+                }
+        // ADDED 00/12/21
+                else if(s.equals("unmark")) {
+            return new UnmarkAction(new StringSchemeVariable(readStringToken()), readStringToken());
+                }
+        /* ADDED 00/12/21 */
+                else if(s.equals("markExpressions")) {
+            return new MarkExpressionsAction(new StringSchemeVariable(readStringToken()), recognizeExpression(), readStringToken());
+                } else if(s.equals("unmarkExpressions")) {
+            return new UnmarkExpressionsAction(new StringSchemeVariable(readStringToken()), recognizeExpression(), readStringToken());
+                }
+        /* */
+        /* REMOVED 00/12/21
+        else if(s.equals("bind")) {
+            return new BindAction(new StringSchemeVariable(readStringToken()), readStringToken(), recognizeExpression());
+        }
+         */
+        /* ADDED 00/12/10 */
+                else if(s.equals("createNewConstant")) {
+            return new CreateNewConstantAction(recognizeExpression());
+                }
+        /* */
+        /* ADDED 00/12/10 */
+                else if(s.equals("callOracle")) {
+            return new OracleAction(new StringSchemeVariable(readStringToken()), readStringToken());
+                }
+        /* */
+        /* */
+        /* ADDED 2004/10/20 */
+                else if(s.equals("createOneSuccessor")) {
+            return new AddOneNodeAction(new StringSchemeVariable(readStringToken()),new
+                    StringSchemeVariable(readStringToken()), recognizeExpression());
+                }
+        /* */
+                else {
+            if(position==1)ErrorMessage= "Unkown action:"+s+ "\n Line:"+(line - oldLine)+"  in the Connectors and Rules Definitions";
+            throw new IllegalArgumentException(ErrorMessage);}
+    }
+    
+    protected void recognizeDuplication(DuplicateAction duplicateAction) {
+        String s = readStringToken();
+        if(!s.equals("begin")) throw new IllegalArgumentException("Must find \"begin <source> <destination> <source> <destination> ... <source> <destination> end\""+s);
+        for(;;) {
+            String t = readStringToken();
+            if(t.equals("end")) return;
+            else duplicateAction.add(new StringSchemeVariable(t), new StringSchemeVariable(readStringToken()));
+        }
+    }
+    
+    protected void addToDispatcher(Tableau tableau, Keep keep) {
+        for(Enumeration enumr = keep.getWorkers(); enumr.hasMoreElements();) {
+            //dispatch to all rules
+            Worker w = (Worker)enumr.nextElement();
+            if(w instanceof EventMachine) tableau.addProcessListener((EventMachine)w);
+            else addToDispatcher(tableau, (Keep)w);
+        }
+    }
+    
+    protected void recognizeStep() {
+        try {
+            stepCount = Integer.parseInt(readStringToken());
+        } catch(NumberFormatException e) {
+            throw new IllegalArgumentException("Put an integer after the 'step' keyword");
+        }
+    }
+    
+    protected void recognizeTestMarkActivationValidity() {
+        String s = readStringToken();
+        if(s.equals("true")) testMarkActivationValidity = true;
+        else if(s.equals("false")) testMarkActivationValidity = false;
+        else throw new IllegalArgumentException("Put true or false after the 'checkMarkActivationValidity' keyword");
+    }
+    
+    public void giveGraphicsResult(Wallet wallet) {/*
+        JFrame frame = new JFrame() {
+            public void processWindowEvent(WindowEvent e) {
+                super.processWindowEvent(e);
+                if(e.getID() == WindowEvent.WINDOW_CLOSING) {
+                    System.exit(0);
+                }
+            }
+        };
+                                                    
+                                                    
+        frame.getContentPane().add(new WalletTableauPainter(wallet, imageLocation));
+        frame.setSize(500,500);
+        frame.show();
+     */
+        panel= new WalletTableauPainter(wallet,	imageLocation);
+    }
+    
+    
+    public void putResultInFile(String file,Wallet wallet) {
+        try{
+            FileWriter fw=new FileWriter(file);
+            fw.write("This File contains the all tableaux of  the given formula:"+formula+"\n");
+            fw.write("Wallet : "+wallet+"\n");
+            for(Enumeration enumr = wallet.getGraphes(); enumr.hasMoreElements();) {
+                Tableau t = (Tableau)enumr.nextElement();
+                fw.write(" . Tableau : "+t+"\n");
+                for(Enumeration enum_ = t.getNodes(); enum_.hasMoreElements();) {
+                    TableauNode n = (TableauNode)enum_.nextElement();
+                    fw.write("   . TableauNode : "+n+"\n");
+                    for(Enumeration enum__ = n.getMarkedExpressions(); enum__.hasMoreElements();) {
+                        MarkedExpression e = (MarkedExpression)enum__.nextElement();
+                        fw.write("     .		    MarkedExpression : "+e +"\n");
+                    }
+                    for(Enumeration enum__ = n.getNextEdges(); enum__.hasMoreElements();) {
+                        TableauEdge e = (TableauEdge)enum__.nextElement();
+                        fw.write("     . TableauEdge		    next : "+e+"\n");
+                    }
+                }
+            }
+            fw.close();
+        } catch(IOException e){}
+    }
+    
+    protected void recognizeTableau(int flag) {
+        Strategy strategy = findStrategy(readStringToken());
+        globalStrategy.add(strategy, null);
+        
+        Wallet wallet = new Wallet();
+        
+        Tableau tableau = new Tableau("tableau0");
+        
+        addToDispatcher(tableau, strategy);
+        
+        tableau.setStrategy(strategy);
+        wallet.add(tableau);
+        
+        TableauNode rootNode = new TableauNode("root");
+        tableau.add(rootNode);
+        
+        formula=new MarkedExpression(recognizeExpression());
+        rootNode.add(formula);
+        
+        if(stepCount == -1) parserOutput.append("strategy working...");
+        else {
+            parserOutput.append("strategy working for " + stepCount + " step");
+            if(stepCount > 1) parserOutput.append("s");
+        }
+        
+        // int step = 0;
+        //while(!globalStrategy.isQuiet()) {
+        //  if((stepCount != -1) && (step >= stepCount)) break;
+        //  step++;
+        
+        // parserOutput.append("#");
+        if(duplicateAction!=null)  duplicateAction.setStepCount(stepCount);
+        globalStrategy.work();
+        //}
+        parserOutput.append("end...");
+        
+        if ((flag==1)||(flag==2)) {
+            
+            if(nameoffile!=null) {
+                putResultInFile(nameoffile,wallet );
+                JOptionPane.showMessageDialog(panel,
+                        "You can see the result in the file " +System.getProperty("user.dir")+"/"+nameoffile,
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            } else {
+                putResultInFile(formula.toString(),wallet );
+                JOptionPane.showMessageDialog(panel,
+                        "You can see the result in the file "    +System.getProperty("user.dir")+"/"+formula,
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                
+            }
+        }
+        
+        ////////////////////////////////////////////////////////////////////////
+        if ((flag==2)||(flag==0))
+            //giveGraphicsResult(wallet);
+            LocalInterface.createCytoscapeFrame(wallet, formula);
+        wallet.initialise();
+        rootNode.initialise();
+        tableau.initialise();
+    }
+    
+    protected Wallet recognizeTableau() {
+        Strategy strategy = findStrategy(readStringToken());
+        globalStrategy.add(strategy, null);
+        Wallet resultWallet = new Wallet();
+        Tableau tableau = new Tableau("tableau0");
+        addToDispatcher(tableau, strategy);
+        tableau.setStrategy(strategy);
+        resultWallet.add(tableau);
+        TableauNode rootNode = new TableauNode("root");
+        tableau.add(rootNode);
+        formula=new MarkedExpression(recognizeExpression());
+        rootNode.add(formula);
+        if(stepCount == -1) parserOutput.append("strategy working...");
+        else {
+            parserOutput.append("strategy working for " + stepCount + " step");
+            if(stepCount > 1) parserOutput.append("s");
+        }
+        // int step = 0;
+        //while(!globalStrategy.isQuiet()) {
+        //  if((stepCount != -1) && (step >= stepCount)) break;
+        //  step++;
+        // parserOutput.append("#");
+        if(duplicateAction!=null)  duplicateAction.setStepCount(stepCount);
+        globalStrategy.work();
+        //}
+        parserOutput.append("end...");
+        /*
+        if ((flag==1)||(flag==2)) {
+         
+            if(nameoffile!=null) {
+                putResultInFile(nameoffile,wallet );
+                JOptionPane.showMessageDialog(panel,
+                        "You can see the result in the file " +System.getProperty("user.dir")+"/"+nameoffile,
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+            } else {
+                putResultInFile(formula.toString(),wallet );
+                JOptionPane.showMessageDialog(panel,
+                        "You can see the result in the file "    +System.getProperty("user.dir")+"/"+formula,
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+         
+            }
+        }
+         
+        ////////////////////////////////////////////////////////////////////////
+        if ((flag==2)||(flag==0))
+            //giveGraphicsResult(wallet);
+            LocalInterface.createCytoscapeFrame(wallet, formula);
+         
+        wallet.initialise();
+        rootNode.initialise();
+        tableau.initialise();
+         */
+        /*if(resultWallet == null)
+            System.out.println("wallet is empty at end of recognize tableau");
+         
+        if(resultWallet == null)
+            System.out.println("wallet is empty at end of recognize tableau & display");
+         */
+        return resultWallet;
+    }
+    
+    public void setName(String name) {
+        
+        nameoffile=name;
+        
+    }
+    public void setFrame(InternalFrame frame) {
+        
+        this.frame=frame;
+        
+    }
+}

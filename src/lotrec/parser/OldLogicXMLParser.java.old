@@ -1,0 +1,388 @@
+/*
+ * LogicXMLParser.java
+ *
+ * Created on 7 mars 2007, 15:33
+ *
+ * To change this template, choose Tools | Template Manager
+ * and open the template in the editor.
+ */
+
+package lotrec.parser;
+
+import java.io.IOException;
+import lotrec.Lotrec;
+import lotrec.dataStructure.Logic;
+import lotrec.dataStructure.TestingFormula;
+import lotrec.dataStructure.expression.Connector;
+import lotrec.dataStructure.expression.ConstantExpression;
+import lotrec.dataStructure.expression.MarkedExpression;
+import lotrec.dataStructure.expression.VariableExpression;
+import lotrec.dataStructure.tableau.Rule;
+import lotrec.dataStructure.tableau.condition.AbstractCondition;
+import lotrec.process.AbstractAction;
+import lotrec.process.Activator;
+import lotrec.process.Strategy;
+import org.apache.xerces.parsers.DOMParser;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.xml.sax.SAXException;
+
+/**
+ *
+ * @author said
+ */
+public class OldLogicXMLParser {
+    
+    private static String LOGIC_TAG = "logic"; //not used
+    private static String LOGIC_DISPLAY_NAME_TAG = "display-name";
+    private static String LOGIC_DESCRIPTION_TAG = "description";
+    private static String LOGIC_DEF_COMMENT_TAG = "def-comment";
+    private static String LOGIC_AUTHOR = "author";
+    private static String LOGIC_LAST_UPDATE = "last-update";
+    private static String DEFAUT_STRATEGY_TAG = "default-strategy";
+    private static String MAX_STEPS_NUM_TAG = "max-steps-num";
+    private static String CONNECTOR_TAG = "connector";
+    private static String CONN_DISPLAY_NAME_TAG = "display-name";
+    private static String CONN_NAME_TAG = "name";
+    private static String CONN_ARITY_TAG = "arity";
+    private static String CONN_ASSOCIATIVE_TAG = "associative";
+    private static String CONN_OUTPUT_FORMAT_TAG = "output-format";
+    private static String CONN_PRIORITY_TAG = "priority";
+    private static String CONN_COMMENT_TAG = "comment";
+    private static String RULE_TAG = "rule";
+    private static String RULE_DISPLAY_NAME_TAG = "display-name";
+    private static String RULE_NAME_TAG = "name";
+    private static String RULE_COMMUTATIVE_TAG = "commutative";
+    private static String CONDITION_TAG = "condition";
+    private static String ACTION_TAG = "action";
+    private static String RULE_COMMENT_TAG = "comment";
+    private static String STRATEGY_TAG = "strategy";
+    private static String STRATEGY_DISPLAY_NAME_TAG = "display-name";
+    private static String STRATEGY_NAME_TAG = "name";
+    private static String STRATEGY_USABILITY_TAG = "usability";
+    private static String STRATEGY_CODE_TAG = "code";
+    private static String STRATEGY_COMMENT_TAG = "comment";
+    private static String TESTING_FORMULA_TAG = "testing-formula";
+    private static String TF_DISPLAY_NAME_TAG = "display-name";
+    private static String TF_CODE_APPEARANCE_TAG = "code-appearance";
+    private static String TF_CODE_TAG = "code";
+    private static String TF_COMMENT_TAG = "comment";
+    private Logic parsedLogic;
+    private OldiesTokenizer oldiesTokenizer;
+    Document doc;
+    /**
+     * Creates a new instance of LogicXMLParser
+     */
+    public OldLogicXMLParser(String xmlFileName) {
+        String fileName = (String) xmlFileName;
+        DOMParser parser = new DOMParser();
+        parsedLogic = new Logic();
+        oldiesTokenizer = new OldiesTokenizer(parsedLogic);
+        oldiesTokenizer.initializeTokenizerAndProps();
+        try {
+            parser.parse(fileName);
+            doc = parser.getDocument();
+        } catch (SAXException ex) {
+            Lotrec.println("XML Logic parsing stoped because of the following SAX Exception:");
+            ex.printStackTrace();
+        } catch (IOException ex) {
+            Lotrec.println("XML Logic parsing stoped because of the following IO Exception:");
+            ex.printStackTrace();
+        }
+    }
+    
+    public Logic parseLogic() throws LogicParserException{
+        Lotrec.println("XML Logic parsing is processing...");
+        if(getTagTextContent(doc,this.LOGIC_DISPLAY_NAME_TAG).equals("")){
+            throw new LogicParserException(LogicParserException.NO_LOGIC_NAME);
+        }else{
+            parsedLogic.setDisplayName(getTagTextContent(doc,this.LOGIC_DISPLAY_NAME_TAG));
+        }
+        parsedLogic.setDescription(getTagTextContent(doc,this.LOGIC_DESCRIPTION_TAG));
+        parsedLogic.setDefinitionComment(getTagTextContent(doc,this.LOGIC_DEF_COMMENT_TAG));
+        parsedLogic.setAuthor(getTagTextContent(doc,this.LOGIC_AUTHOR));
+        parsedLogic.setLastUpdate(getTagTextContent(doc,this.LOGIC_LAST_UPDATE));
+        this.parseConnectors();        
+        this.parseRules();
+        try{
+            int maxStepsNum = Integer.parseInt(getTagTextContent(doc,this.MAX_STEPS_NUM_TAG));
+            parsedLogic.setMaxStepsNum(maxStepsNum);
+        }catch(Exception e){
+            if(e instanceof NumberFormatException){
+                throw new LogicParserException(LogicParserException.BAD_MAX_STEPS_FORMAT +
+                        LogicParserException.EXCEPTION_CAUSE + getTagTextContent(doc,this.MAX_STEPS_NUM_TAG));
+            }
+        }
+        this.parseStrategies();
+        if(getTagTextContent(doc,this.DEFAUT_STRATEGY_TAG) == null){
+            throw new LogicParserException(LogicParserException.NO_DEFAULT_STRATEGY);
+        }else {
+            if(parsedLogic.getStrategy(getTagTextContent(doc,this.DEFAUT_STRATEGY_TAG))!=null)
+                parsedLogic.setDefaultStrategyName(getTagTextContent(doc,this.DEFAUT_STRATEGY_TAG));            
+            else
+                throw new LogicParserException(LogicParserException.INCORRECT_DEFAULT_STRATEGY);
+        }
+        this.parseTestingFormulae();
+        
+        //Lotrec.println("------------The resulting parsed Logic-------------");
+        //Lotrec.println(parsedLogic);
+        //Lotrec.println("-------End of resulting parsed Logic Display-------");
+        
+        Lotrec.println("XML Logic parsing completed successfully...");
+        return parsedLogic;
+    }
+    
+    private void parseConnectors()throws LogicParserException{
+        int connectorsCount = doc.getElementsByTagName(this.CONNECTOR_TAG).getLength();
+        if(connectorsCount == 0){
+            throw new LogicParserException(LogicParserException.NO_CONNECTORS);
+        }else{
+            for(int i=0; i<connectorsCount; i++){
+                Element connElement = (Element)doc.getElementsByTagName(CONNECTOR_TAG).item(i);
+                Connector conn = new Connector();
+                if(getTagTextContent(connElement,this.CONN_NAME_TAG).equals("")){
+                    throw new LogicParserException(LogicParserException.NO_CONNECTOR_NAME +
+                            LogicParserException.EXCEPTION_CAUSE + getTagTextContent(connElement,this.CONN_NAME_TAG));
+                }else if(parsedLogic.getConnector(getTagTextContent(connElement,this.CONN_NAME_TAG))!=null){
+                    throw new LogicParserException(LogicParserException.DUPLICATED_CONNECTORS +
+                            getTagTextContent(connElement,this.CONN_NAME_TAG));
+                }else{
+                    conn.setName(getTagTextContent(connElement,this.CONN_NAME_TAG));
+                }
+                if(getTagTextContent(connElement,this.CONN_DISPLAY_NAME_TAG).equals("")){
+                    conn.setDisplayName(conn.getName());
+                }else{
+                    conn.setDisplayName(getTagTextContent(connElement,this.CONN_DISPLAY_NAME_TAG));
+                }
+                try{
+                    int arity = Integer.parseInt(getTagTextContent(connElement,this.CONN_ARITY_TAG));
+                    conn.setArity(arity);
+                }catch(Exception e){
+                    if(e instanceof NumberFormatException){
+                        throw new LogicParserException(LogicParserException.NO_CONNECTOR_ARITY+
+                                LogicParserException.EXCEPTION_CAUSE + getTagTextContent(connElement,this.CONN_ARITY_TAG));
+                    }
+                }
+                if(getTagTextContent(connElement,this.CONN_ASSOCIATIVE_TAG).equals("true")){
+                    conn.setAssociative(true);
+                }else if(getTagTextContent(connElement,this.CONN_ASSOCIATIVE_TAG).equals("false")){
+                    conn.setAssociative(false);
+                }else{
+                    throw new LogicParserException(LogicParserException.NO_CONNECTOR_ASSOCIATIVITY+
+                            LogicParserException.EXCEPTION_CAUSE + getTagTextContent(connElement,this.CONN_ASSOCIATIVE_TAG));
+                }
+                if(getTagTextContent(connElement,this.CONN_OUTPUT_FORMAT_TAG).equals("")){
+                    throw new LogicParserException(LogicParserException.NO_CONNECTOR_OUTPUT+
+                            LogicParserException.EXCEPTION_CAUSE + getTagTextContent(connElement,this.CONN_OUTPUT_FORMAT_TAG));
+                }else{
+                    conn.setOutString(getTagTextContent(connElement,this.CONN_OUTPUT_FORMAT_TAG));
+                }
+                try{
+                    int priority = Integer.parseInt(getTagTextContent(connElement,this.CONN_PRIORITY_TAG));
+                    conn.setPriority(priority);
+                }catch(Exception e){
+                    if(e instanceof NumberFormatException){
+                        throw new LogicParserException(LogicParserException.NO_CONNECTOR_PRIORITY+
+                                LogicParserException.EXCEPTION_CAUSE + getTagTextContent(connElement,this.CONN_PRIORITY_TAG));
+                    }
+                }
+                conn.setComment(getTagTextContent(connElement,this.CONN_COMMENT_TAG));
+                parsedLogic.addConnector(conn);
+            }
+        }
+    }
+    private void parseRules()throws LogicParserException{
+        int rulesCount = doc.getElementsByTagName(RULE_TAG).getLength();
+        if(rulesCount == 0){
+            throw new LogicParserException(LogicParserException.NO_RULES);
+        }else{
+            for(int i=0; i<rulesCount; i++){
+                Element ruleElement = (Element)doc.getElementsByTagName(RULE_TAG).item(i);
+                Rule rule = new Rule();
+                if(this.getTagTextContent(ruleElement,this.RULE_NAME_TAG).equals("")){
+                    throw new LogicParserException(LogicParserException.NO_RULE_NAME +
+                            LogicParserException.EXCEPTION_CAUSE + getTagTextContent(ruleElement,this.RULE_NAME_TAG));
+                }else if(parsedLogic.getRule(getTagTextContent(ruleElement,this.RULE_NAME_TAG))!=null){
+                    throw new LogicParserException(LogicParserException.DUPLICATED_RULES +
+                            getTagTextContent(ruleElement,this.RULE_NAME_TAG));
+                }else{
+                    rule.setName(getTagTextContent(ruleElement,this.RULE_NAME_TAG));
+                }
+                if(this.getTagTextContent(ruleElement,this.RULE_DISPLAY_NAME_TAG).equals("")){
+                    rule.setDisplayName(rule.getName());
+                }else{
+                    rule.setDisplayName(getTagTextContent(ruleElement,this.RULE_DISPLAY_NAME_TAG));
+                }
+                if(this.getTagTextContent(ruleElement,this.RULE_COMMUTATIVE_TAG).equals("true")){
+                    rule.setCommutative(true);
+                }else if(this.getTagTextContent(ruleElement,this.RULE_COMMUTATIVE_TAG).equals("false")){
+                    rule.setCommutative(false);
+                }else{
+                    throw new LogicParserException(LogicParserException.NO_RULE_COMMUTATIVE +
+                            LogicParserException.EXCEPTION_CAUSE + getTagTextContent(ruleElement,this.RULE_COMMUTATIVE_TAG));
+                }
+                parseConditions(rule,ruleElement);
+                parseActions(rule,ruleElement);
+                rule.setComment(getTagTextContent(ruleElement,this.RULE_COMMENT_TAG));
+                parsedLogic.addRule(rule);
+                //Lotrec.println("Rule num[" + i + "] is: " + ruleElement.getElementsByTagName(RULE_DISPLAY_NAME_TAG).item(0).getTextContent());
+                //Lotrec.println("Condition 1 of rule num[" + i + "] is: " + ruleElement.getElementsByTagName(CONDITION_TAG).item(0).getTextContent());
+            }
+        }
+    }
+    public void parseConditions(Rule rule,Element ruleElement) throws LogicParserException{
+        int conditionsCount = ruleElement.getElementsByTagName(this.CONDITION_TAG).getLength();
+        if(conditionsCount == 0){
+            throw new LogicParserException(LogicParserException.NO_RULE_CONDITIONS + rule.getName() + ".");
+        }else{
+            for(int i=0; i<conditionsCount; i++){
+                String conditionCode = ruleElement.getElementsByTagName(this.CONDITION_TAG).item(i).getTextContent();
+                //Lotrec.println("reading condition: " + conditionCode);
+                AbstractCondition condition = oldiesTokenizer.parseCondition(conditionCode);
+                condition.setCode(conditionCode);
+                condition.setItsRule(rule);
+                oldiesTokenizer.verifyCodeEnd();
+                rule.addCondition(condition);
+            }
+        }
+    }
+    public void parseActions(Rule rule,Element ruleElement) throws LogicParserException{
+        int actionsCount = ruleElement.getElementsByTagName(this.ACTION_TAG).getLength();
+        if(actionsCount == 0){
+            throw new LogicParserException(LogicParserException.NO_RULE_ACTIONS + rule.getName() + ".");
+        }else{
+            for(int i=0; i<actionsCount; i++){
+                String actionCode = ruleElement.getElementsByTagName(this.ACTION_TAG).item(i).getTextContent();
+                //Lotrec.println("reading action: " + actionCode);
+                AbstractAction action = oldiesTokenizer.parseAction(actionCode);
+                action.setCode(actionCode);
+                action.setItsRule(rule);
+                oldiesTokenizer.verifyCodeEnd();
+                rule.addAction(action);
+            }
+        }
+    }
+    
+    public void parseStrategies()throws LogicParserException{
+        int strategiesCount = doc.getElementsByTagName(this.STRATEGY_TAG).getLength();
+        if(strategiesCount == 0){
+            throw new LogicParserException(LogicParserException.NO_STRATEGIES);
+        }else{
+            for(int i=0; i<strategiesCount; i++){
+                Element strategyElement = (Element)doc.getElementsByTagName(this.STRATEGY_TAG).item(i);
+                String strategyName = this.getTagTextContent(strategyElement,this.STRATEGY_NAME_TAG);
+                Strategy strategy = parsedLogic.getStrategy(strategyName);
+                if(strategy != null){
+                    throw new LogicParserException(LogicParserException.DUPLICATED_STRATEGIES + strategyName);
+                }
+                strategy = oldiesTokenizer.parseStrategy(getTagTextContent(strategyElement,this.STRATEGY_CODE_TAG));
+                strategy.setWorkerName(strategyName);
+                strategy.setCode(getTagTextContent(strategyElement,this.STRATEGY_CODE_TAG));
+                String strategyUsability = this.getTagTextContent(strategyElement,this.STRATEGY_USABILITY_TAG);
+                strategy.setUsability(strategyUsability);
+                String strategyComment = this.getTagTextContent(strategyElement,this.STRATEGY_COMMENT_TAG);
+                strategy.setComment(strategyComment);
+                parsedLogic.addStrategy(strategy);
+            }
+        }
+    }
+    public void parseTestingFormulae()throws LogicParserException{
+        int tstFormulaeCount = doc.getElementsByTagName(this.TESTING_FORMULA_TAG).getLength();
+        if(tstFormulaeCount > 0){
+            for(int i=0; i<tstFormulaeCount; i++){
+                Element tstFormulaElement = (Element)doc.getElementsByTagName(this.TESTING_FORMULA_TAG).item(i);
+                TestingFormula tstFormula = new TestingFormula();
+                String tstFormulaCode = getTagTextContent(tstFormulaElement,this.TF_CODE_TAG);
+                if(tstFormulaCode.equals("")){
+                    throw new LogicParserException(LogicParserException.EMPTY_TESTING_FORMULA);
+                }
+                tstFormula.setCode(tstFormulaCode);
+                tstFormula.setFormula(new MarkedExpression(oldiesTokenizer.parseExpression(tstFormulaCode)));
+                if(getTagTextContent(tstFormulaElement,this.TF_CODE_APPEARANCE_TAG).equals("")){
+                    tstFormula.setCodeAppearence(tstFormulaCode);
+                }else{
+                    tstFormula.setCodeAppearence(getTagTextContent(tstFormulaElement,this.TF_CODE_APPEARANCE_TAG));
+                }
+                if(getTagTextContent(tstFormulaElement,this.TF_DISPLAY_NAME_TAG).equals("")){
+                    tstFormula.setName(tstFormula.getCodeAppearence());
+                }else{
+                    tstFormula.setName(getTagTextContent(tstFormulaElement,this.TF_DISPLAY_NAME_TAG));
+                }
+                String tstFormulaComment = this.getTagTextContent(tstFormulaElement,this.TF_COMMENT_TAG);
+                tstFormula.setComment(tstFormulaComment);
+                parsedLogic.addTestingFormula(tstFormula);
+            }
+        }
+    }
+    
+    
+    public Connector parseConnector(String connectorCode) {
+        return null;
+    }
+    
+    public ConstantExpression parseConstant(String constantCode) {
+        return null;
+    }
+    
+    public VariableExpression parseVariable(String variableCode) {
+        return null;
+    }
+    
+    public MarkedExpression parseFormula(String formulaCode, Logic logicDef) {
+        return null;
+    }
+    
+    public AbstractCondition parseRuleCondition(String conditionCode, Logic logicDef) {
+        return null;
+    }
+    
+    public Activator parseRuleActivator(String actionCode, Logic logicDef) {
+        return null;
+    }
+    
+    public Rule parseRule(String ruleCode, Logic logicDef) {
+        return null;
+    }
+    
+    public Strategy parseStrategy(String strategyCode, Logic logicDef) {
+        return null;
+    }
+    
+    public String getAttribute(Document document, String elementName, String attributeName){
+        String res = null;
+        try{
+            res = document.getElementsByTagName(elementName).item(0).getAttributes().getNamedItem(attributeName).getNodeValue();
+        } catch(Exception e){}
+        return res;
+    }
+    
+    public void setAttribute(Document document, String elementName, String attributeName, String attributeValue){
+        try{
+            document.getElementsByTagName(elementName).item(0).getAttributes().getNamedItem(attributeName).setNodeValue(attributeValue);
+        } catch(Exception e){}
+    }
+    
+    public String getTagTextContent(Object e, String tagName){
+        Document d;
+        Element ed;
+        if(e instanceof Document){
+            d = (Document) e;
+            return d.getElementsByTagName(tagName).item(0).getTextContent();
+        } else{
+            ed = (Element) e;
+            return ed.getElementsByTagName(tagName).item(0).getTextContent();
+        }
+        
+    }
+    
+    public int getElementsCount(Document document, String elementName){
+        int res = 0;
+        try{
+            res = document.getElementsByTagName(elementName).getLength();
+            //item(0).getAttributes().getNamedItem(attributeName).getNodeValue();
+        } catch(Exception e){}
+        return res;
+    }
+    
+    
+}

@@ -1,0 +1,87 @@
+/*
+ * TableauxEnginePane.java
+ *
+ * Created on 26 octobre 2007, 16:43
+ *
+ * To change this template, choose Tools | Template Manager
+ * and open the template in the editor.
+ */
+
+package lotrec.gui;
+
+import java.awt.BorderLayout;
+import javax.swing.BorderFactory;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JToggleButton;
+import lotrec.resources.ResourcesProvider;
+
+/**
+ *
+ * @author said
+ */
+public class LoadedLogicsPanel1 extends JPanel{
+    
+//    private JPanel northPanel;
+//    private JToggleButton btnShowHide;
+    private LoadedLogicsPane loadedLogicsPane;
+    private MainFrame mainFrame;
+    private java.util.ResourceBundle resource;
+    
+    /** Creates a new instance of TableauxEnginePane */
+    public LoadedLogicsPanel1(MainFrame mainFrame) {
+        super();
+        final MainFrame copyMainFrame = mainFrame;
+        final LoadedLogicsPanel1 copyOfThis = this;
+        this.mainFrame = mainFrame;
+        loadedLogicsPane = new LoadedLogicsPane(mainFrame);
+//        prepareNorthPanel();
+        setLayout(new BorderLayout());
+//        add(this.northPanel, BorderLayout.NORTH);
+        add(this.loadedLogicsPane, BorderLayout.CENTER);
+        this.refresh();
+    }
+    
+//    public void prepareNorthPanel(){
+//        btnShowHide = new JToggleButton();
+//        btnShowHide.setContentAreaFilled(false);
+//        btnShowHide.setForeground(new java.awt.Color(51, 102, 255));
+//        btnShowHide.addActionListener(new java.awt.event.ActionListener() {
+//            public void actionPerformed(java.awt.event.ActionEvent evt) {
+//                if(btnShowHide.isSelected()){    
+//                    mainFrame.hideLogicPanel(); 
+//                }else{
+//                    mainFrame.showLogicPanel();  
+//                }
+//                refreshShowHide();
+//            }
+//        });
+//        northPanel = new JPanel();
+//        getNorthPanel().setLayout(new BorderLayout());
+//        northPanel.add(btnShowHide, BorderLayout.EAST);
+//    }
+    
+//    public void refreshShowHide(){
+//        this.resource = java.util.ResourceBundle.getBundle("lotrec.resources.LoadedLogicsPanel", ResourcesProvider.getCurrentLocale());
+//        if(btnShowHide.isSelected()){
+//            btnShowHide.setText(resource.getString("ShowHide.Show"));
+//        }else{
+//            btnShowHide.setText(resource.getString("ShowHide.Hide"));
+//        }        
+//    }
+    
+    public void refresh(){
+        this.resource = java.util.ResourceBundle.getBundle("lotrec.resources.LoadedLogicsPanel", ResourcesProvider.getCurrentLocale());
+        this.setBorder(BorderFactory.createTitledBorder(resource.getString("LoadedLogicsPanel.title")));          
+//        refreshShowHide();
+        loadedLogicsPane.refresh();
+    }
+    
+    public LoadedLogicsPane getLoadedLogicsPane() {
+        return loadedLogicsPane;
+    }
+
+//    public JPanel getNorthPanel() {
+//        return northPanel;
+//    }
+}
