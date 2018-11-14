@@ -11,3 +11,8 @@ nbactions.xml
 
 
 # End of https://www.gitignore.io/api/netbeans
+
+# LoTREC changes:
+# Added:
+**/Thumbs.db
+# Removed:
