@@ -2,17 +2,25 @@
 
 ### NetBeans ###
 nbproject/private/
-build/
 nbbuild/
 dist/
 nbdist/
 .nb-gradle/
 nbactions.xml
 
-
 # End of https://www.gitignore.io/api/netbeans
+
+### Gradle ###
+build/
+.gradle/
+
+# End of Gradle
 
 # LoTREC changes:
 # Added:
 **/Thumbs.db
 # Removed:
+
+# Claude Code and SpecKit local files
+.claude
+.specify
