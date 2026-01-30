@@ -217,6 +217,10 @@ See `.specify/memory/roadmap.md` for the full modernization roadmap.
 - Phase 1.2 (Test infrastructure): IN PROGRESS - JUnit 5 + AssertJ configured, initial tests created
 - Phase 2+ (Code quality, UI modernization): PENDING
 
+## Commit Messages
+
+Do not include the email address in the "Co-Authored-By" line in commit messages.
+
 ## Quick Reference
 
 | Task | Command |
