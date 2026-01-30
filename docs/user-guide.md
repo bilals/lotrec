@@ -213,4 +213,3 @@ LoTREC uses **prefix notation** internally:
 - [Getting Started](getting-started.md) - Installation and your first proof
 - [Defining Logics](defining-logics.md) - Create custom logics with XML rules
 - [Predefined Logics](predefined-logics.md) - Overview of 38 built-in logics
-- [CLAUDE.md](../CLAUDE.md) - Developer documentation and architecture overview
