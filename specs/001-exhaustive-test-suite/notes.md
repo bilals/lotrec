@@ -6,12 +6,13 @@
 
 | Metric | Result |
 |--------|--------|
-| **Total Tests** | 1288 |
+| **Total Tests** | 1301 |
 | **Test Files Created** | 38 |
 | **All Tests Passing** | Yes |
 | **Execution Time** | ~90 seconds |
 | **Parser Coverage** | 61% ✅ |
-| **Headless Engine Tests** | 31 ✅ (NEW) |
+| **Headless Engine Tests** | 31 ✅ (Enhancement-001) |
+| **Parser Methods Added** | 9 ✅ (Enhancement-003) |
 
 ---
 
@@ -90,6 +91,17 @@
 **Issue**: `EventMachine` requires complex setup with rules, conditions, actions, and tableau context.
 
 **Impact**: Strategy execution testing is limited to worker management, not actual rule application.
+
+### 5. ~~Missing Parser Methods~~ ✅ RESOLVED
+
+**Issue**: 6 conditions and 3 actions were registered in `CLASSES_KEYWORDS` but not implemented in `OldiesTokenizer`.
+
+**~~Impact~~**: ~~String-based rule parsing would throw `ParseException` for these keywords.~~
+
+**Resolution**: Implemented all 9 missing parser methods:
+- **See:** [enhancement-plan-003-Parser-Condition-Action.md](./enhancement-plan-003-Parser-Condition-Action.md)
+
+**Result**: All registered conditions and actions are now parseable via `OldiesTokenizer`.
 
 ---
 
@@ -262,8 +274,28 @@ src/lotrec/engine/
 └── Engine.java                  [MODIFIED]
 ```
 
+### Production Code (Enhancement-003)
+
+Added missing parser methods (see [enhancement-plan-003](./enhancement-plan-003-Parser-Condition-Action.md)):
+
+```
+src/lotrec/parser/
+└── OldiesTokenizer.java         [MODIFIED] ← Added 6 condition cases, 3 action cases
+```
+
+### Test Updates (Enhancement-003)
+
+```
+test/lotrec/dataStructure/tableau/
+├── action/
+│   └── ActionRegistryTest.java      [MODIFIED] ← Updated 3 tests
+└── condition/
+    └── ConditionRegistryTest.java   [MODIFIED] ← Added 6 parsing tests
+```
+
 ---
 
 *Document created: 2026-01-29*
 *Updated: 2026-01-30 (Enhancement-001 completed)*
 *Updated: 2026-01-30 (Enhancement-002 completed)*
+*Updated: 2026-01-30 (Enhancement-003 completed)*

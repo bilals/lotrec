@@ -250,13 +250,16 @@ class ActionRegistryTest {
         }
 
         @Test
-        @DisplayName("should NOT parse 'createOneParent' - not implemented in parser")
-        void shouldNotParseCreateOneParent() {
-            // Note: createOneParent is in CLASSES_KEYWORDS but not implemented in parseAction
-            // This documents the current behavior - the action class exists but cannot be parsed
-            assertThatThrownBy(() -> tokenizer.parseAction("createOneParent ?n ?m R"))
-                    .isInstanceOf(ParseException.class)
-                    .hasMessageContaining("createOneParent");
+        @DisplayName("should parse 'createOneParent' action with two nodes and relation")
+        void shouldParseCreateOneParent() throws ParseException {
+            AbstractAction action = tokenizer.parseAction("createOneParent ?n ?m R");
+
+            assertThat(action).isInstanceOf(AddOneParentAction.class);
+            assertThat(action.getName()).isEqualTo("createOneParent");
+            assertThat(action.getParameters()).hasSize(3);
+            assertThat(action.getParameters().get(0).getType()).isEqualTo(ParameterType.NODE);
+            assertThat(action.getParameters().get(1).getType()).isEqualTo(ParameterType.NODE);
+            assertThat(action.getParameters().get(2).getType()).isEqualTo(ParameterType.RELATION);
         }
     }
 
@@ -301,25 +304,32 @@ class ActionRegistryTest {
     }
 
     @Nested
-    @DisplayName("Action Parsing - Unimplemented Actions")
-    class UnimplementedActionParsing {
+    @DisplayName("Action Parsing - Link/Merge Actions")
+    class LinkMergeActionParsing {
 
         @Test
-        @DisplayName("should NOT parse 'unlink' - not implemented in parser")
-        void shouldNotParseUnlink() {
-            // Note: unlink is in CLASSES_KEYWORDS but not implemented in parseAction
-            assertThatThrownBy(() -> tokenizer.parseAction("unlink ?n ?m R"))
-                    .isInstanceOf(ParseException.class)
-                    .hasMessageContaining("unlink");
+        @DisplayName("should parse 'unlink' action with two nodes and relation")
+        void shouldParseUnlink() throws ParseException {
+            AbstractAction action = tokenizer.parseAction("unlink ?n ?m R");
+
+            assertThat(action).isInstanceOf(UnlinkAction.class);
+            assertThat(action.getName()).isEqualTo("unlink");
+            assertThat(action.getParameters()).hasSize(3);
+            assertThat(action.getParameters().get(0).getType()).isEqualTo(ParameterType.NODE);
+            assertThat(action.getParameters().get(1).getType()).isEqualTo(ParameterType.NODE);
+            assertThat(action.getParameters().get(2).getType()).isEqualTo(ParameterType.RELATION);
         }
 
         @Test
-        @DisplayName("should NOT parse 'merge' - not implemented in parser")
-        void shouldNotParseMerge() {
-            // Note: merge is in CLASSES_KEYWORDS but not implemented in parseAction
-            assertThatThrownBy(() -> tokenizer.parseAction("merge ?n ?m"))
-                    .isInstanceOf(ParseException.class)
-                    .hasMessageContaining("merge");
+        @DisplayName("should parse 'merge' action with two node identifiers")
+        void shouldParseMerge() throws ParseException {
+            AbstractAction action = tokenizer.parseAction("merge ?n ?m");
+
+            assertThat(action).isInstanceOf(MergeNodeInNodeAction.class);
+            assertThat(action.getName()).isEqualTo("merge");
+            assertThat(action.getParameters()).hasSize(2);
+            assertThat(action.getParameters().get(0).getType()).isEqualTo(ParameterType.NODE);
+            assertThat(action.getParameters().get(1).getType()).isEqualTo(ParameterType.NODE);
         }
     }
 

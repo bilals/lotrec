@@ -169,10 +169,6 @@ class ConditionRegistryTest {
     @DisplayName("Condition Parsing - Atomic Tests")
     class ConditionParsingAtomicTests {
 
-        // Note: isAtomic and isNotAtomic are registered in CLASSES_KEYWORDS
-        // but not implemented in OldiesTokenizer.parseCondition()
-        // These tests document the expected behavior once implemented
-
         @Test
         @DisplayName("should have isAtomic registered in CLASSES_KEYWORDS")
         void shouldHaveIsAtomicRegistered() {
@@ -187,6 +183,28 @@ class ConditionRegistryTest {
             assertThat(AbstractCondition.CLASSES_KEYWORDS).containsKey("isNotAtomic");
             assertThat(AbstractCondition.CLASSES_KEYWORDS.get("isNotAtomic"))
                     .isEqualTo("IsNotAtomicCondition");
+        }
+
+        @Test
+        @DisplayName("should parse isAtomic condition with formula")
+        void shouldParseIsAtomic() throws ParseException {
+            AbstractCondition cond = tokenizer.parseCondition("isAtomic _X");
+
+            assertThat(cond).isInstanceOf(IsAtomicCondition.class);
+            assertThat(cond.getName()).isEqualTo("isAtomic");
+            assertThat(cond.getParameters()).hasSize(1);
+            assertThat(cond.getParameters().get(0).getType()).isEqualTo(ParameterType.FORMULA);
+        }
+
+        @Test
+        @DisplayName("should parse isNotAtomic condition with formula")
+        void shouldParseIsNotAtomic() throws ParseException {
+            AbstractCondition cond = tokenizer.parseCondition("isNotAtomic _X");
+
+            assertThat(cond).isInstanceOf(IsNotAtomicCondition.class);
+            assertThat(cond.getName()).isEqualTo("isNotAtomic");
+            assertThat(cond.getParameters()).hasSize(1);
+            assertThat(cond.getParameters().get(0).getType()).isEqualTo(ParameterType.FORMULA);
         }
 
         @Test
@@ -264,6 +282,17 @@ class ConditionRegistryTest {
         }
 
         @Test
+        @DisplayName("should parse hasNoParents condition with node")
+        void shouldParseHasNoParents() throws ParseException {
+            AbstractCondition cond = tokenizer.parseCondition("hasNoParents ?n");
+
+            assertThat(cond).isInstanceOf(HasNoParentsCondition.class);
+            assertThat(cond.getName()).isEqualTo("hasNoParents");
+            assertThat(cond.getParameters()).hasSize(1);
+            assertThat(cond.getParameters().get(0).getType()).isEqualTo(ParameterType.NODE);
+        }
+
+        @Test
         @DisplayName("hasNoParents condition class exists and can be instantiated")
         void hasNoParentsConditionClassExists() {
             lotrec.dataStructure.expression.StringSchemeVariable node =
@@ -324,6 +353,18 @@ class ConditionRegistryTest {
         }
 
         @Test
+        @DisplayName("should parse areNotEqual condition with two formulas")
+        void shouldParseAreNotEqual() throws ParseException {
+            AbstractCondition cond = tokenizer.parseCondition("areNotEqual _X _Y");
+
+            assertThat(cond).isInstanceOf(NotEqualCondition.class);
+            assertThat(cond.getName()).isEqualTo("areNotEqual");
+            assertThat(cond.getParameters()).hasSize(2);
+            assertThat(cond.getParameters().get(0).getType()).isEqualTo(ParameterType.FORMULA);
+            assertThat(cond.getParameters().get(1).getType()).isEqualTo(ParameterType.FORMULA);
+        }
+
+        @Test
         @DisplayName("areNotEqual condition class exists and can be instantiated")
         void areNotEqualConditionClassExists() {
             lotrec.dataStructure.expression.VariableExpression expr1 =
@@ -359,6 +400,18 @@ class ConditionRegistryTest {
             assertThat(AbstractCondition.CLASSES_KEYWORDS).containsKey("haveSameFormulasSet");
             assertThat(AbstractCondition.CLASSES_KEYWORDS.get("haveSameFormulasSet"))
                     .isEqualTo("HaveSameFormulasSetCondition");
+        }
+
+        @Test
+        @DisplayName("should parse haveSameFormulasSet condition with two nodes")
+        void shouldParseHaveSameFormulasSet() throws ParseException {
+            AbstractCondition cond = tokenizer.parseCondition("haveSameFormulasSet ?n ?m");
+
+            assertThat(cond).isInstanceOf(HaveSameFormulasSetCondition.class);
+            assertThat(cond.getName()).isEqualTo("haveSameFormulasSet");
+            assertThat(cond.getParameters()).hasSize(2);
+            assertThat(cond.getParameters().get(0).getType()).isEqualTo(ParameterType.NODE);
+            assertThat(cond.getParameters().get(1).getType()).isEqualTo(ParameterType.NODE);
         }
 
         @Test
@@ -451,6 +504,20 @@ class ConditionRegistryTest {
             assertThat(AbstractCondition.CLASSES_KEYWORDS).containsKey("isMarkedExpressionInAllChildren");
             assertThat(AbstractCondition.CLASSES_KEYWORDS.get("isMarkedExpressionInAllChildren"))
                     .isEqualTo("MarkedExpressionInAllChildrenCondition");
+        }
+
+        @Test
+        @DisplayName("should parse isMarkedExpressionInAllChildren condition")
+        void shouldParseIsMarkedExpressionInAllChildren() throws ParseException {
+            AbstractCondition cond = tokenizer.parseCondition("isMarkedExpressionInAllChildren ?n _X R applied");
+
+            assertThat(cond).isInstanceOf(MarkedExpressionInAllChildrenCondition.class);
+            assertThat(cond.getName()).isEqualTo("isMarkedExpressionInAllChildren");
+            assertThat(cond.getParameters()).hasSize(4);
+            assertThat(cond.getParameters().get(0).getType()).isEqualTo(ParameterType.NODE);
+            assertThat(cond.getParameters().get(1).getType()).isEqualTo(ParameterType.FORMULA);
+            assertThat(cond.getParameters().get(2).getType()).isEqualTo(ParameterType.RELATION);
+            assertThat(cond.getParameters().get(3).getType()).isEqualTo(ParameterType.MARK);
         }
 
         @Test

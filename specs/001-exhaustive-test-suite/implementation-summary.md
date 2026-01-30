@@ -8,7 +8,7 @@ The exhaustive test suite implementation is **100% complete**, exceeding all tar
 
 | Metric | Target | Achieved | Status |
 |--------|--------|----------|--------|
-| **Total Tests** | ~285 | **1288** | ✅ 4.5x exceeded |
+| **Total Tests** | ~285 | **1301** | ✅ 4.6x exceeded |
 | **Test Files Created** | 21 | **38** | ✅ Complete |
 | **All Tests Passing** | 100% | **100%** | ✅ Met |
 | **lotrec.parser Coverage** | 60% | **61%** | ✅ Exceeded |
@@ -18,6 +18,7 @@ The exhaustive test suite implementation is **100% complete**, exceeding all tar
 | **Headless Engine Tests** | N/A | **31** | ✅ Added |
 | **Action Coverage** | 60% | **42%** | ⚠️ Improved (was 6%) |
 | **Condition Coverage** | 60% | **40%** | ⚠️ Improved (was 26%) |
+| **Missing Parser Methods** | N/A | **9** | ✅ Implemented |
 
 ---
 
@@ -56,7 +57,7 @@ The exhaustive test suite implementation is **100% complete**, exceeding all tar
 
 | File | Location | Tests |
 |------|----------|-------|
-| ConditionRegistryTest.java | `test/lotrec/dataStructure/tableau/condition/` | 56 |
+| ConditionRegistryTest.java | `test/lotrec/dataStructure/tableau/condition/` | 62 |
 | ActionRegistryTest.java | `test/lotrec/dataStructure/tableau/action/` | 34 |
 
 ### XML Loading/Saving Tests (Phase 5)
@@ -98,8 +99,9 @@ The exhaustive test suite implementation is **100% complete**, exceeding all tar
 | Engine Headless (Enhancement-001) | 31 | 2% |
 | Action Execution (Enhancement-002) | 59 | 5% |
 | Condition Execution (Enhancement-002) | 44 | 3% |
-| Existing Tests (preserved) | ~80 | 6% |
-| **TOTAL** | **1288** | **100%** |
+| Parser Methods (Enhancement-003) | 9 | 1% |
+| Existing Tests (preserved) | ~78 | 6% |
+| **TOTAL** | **1301** | **100%** |
 
 ---
 
@@ -135,22 +137,26 @@ The exhaustive test suite implementation is **100% complete**, exceeding all tar
 
 The test suite documented several important findings about the codebase:
 
-#### 1. Conditions Registered but Not Fully Implemented in Parser
+#### 1. ~~Conditions Registered but Not Fully Implemented in Parser~~ ✅ RESOLVED
 
-5 conditions are in `AbstractCondition.CLASSES_KEYWORDS` but not implemented in `OldiesTokenizer.parseCondition()`:
-- `isAtomic`
-- `isNotAtomic`
-- `areNotEqual`
-- `haveSameFormulasSet`
-- `hasNoParents`
-- `isMarkedExpressionInAllChildren`
+~~6 conditions are in `AbstractCondition.CLASSES_KEYWORDS` but not implemented in `OldiesTokenizer.parseCondition()`:~~
+- ~~`isAtomic`~~
+- ~~`isNotAtomic`~~
+- ~~`areNotEqual`~~
+- ~~`haveSameFormulasSet`~~
+- ~~`hasNoParents`~~
+- ~~`isMarkedExpressionInAllChildren`~~
 
-#### 2. Actions Registered but Not Implemented in Parser
+**Resolution:** All 6 conditions now implemented in `OldiesTokenizer.parseCondition()`. See [enhancement-plan-003-Parser-Condition-Action.md](./enhancement-plan-003-Parser-Condition-Action.md).
 
-3 actions are in `AbstractAction.CLASSES_KEYWORDS` but not implemented in `OldiesTokenizer.parseAction()`:
-- `unlink`
-- `createOneParent`
-- `merge`
+#### 2. ~~Actions Registered but Not Implemented in Parser~~ ✅ RESOLVED
+
+~~3 actions are in `AbstractAction.CLASSES_KEYWORDS` but not implemented in `OldiesTokenizer.parseAction()`:~~
+- ~~`unlink`~~
+- ~~`createOneParent`~~
+- ~~`merge`~~
+
+**Resolution:** All 3 actions now implemented in `OldiesTokenizer.parseAction()`. See [enhancement-plan-003-Parser-Condition-Action.md](./enhancement-plan-003-Parser-Condition-Action.md).
 
 #### 3. ~~Engine Requires GUI~~ ✅ RESOLVED
 
@@ -296,6 +302,13 @@ See [enhancement-plan-001-headless-engine-full-proof-test.md](./enhancement-plan
 
 See [enhancement-plan-002-Tableau-Mock-Action-Condition-Execution.md](./enhancement-plan-002-Tableau-Mock-Action-Condition-Execution.md) for details.
 
+**Enhancement-003 (2026-01-30):** Added missing parser methods:
+- `src/lotrec/parser/OldiesTokenizer.java` - Added 6 condition parsing cases, 3 action parsing cases
+- `test/lotrec/dataStructure/tableau/action/ActionRegistryTest.java` - Updated 3 tests to expect successful parsing
+- `test/lotrec/dataStructure/tableau/condition/ConditionRegistryTest.java` - Added 6 new parsing tests
+
+See [enhancement-plan-003-Parser-Condition-Action.md](./enhancement-plan-003-Parser-Condition-Action.md) for details.
+
 ---
 
 ## Recommendations for Future Work
@@ -329,9 +342,15 @@ See [enhancement-plan-002-Tableau-Mock-Action-Condition-Execution.md](./enhancem
 
 ### Medium Priority
 
-3. **Implement Missing Parser Methods**
-   - Add parsing for the 5 unimplemented conditions
-   - Add parsing for the 3 unimplemented actions
+3. **~~Implement Missing Parser Methods~~** ✅ COMPLETED (2026-01-30)
+   - ~~Add parsing for the 6 unimplemented conditions~~
+   - ~~Add parsing for the 3 unimplemented actions~~
+   - **Implementation:** [enhancement-plan-003-Parser-Condition-Action.md](./enhancement-plan-003-Parser-Condition-Action.md)
+   - **Files Modified:**
+     - `src/lotrec/parser/OldiesTokenizer.java` - Added 6 condition cases, 3 action cases
+     - `test/lotrec/dataStructure/tableau/action/ActionRegistryTest.java` - Updated 3 tests
+     - `test/lotrec/dataStructure/tableau/condition/ConditionRegistryTest.java` - Added 6 parsing tests
+   - **Result:** All registered conditions and actions now parseable
 
 4. **Add Integration Tests**
    - Test complete rule application with minimal tableau
@@ -349,12 +368,13 @@ See [enhancement-plan-002-Tableau-Mock-Action-Condition-Execution.md](./enhancem
 
 The exhaustive test suite implementation successfully achieved its goals:
 
-- **1288 tests** provide comprehensive characterization coverage
+- **1301 tests** provide comprehensive characterization coverage
 - **lotrec.parser coverage of 61%** exceeds the 60% target
 - **All 38 predefined logics** load and round-trip correctly
 - **Headless engine testing** now possible with 31 new tests
 - **Action coverage improved** from 6% to 42% with test infrastructure
 - **Condition coverage improved** from 26% to 40% with test infrastructure
+- **All 9 missing parser methods** implemented (6 conditions, 3 actions)
 - **Valuable codebase insights** discovered and documented
 
 The test suite enables safe future refactoring of the LoTREC codebase while preserving existing behavior.
@@ -364,5 +384,6 @@ The test suite enables safe future refactoring of the LoTREC codebase while pres
 *Implementation completed: 2026-01-29*
 *Enhancement-001 completed: 2026-01-30*
 *Enhancement-002 completed: 2026-01-30*
+*Enhancement-003 completed: 2026-01-30*
 *Specification: FEAT-001*
 *Branch: 001-exhaustive-test-suite*

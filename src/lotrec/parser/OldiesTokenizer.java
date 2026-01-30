@@ -40,6 +40,12 @@ import lotrec.dataStructure.tableau.condition.NotIdenticalCondition;
 import lotrec.dataStructure.tableau.condition.NotLinkCondition;
 import lotrec.dataStructure.tableau.condition.NotMarkCondition;
 import lotrec.dataStructure.tableau.condition.NotMarkExpressionCondition;
+import lotrec.dataStructure.tableau.condition.IsAtomicCondition;
+import lotrec.dataStructure.tableau.condition.IsNotAtomicCondition;
+import lotrec.dataStructure.tableau.condition.NotEqualCondition;
+import lotrec.dataStructure.tableau.condition.HaveSameFormulasSetCondition;
+import lotrec.dataStructure.tableau.condition.HasNoParentsCondition;
+import lotrec.dataStructure.tableau.condition.MarkedExpressionInAllChildrenCondition;
 import lotrec.process.AbstractAction;
 import lotrec.process.AllRules;
 import lotrec.process.EventMachine;
@@ -204,6 +210,52 @@ public class OldiesTokenizer {
             cond.addParameter(new Parameter(ParameterType.FORMULA, formulaArg));
             cond.addParameter(new Parameter(ParameterType.MARK, markArg));
             return cond;
+        } else if (condName.equals("isAtomic")) {
+            formulaArg = recognizeExpression();
+            cond = new IsAtomicCondition(formulaArg);
+            cond.setName(condName);
+            cond.addParameter(new Parameter(ParameterType.FORMULA, formulaArg));
+            return cond;
+        } else if (condName.equals("isNotAtomic")) {
+            formulaArg = recognizeExpression();
+            cond = new IsNotAtomicCondition(formulaArg);
+            cond.setName(condName);
+            cond.addParameter(new Parameter(ParameterType.FORMULA, formulaArg));
+            return cond;
+        } else if (condName.equals("areNotEqual")) {
+            Expression formula1 = recognizeExpression();
+            Expression formula2 = recognizeExpression();
+            cond = new NotEqualCondition(formula1, formula2);
+            cond.setName(condName);
+            cond.addParameter(new Parameter(ParameterType.FORMULA, formula1));
+            cond.addParameter(new Parameter(ParameterType.FORMULA, formula2));
+            return cond;
+        } else if (condName.equals("haveSameFormulasSet")) {
+            nodeArg = new StringSchemeVariable(readStringToken());
+            node2Arg = new StringSchemeVariable(readStringToken());
+            cond = new HaveSameFormulasSetCondition(nodeArg, node2Arg);
+            cond.setName(condName);
+            cond.addParameter(new Parameter(ParameterType.NODE, nodeArg));
+            cond.addParameter(new Parameter(ParameterType.NODE, node2Arg));
+            return cond;
+        } else if (condName.equals("hasNoParents")) {
+            nodeArg = new StringSchemeVariable(readStringToken());
+            cond = new HasNoParentsCondition(nodeArg);
+            cond.setName(condName);
+            cond.addParameter(new Parameter(ParameterType.NODE, nodeArg));
+            return cond;
+        } else if (condName.equals("isMarkedExpressionInAllChildren")) {
+            nodeArg = new StringSchemeVariable(readStringToken());
+            formulaArg = recognizeExpression();
+            relationArg = recognizeExpression();
+            markArg = readStringToken();
+            cond = new MarkedExpressionInAllChildrenCondition(nodeArg, formulaArg, relationArg, markArg);
+            cond.setName(condName);
+            cond.addParameter(new Parameter(ParameterType.NODE, nodeArg));
+            cond.addParameter(new Parameter(ParameterType.FORMULA, formulaArg));
+            cond.addParameter(new Parameter(ParameterType.RELATION, relationArg));
+            cond.addParameter(new Parameter(ParameterType.MARK, markArg));
+            return cond;
         } else {
             throw new ParseException(ParseException.UNKOWN_CODITION +
                     ParseException.EXCEPTION_CAUSE + condName);
@@ -343,7 +395,7 @@ public class OldiesTokenizer {
 //            nodeArg = new StringSchemeVariable(readStringToken());//.equals(node0)
 
 
-            readStringToken(); //.equals("begin")            
+            readStringToken(); //.equals("begin")
             readStringToken(); //.equals(node0)
             //node2Arg = new StringSchemeVariable(readStringToken());//.equals(node1)
 
@@ -355,6 +407,34 @@ public class OldiesTokenizer {
             ac.setName(acName);
 //            ac.addParameter(new Parameter(ParameterType.NODE, nodeArg));
             ac.addParameter(new Parameter(ParameterType.MARK, markArg));
+            return ac;
+        } else if (acName.equals("unlink")) {
+            nodeArg = new StringSchemeVariable(readStringToken());
+            node2Arg = new StringSchemeVariable(readStringToken());
+            relationArg = recognizeExpression();
+            ac = new UnlinkAction(nodeArg, node2Arg, relationArg);
+            ac.setName(acName);
+            ac.addParameter(new Parameter(ParameterType.NODE, nodeArg));
+            ac.addParameter(new Parameter(ParameterType.NODE, node2Arg));
+            ac.addParameter(new Parameter(ParameterType.RELATION, relationArg));
+            return ac;
+        } else if (acName.equals("createOneParent")) {
+            nodeArg = new StringSchemeVariable(readStringToken());
+            node2Arg = new StringSchemeVariable(readStringToken());
+            relationArg = recognizeExpression();
+            ac = new AddOneParentAction(nodeArg, node2Arg, relationArg);
+            ac.setName(acName);
+            ac.addParameter(new Parameter(ParameterType.NODE, nodeArg));
+            ac.addParameter(new Parameter(ParameterType.NODE, node2Arg));
+            ac.addParameter(new Parameter(ParameterType.RELATION, relationArg));
+            return ac;
+        } else if (acName.equals("merge")) {
+            nodeArg = new StringSchemeVariable(readStringToken());
+            node2Arg = new StringSchemeVariable(readStringToken());
+            ac = new MergeNodeInNodeAction(nodeArg, node2Arg);
+            ac.setName(acName);
+            ac.addParameter(new Parameter(ParameterType.NODE, nodeArg));
+            ac.addParameter(new Parameter(ParameterType.NODE, node2Arg));
             return ac;
         } // Perhaps an un-used list of actions!!
         // this must be verified
