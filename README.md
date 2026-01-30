@@ -1,34 +1,86 @@
-# Overview
-LoTREC is an automated theorem prover for modal and description logic. It allows students and researchers in logic to define well-known and new exotic logics with Kripke's semantics, and to check the properties of their formulas, i.e. their satisfiability or validity, as well as performing model checking.
+# LoTREC - Tableaux Theorem Prover
 
-The syntax of a logic is defined by providing a set of connectors names and syntactical rules, and the sematincs of the logic is defined by providing a set of graph rewriting rules. A formula can be then automatically tested with LoTREC, which applies the graph rewriting rules in order to decompose and analyze the formula.
+[![Java](https://img.shields.io/badge/Java-8%2B-orange)](https://adoptium.net/)
+[![License](https://img.shields.io/badge/License-GPL--2.0-blue.svg)](LICENSE)
+[![Latest Release](https://img.shields.io/github/v/release/bilals/lotrec)](https://github.com/bilals/lotrec/releases/latest)
 
-# Installation
-[**Download the latest release here**](https://github.com/bilals/lotrec/releases/latest), extract the ZIP and execute `bin/LoTREC.bat` on Windows or `bin/LoTREC` on Linux.
+**LoTREC** is an automated theorem prover for modal and description logics using the tableau method. It enables students and researchers to define custom logics with Kripke semantics and verify formula properties (satisfiability, validity) through interactive proof visualization.
 
-All you need in order to run LoTREC is the Java Runtime Environement (JRE) 8 (i.e. 1.8) or later. The latest versions, e.g., Java 21, works well and it can be downloaded from the Eclipse Adoptium site https://adoptium.net/ or alternatively OpenJDK, or Oracle's Java website.
+![LoTREC Main Interface](docs/images/tableau-result.png)
 
-## For Geeks
-Alternatively, fork then checkout or download LoTREC's code base from GitHub,open in VS Code, then build and run it with Gradle.
+## Features
 
-## Allocate More Memory
-It is imporatnat to increase the amount of allocated RAM if you are debugging or working extensively with LoTREC, specially if you are displaying many graphs during your session. Otherwise, LoTREC would run out of memory and should be consequently restarted.
+- **38 predefined logics** including K, KT, S4, S5, and description logics
+- **Visual tableau construction** with interactive graph display
+- **Custom logic definition** via XML-based rule specification
+- **Step-by-step debugging** with breakpoints on rules
+- **Model checking** capabilities
 
-Edit the file "bin/LoTREC.bat", and look for the following line:
-``` 
-set DEFAULT_JVM_OPTS=
-``` 
-You can specify the allocated memory as follows:
-``` 
-set DEFAULT_JVM_OPTS=-Xmx512M
-``` 
-The command option -Xmx512M allocates 512MB RAM to LoTREC. It can be further increased, e.g., -Xmx2048M for 2GB RAM.
+## Quick Start
 
-# Contact
-Please feel free to contact us here on GitHub, to fork the project, contribute to it and send us pull requests to integrate your contributions, or report any problem.
+### 1. Download & Run
 
-For any further information, please visit our web site:
-https://github.com/bilals/lotrec
+[**Download the latest release**](https://github.com/bilals/lotrec/releases/latest), extract the ZIP, and run:
+- **Windows:** `bin/LoTREC.bat`
+- **Linux/macOS:** `bin/LoTREC`
 
-Legacy site on the IRIT Research Lab
-https://www.irit.fr/Lotrec/
+> Requires Java 8 or later. Get it from [Eclipse Adoptium](https://adoptium.net/).
+
+### 2. Choose a Logic
+
+On startup, select a predefined logic like **Modal logic K** or open your own logic file.
+
+![Task Pane](docs/images/task-pane.png)
+
+### 3. Test a Formula
+
+Enter a formula and click **Build Premodels** to see the tableau proof tree.
+
+## Documentation
+
+| Guide | Description |
+|-------|-------------|
+| [Getting Started](docs/getting-started.md) | Installation and your first proof |
+| [User Guide](docs/user-guide.md) | Complete interface reference |
+| [Defining Logics](docs/defining-logics.md) | Create custom logics with XML |
+| [Predefined Logics](docs/predefined-logics.md) | List of 38 built-in logics |
+
+## For Developers
+
+Clone the repository and build with Gradle:
+
+```bash
+git clone https://github.com/bilals/lotrec.git
+cd lotrec
+./gradlew build    # Build and test
+./gradlew run      # Run the application
+```
+
+See [CLAUDE.md](CLAUDE.md) for detailed build commands and architecture overview.
+
+## Memory Allocation
+
+For extensive debugging sessions or large proofs, increase memory allocation.
+
+Edit `bin/LoTREC.bat` (Windows) or `bin/LoTREC` (Linux/macOS):
+```
+DEFAULT_JVM_OPTS="-Xmx512M"   # 512MB (or -Xmx2048M for 2GB)
+```
+
+## Contributing
+
+We welcome contributions! Please:
+- Fork the repository
+- Create a feature branch
+- Submit a pull request
+
+Report issues on [GitHub Issues](https://github.com/bilals/lotrec/issues).
+
+## Links
+
+- **Repository:** https://github.com/bilals/lotrec
+- **Legacy Site:** https://www.irit.fr/Lotrec/
+
+## License
+
+LoTREC is released under the [GPL-2.0 License](LICENSE).
