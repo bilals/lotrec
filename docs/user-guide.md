@@ -207,3 +207,10 @@ LoTREC uses **prefix notation** internally:
 3. **Check the Run Info** (Help menu) for performance statistics
 4. **Increase memory** for complex proofs
 5. **Save frequently** when editing logic definitions
+
+## Further Reading
+
+- [Getting Started](getting-started.md) - Installation and your first proof
+- [Defining Logics](defining-logics.md) - Create custom logics with XML rules
+- [Predefined Logics](predefined-logics.md) - Overview of 38 built-in logics
+- [CLAUDE.md](../CLAUDE.md) - Developer documentation and architecture overview
