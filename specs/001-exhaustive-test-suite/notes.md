@@ -6,11 +6,12 @@
 
 | Metric | Result |
 |--------|--------|
-| **Total Tests** | 1155 |
-| **Test Files Created** | 20 |
+| **Total Tests** | 1185 |
+| **Test Files Created** | 21 |
 | **All Tests Passing** | Yes |
 | **Execution Time** | ~90 seconds |
 | **Parser Coverage** | 61% ✅ |
+| **Headless Engine Tests** | 31 ✅ (NEW) |
 
 ---
 
@@ -42,22 +43,19 @@
 
 ## Known Limitations
 
-### 1. GUI/Cytoscape Dependency
+### 1. ~~GUI/Cytoscape Dependency~~ ✅ RESOLVED
 
 **Issue**: The `Engine` class requires `MainFrame` and Cytoscape initialization to run properly. The `Launcher.treatArgsForBenchmark()` method initializes the full GUI stack.
 
-**Impact**: Cannot test full proof search execution in headless environment.
+**~~Impact~~**: ~~Cannot test full proof search execution in headless environment.~~
 
-**Workaround Applied**: Tests focus on:
-- Logic loading and parsing (headless)
-- Formula parsing (headless)
-- Strategy parsing (headless)
-- Data structure operations (headless)
+**Resolution**: Implemented `EngineListener` interface pattern:
+- `EngineListener` interface abstracts all GUI callbacks
+- `HeadlessEngineListener` provides no-op implementation for testing
+- `SwingEngineListener` wraps `MainFrame` for GUI mode
+- **See:** [enhancement-plan-001-headless-engine-full-proof-test.md](./enhancement-plan-001-headless-engine-full-proof-test.md)
 
-**Recommendation for Future**:
-1. Refactor `Engine` to accept an interface instead of `MainFrame` directly
-2. Create `HeadlessEngine` for testing
-3. Extract proof search logic from GUI concerns
+**Result**: Full proof search now testable in headless environment with 31 new engine tests.
 
 ### 2. Action Execution Testing
 
@@ -141,10 +139,13 @@ Created for strategy testing:
 
 ### High Priority
 
-1. **Refactor Engine for Testability**
-   - Extract proof search from GUI
-   - Allow headless execution
-   - Would unlock ~40% additional coverage
+1. **~~Refactor Engine for Testability~~** ✅ COMPLETED
+   - ~~Extract proof search from GUI~~
+   - ~~Allow headless execution~~
+   - ~~Would unlock ~40% additional coverage~~
+   - **See:** [enhancement-plan-001-headless-engine-full-proof-test.md](./enhancement-plan-001-headless-engine-full-proof-test.md)
+   - **Implementation:** Added `EngineListener` interface pattern with `HeadlessEngineListener` for testing
+   - **Result:** 31 new headless engine tests, full proof search now testable without GUI
 
 2. **Add Tableau Mock Infrastructure**
    - Mock `Tableau`, `TableauNode`, `Graph`
@@ -172,9 +173,11 @@ Created for strategy testing:
 
 ---
 
-## Files Not Requiring Code Changes
+## Files Summary
 
-Per the specification, **no production code was modified**. All changes are test-only:
+### Test Files (FEAT-001)
+
+Per the original specification, **no production code was modified**:
 
 ```
 test/
@@ -203,13 +206,28 @@ test/
 │   │   ├── FirstRuleTest.java               [NEW]
 │   │   └── AllRulesTest.java                [NEW]
 │   ├── engine/
-│   │   └── LauncherBenchmarkTest.java       [NEW]
+│   │   ├── LauncherBenchmarkTest.java       [NEW]
+│   │   └── EngineHeadlessTest.java          [NEW] ← Enhancement-001
 │   └── logics/
 │       ├── PredefinedLogicsLoadTest.java    [NEW]
 │       ├── PredefinedLogicsSaveTest.java    [NEW]
 │       └── SatisfiabilityTest.java          [NEW]
 ```
 
+### Production Code (Enhancement-001)
+
+Added for headless engine support (see [enhancement-plan-001](./enhancement-plan-001-headless-engine-full-proof-test.md)):
+
+```
+src/lotrec/engine/
+├── EngineListener.java          [NEW]
+├── HeadlessEngineListener.java  [NEW]
+├── SwingEngineListener.java     [NEW]
+├── EngineBuilder.java           [NEW]
+└── Engine.java                  [MODIFIED]
+```
+
 ---
 
 *Document created: 2026-01-29*
+*Updated: 2026-01-30 (Enhancement-001 completed)*

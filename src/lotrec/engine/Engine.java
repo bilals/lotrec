@@ -8,18 +8,15 @@
  */
 package lotrec.engine;
 
-import java.awt.Cursor;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.Vector;
-import javax.swing.SwingUtilities;
+
 import lotrec.dataStructure.Logic;
 import lotrec.dataStructure.expression.MarkedExpression;
 import lotrec.dataStructure.graph.Wallet;
 import lotrec.dataStructure.tableau.Tableau;
 import lotrec.dataStructure.tableau.TableauNode;
 import lotrec.dataStructure.tableau.action.DuplicateAction;
-import lotrec.gui.DialogsFactory;
 import lotrec.gui.MainFrame;
 import lotrec.process.EventMachine;
 import lotrec.process.Routine;
@@ -47,7 +44,9 @@ public class Engine extends Thread {
     private ArrayList rulesBreakPoints;// = new ArrayList();// set of EventMachines'levels to be paused
     private Wallet currentWallet;
     private EngineStatus status;
-    private MainFrame mainFrame;
+    private EngineListener listener;
+    @Deprecated
+    private MainFrame mainFrame; // Kept for backward compatibility via getMainFrame()
     private boolean runningBySteps = false;
     private EngineTimer engineTimer;
     private int appliedRules;
@@ -58,8 +57,16 @@ public class Engine extends Thread {
     public Engine() {
     }
 
-    public Engine(Logic chosenLogic, Strategy chosenStrategy, MarkedExpression chosenFormula, MainFrame mainFrame) {
-        this.mainFrame = mainFrame;
+    /**
+     * Creates an Engine with the given EngineListener for headless/testable execution.
+     *
+     * @param chosenLogic the logic definition to use
+     * @param chosenStrategy the strategy to apply
+     * @param chosenFormula the formula to analyze
+     * @param listener the listener for engine events (use HeadlessEngineListener for testing)
+     */
+    public Engine(Logic chosenLogic, Strategy chosenStrategy, MarkedExpression chosenFormula, EngineListener listener) {
+        this.listener = listener;
         rulesNames = new ArrayList();
         this.logic = chosenLogic;
         strategy = chosenStrategy;
@@ -71,6 +78,21 @@ public class Engine extends Thread {
         appliedRules = 0;
         totalAppliedRules = 0;
         benchmarker = new Benchmarker();
+    }
+
+    /**
+     * Creates an Engine with GUI support via MainFrame.
+     *
+     * @param chosenLogic the logic definition to use
+     * @param chosenStrategy the strategy to apply
+     * @param chosenFormula the formula to analyze
+     * @param mainFrame the main application frame (for GUI updates)
+     * @deprecated Use {@link #Engine(Logic, Strategy, MarkedExpression, EngineListener)} instead
+     */
+    @Deprecated
+    public Engine(Logic chosenLogic, Strategy chosenStrategy, MarkedExpression chosenFormula, MainFrame mainFrame) {
+        this(chosenLogic, chosenStrategy, chosenFormula, new SwingEngineListener(mainFrame));
+        this.mainFrame = mainFrame; // Keep for backward compatibility via getMainFrame()
     }
 
     public void add(Strategy strategy) {
@@ -191,52 +213,38 @@ public class Engine extends Thread {
 
     @Override
     public void run() {
-//        try {
-//            System.setOut(new PrintStream(new FileOutputStream("out.txt")));
-//        } catch (FileNotFoundException ex) {
-//            Logger.getLogger(Engine.class.getName()).log(Level.SEVERE, null, ex);
-//        }
         startBuild();
         getEngineTimer().start();
         try {
             this.applyStrategies();
         } catch (Exception ex) {
-            DialogsFactory.runTimeErrorMessage(mainFrame, "The following run-time exception occured during rules application:\n" +
-                    ex.getMessage());
+            if (listener != null) {
+                listener.onRuntimeError(ex.getMessage());
+            }
         }
         getEngineTimer().stop();
         updateElapsedTime();
-        //Activate When benchmarking
-        //--------------------------
-//        System.out.println("Elapsed run time is: " + getEngineTimer().getElapsedTime() + " ms");
-//        System.out.println("Elapsed run time is: " + getEngineTimer().getElapsedTime()/1000 + " s");
-        //--------------------------
         endBuild();
-    //Activated When benchmarking
-    //---------------------------
-//        updateTableauxCount();
-//        updateAppliedRules();
-//        updateTotalAppliedRules();
-    //---------------------------
-
-//        mainFrame.getTableauxPanel().displayTableaux();
     }
 
     public void applyStrategies() {
         if (this.isRunningBySteps()) {
-            getMainFrame().getTableauxPanel().makePause();// Engine.pauseWork(); is called there
-            System.out.println("Engine is paused before first step to enable editing the initial premodel...");
-            synchronized (this) {
-                if (shouldPause()) {
-                    makePause();
-                    while (shouldPause()) {
-                        try {
-                            wait();
-                        } catch (InterruptedException ex) {
-                            System.err.println("Exception during Engine.wait(): " + ex);
+            // In GUI mode, pause before first step; in headless mode, skip step-by-step
+            if (mainFrame != null) {
+                mainFrame.getTableauxPanel().makePause();// Engine.pauseWork(); is called there
+                System.out.println("Engine is paused before first step to enable editing the initial premodel...");
+                synchronized (this) {
+                    if (shouldPause()) {
+                        makePause();
+                        while (shouldPause()) {
+                            try {
+                                wait();
+                            } catch (InterruptedException ex) {
+                                System.err.println("Exception during Engine.wait(): " + ex);
+                            }
                         }
+                        makeResume();
                     }
-                    makeResume();
                 }
             }
         }
@@ -260,45 +268,36 @@ public class Engine extends Thread {
                 }
             }
             if (!str.isQuiet()) {
-                //Discativated when benchmarking
-                //------------------------------
                 System.out.println(" ");
                 System.out.println("The global strategy starts working on tableau " +
                         str.getRelatedTableau().getName() + " ..");
-                //------------------------------
                 str.work();
-                //Discativated when benchmarking
-                //------------------------------
                 System.out.println("The global strategy stops working on tableau " +
                         str.getRelatedTableau().getName() + " ..");
                 System.out.println(" ");
-            //------------------------------
             }
-//        System.out.println("Nb Tentatives in classical system: "+this.getBenchmarker().getNbTentativesClassic());
-//        System.out.println("Nb Tentatives in LoTREC: "+this.getBenchmarker().getNbTentativesLoTREC());
-//        System.out.println();
-//        System.out.println(this.getBenchmarker().getNbTentativesLoTREC()+" "+this.getBenchmarker().getNbTentativesClassic());
-//        System.out.println();
             if (this.openTableauAction == Engine.STOP_WHEN_HAVING_OPEN_TABLEAU && !str.getRelatedTableau().isClosed()) {
                 stopWork();
                 System.out.println("Engine is stopped, cause an open tableau is found..");
                 break;
-//                return;
             }
             if (this.openTableauAction == Engine.PAUSE_WHEN_HAVING_OPEN_TABLEAU && !str.getRelatedTableau().isClosed()) {
-                getMainFrame().getTableauxPanel().makePause();// Engine.pauseWork(); is called there
-                System.out.println("Engine is paused, cause an open tableau is found..");
-                synchronized (this) {
-                    if (shouldPause()) {
-                        makePause();
-                        while (shouldPause()) {
-                            try {
-                                wait();
-                            } catch (InterruptedException ex) {
-                                System.err.println("Exception during Engine.wait(): " + ex);
+                // In GUI mode, pause when open tableau found; in headless mode, skip pause
+                if (mainFrame != null) {
+                    mainFrame.getTableauxPanel().makePause();// Engine.pauseWork(); is called there
+                    System.out.println("Engine is paused, cause an open tableau is found..");
+                    synchronized (this) {
+                        if (shouldPause()) {
+                            makePause();
+                            while (shouldPause()) {
+                                try {
+                                    wait();
+                                } catch (InterruptedException ex) {
+                                    System.err.println("Exception during Engine.wait(): " + ex);
+                                }
                             }
+                            makeResume();
                         }
-                        makeResume();
                     }
                 }
             }
@@ -316,17 +315,9 @@ public class Engine extends Thread {
 
     public void startBuild() {
         reInitializeStopPause();
-        mainFrame.getTableauxPanel().setSelectionModeEnabled(false);
-        mainFrame.getTableauxPanel().resetSelectionMode();
-        mainFrame.getTableauxPanel().enableControlsButtons();
-        mainFrame.getControlsPanel().disableBuildButtons();
-        mainFrame.showWaitCursor();
-        mainFrame.getTableauxPanel().getControlsPanel().
-                setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-        //Disactivated when benchmarking
-        //------------------------------
-        mainFrame.getTableauxPanel().fillTabListAndDisplayFirst();
-        //------------------------------
+        if (listener != null) {
+            listener.onBuildStart();
+        }
         if (isRunningBySteps()) {
             setStatus(EngineStatus.STEPRUNNING);
         } else {
@@ -335,21 +326,16 @@ public class Engine extends Thread {
     }
 
     public void endBuild() {
-        if (shouldStop) {
+        boolean wasStopped = shouldStop;
+        if (wasStopped) {
             setStatus(EngineStatus.STOPPED);
         } else {
             setStatus(EngineStatus.FINISHED);
         }
         reInitializeStopPause();
-        mainFrame.getTableauxPanel().setSelectionModeEnabled(true);
-        mainFrame.getTableauxPanel().disableControlsButtons();
-        mainFrame.getControlsPanel().enableBuildButtons();
-        mainFrame.hideWaitCursor();
-//        mainFrame.getTableauxPanel().fillTabListAndDisplayFirst();
-        //Disactivated When benchmarking
-        //------------------------------
-        mainFrame.getTableauxPanel().fillTabListAndDisplayLastChosenOnes();
-    //------------------------------
+        if (listener != null) {
+            listener.onBuildEnd(wasStopped);
+        }
     }
 
     public void endNextStep() {
@@ -397,45 +383,36 @@ public class Engine extends Thread {
         setStatus(EngineStatus.PAUSED);
         getEngineTimer().pause();
         updateElapsedTime();
-        getMainFrame().getTableauxPanel().enableControlsButtons();
-        getMainFrame().hideWaitCursor();
-        //Disactivated when benchmarking
-        //------------------------------
-        getMainFrame().getTableauxPanel().fillTabListAndDisplayLastChosenOnes();
-        //------------------------------
-        getMainFrame().getTableauxPanel().setSelectionModeEnabled(true);
+        if (listener != null) {
+            listener.onPause();
+        }
     }
 
     public void makeResume() {
-        getMainFrame().getTableauxPanel().enableControlsButtons();
-        getMainFrame().showWaitCursor();
-        getMainFrame().getTableauxPanel().getControlsPanel().
-                setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-        getMainFrame().getTableauxPanel().setSelectionModeEnabled(false);
+        if (listener != null) {
+            listener.onResume();
+        }
         setStatus(EngineStatus.RESUMED);
         getEngineTimer().resume();
     }
 
     public void makeStepPause(EventMachine ruleEM) {
-        getMainFrame().getTableauxPanel().enableStepControlsButtons();
         setStatus(EngineStatus.STEPFINISHED);
         getEngineTimer().pause();
         updateElapsedTime();
-        getMainFrame().hideWaitCursor();
-        getMainFrame().getTableauxPanel().fillTabListAndDisplayLastChosenOnes();
-        getMainFrame().getTableauxPanel().setSelectionModeEnabled(true);
         updatePausedAtRule(ruleEM.getWorkerName());
+        if (listener != null) {
+            listener.onStepPause(ruleEM);
+        }
         System.out.println("  Rule " + ruleEM + " is step paused..");
     }
 
     public void makeStepResume(EventMachine ruleEM) {
         updatePausedAtRule("-");
         System.out.println("  Rule " + ruleEM + " is step resumed..");
-        getMainFrame().getTableauxPanel().disableStepControlsButtons();
-        getMainFrame().showWaitCursor();
-        getMainFrame().getTableauxPanel().getControlsPanel().
-                setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-        getMainFrame().getTableauxPanel().setSelectionModeEnabled(false);
+        if (listener != null) {
+            listener.onStepResume(ruleEM);
+        }
         setStatus(EngineStatus.STEPRUNNING);
         getEngineTimer().resume();
     }
@@ -497,77 +474,61 @@ public class Engine extends Thread {
     }
 
     public void updateTableauxCount() {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                mainFrame.getTableauxPanel().displayTableauxCount(currentWallet.getGraphes().size());
-            }
-        });
+        if (listener != null && currentWallet != null) {
+            listener.onTableauxCountChanged(currentWallet.getGraphes().size());
+        }
     }
 
     public void updateEngineStatus() {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                mainFrame.getTableauxPanel().displayEngineStatus(status.toString());
-            }
-        });
+        if (listener != null) {
+            listener.onStatusChanged(status);
+        }
     }
 
     public void updateElapsedTime() {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                mainFrame.getTableauxPanel().displayEngineElapsedTime(getEngineTimer().getElapsedTime() + " ms");
-            }
-        });
+        if (listener != null) {
+            listener.onElapsedTimeChanged(getEngineTimer().getElapsedTime());
+        }
     }
 
     public void updateAppliedRules() {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                mainFrame.getTableauxPanel().displayEngineAppliedRules(String.valueOf(appliedRules));
-            }
-        });
+        if (listener != null) {
+            listener.onAppliedRulesChanged(appliedRules);
+        }
     }
 
     public void updateTotalAppliedRules() {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                mainFrame.getTableauxPanel().displayEngineTotalAppliedRules(String.valueOf(totalAppliedRules));
-            }
-        });
+        if (listener != null) {
+            listener.onTotalAppliedRulesChanged(totalAppliedRules);
+        }
     }
 
     public void updateLastAppliedRule(final String ruleName, final String onTableauName) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                mainFrame.getTableauxPanel().displayLastAppliedRule(ruleName, onTableauName);
-            }
-        });
+        if (listener != null) {
+            listener.onRuleApplied(ruleName, onTableauName);
+        }
     }
 
     public void updatePausedAtRule(final String ruleName) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                mainFrame.getTableauxPanel().displayPausedAtRule(ruleName);
-            }
-        });
+        if (listener != null) {
+            listener.onPausedAtRule(ruleName);
+        }
     }
 
+    /**
+     * @return the MainFrame, or null if running in headless mode
+     * @deprecated Use EngineListener callbacks instead of directly accessing MainFrame
+     */
+    @Deprecated
     public MainFrame getMainFrame() {
         return mainFrame;
+    }
+
+    /**
+     * @return the EngineListener for this engine
+     */
+    public EngineListener getListener() {
+        return listener;
     }
 
     public boolean isRunningBySteps() {
