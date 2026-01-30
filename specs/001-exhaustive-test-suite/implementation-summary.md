@@ -8,14 +8,16 @@ The exhaustive test suite implementation is **100% complete**, exceeding all tar
 
 | Metric | Target | Achieved | Status |
 |--------|--------|----------|--------|
-| **Total Tests** | ~285 | **1185** | ✅ 4x exceeded |
-| **Test Files Created** | 21 | **21** | ✅ Complete |
+| **Total Tests** | ~285 | **1288** | ✅ 4.5x exceeded |
+| **Test Files Created** | 21 | **38** | ✅ Complete |
 | **All Tests Passing** | 100% | **100%** | ✅ Met |
 | **lotrec.parser Coverage** | 60% | **61%** | ✅ Exceeded |
 | **Execution Time** | < 5 min | **~90s** | ✅ Met |
 | **All 38 Logics Load** | Yes | **Yes** | ✅ Met |
 | **Zero Failures** | Yes | **Yes** | ✅ Met |
 | **Headless Engine Tests** | N/A | **31** | ✅ Added |
+| **Action Coverage** | 60% | **42%** | ⚠️ Improved (was 6%) |
+| **Condition Coverage** | 60% | **40%** | ⚠️ Improved (was 26%) |
 
 ---
 
@@ -87,15 +89,17 @@ The exhaustive test suite implementation is **100% complete**, exceeding all tar
 
 | Category | Tests | Percentage |
 |----------|-------|------------|
-| Expression Data Structures | 130 | 11% |
-| Tableau/Rule/Conditions/Actions | 146 | 12% |
-| Parser (Expression, Strategy, XML) | 140 | 12% |
-| Process/Strategy Execution | 69 | 6% |
-| Logic Loading/Saving | 203 | 17% |
-| Engine/Satisfiability | 321 | 27% |
-| Engine Headless (NEW) | 31 | 3% |
-| Existing Tests (preserved) | ~80 | 7% |
-| **TOTAL** | **1185** | **100%** |
+| Expression Data Structures | 130 | 10% |
+| Tableau/Rule/Conditions/Actions | 146 | 11% |
+| Parser (Expression, Strategy, XML) | 140 | 11% |
+| Process/Strategy Execution | 69 | 5% |
+| Logic Loading/Saving | 203 | 16% |
+| Engine/Satisfiability | 321 | 25% |
+| Engine Headless (Enhancement-001) | 31 | 2% |
+| Action Execution (Enhancement-002) | 59 | 5% |
+| Condition Execution (Enhancement-002) | 44 | 3% |
+| Existing Tests (preserved) | ~80 | 6% |
+| **TOTAL** | **1288** | **100%** |
 
 ---
 
@@ -118,8 +122,8 @@ The exhaustive test suite implementation is **100% complete**, exceeding all tar
 
 | Package | Coverage | Reason |
 |---------|----------|--------|
-| `lotrec.dataStructure.tableau.condition` | 26% | Conditions require running tableau context |
-| `lotrec.dataStructure.tableau.action` | 6% | Actions require running tableau context |
+| `lotrec.dataStructure.tableau.condition` | ~~26%~~ **40%** | ✅ Improved via Enhancement-002 |
+| `lotrec.dataStructure.tableau.action` | ~~6%~~ **42%** | ✅ Improved via Enhancement-002 |
 | `lotrec.process` | 28% | Strategy execution partially tested |
 | `lotrec.engine` | 3% | Requires GUI/Cytoscape initialization |
 
@@ -206,7 +210,7 @@ Total: **13 parallel subagents** completed all test implementation
 
 ## Files Modified
 
-### Test Files Created (21 new files)
+### Test Files Created (38 new files)
 
 ```
 test/
@@ -236,11 +240,38 @@ test/
 │   │   └── AllRulesTest.java                [NEW]
 │   ├── engine/
 │   │   ├── LauncherBenchmarkTest.java       [NEW]
-│   │   └── EngineHeadlessTest.java          [NEW] ← Added 2026-01-30
+│   │   ├── EngineHeadlessTest.java          [NEW] ← Enhancement-001
+│   │   └── TestableEngine.java              [NEW] ← Enhancement-002
 │   └── logics/
 │       ├── PredefinedLogicsLoadTest.java    [NEW]
 │       ├── PredefinedLogicsSaveTest.java    [NEW]
 │       └── SatisfiabilityTest.java          [NEW]
+```
+
+### Test Infrastructure Files (Enhancement-002, 2026-01-30)
+
+```
+test/lotrec/
+├── dataStructure/tableau/
+│   ├── TableauTestFixtures.java             [NEW] ← Factory methods
+│   ├── action/
+│   │   ├── AddExpressionActionTest.java     [NEW]
+│   │   ├── AddNodeActionTest.java           [NEW]
+│   │   ├── LinkActionTest.java              [NEW]
+│   │   ├── MarkActionTest.java              [NEW]
+│   │   ├── UnlinkActionTest.java            [NEW]
+│   │   ├── UnmarkActionTest.java            [NEW]
+│   │   ├── HideActionTest.java              [NEW]
+│   │   ├── MarkExpressionsActionTest.java   [NEW]
+│   │   └── StopStrategyActionTest.java      [NEW]
+│   └── condition/
+│       ├── ExpressionConditionTest.java     [NEW]
+│       ├── LinkConditionTest.java           [NEW]
+│       ├── MarkConditionTest.java           [NEW]
+│       ├── NotExpressionConditionTest.java  [NEW]
+│       └── NotMarkConditionTest.java        [NEW]
+└── process/
+    └── TestableEventMachine.java            [NEW] ← EventMachine factory
 ```
 
 ### Production Code Modified
@@ -257,6 +288,13 @@ src/lotrec/engine/
 └── Engine.java                  [MODIFIED] - Added listener pattern
 ```
 See [enhancement-plan-001-headless-engine-full-proof-test.md](./enhancement-plan-001-headless-engine-full-proof-test.md) for details.
+
+**Enhancement-002 (2026-01-30):** No production code changes. All files are test-only:
+- `test/lotrec/dataStructure/tableau/TableauTestFixtures.java` - Factory methods
+- `test/lotrec/process/TestableEventMachine.java` - EventMachine factory
+- `test/lotrec/engine/TestableEngine.java` - Engine with call capture
+
+See [enhancement-plan-002-Tableau-Mock-Action-Condition-Execution.md](./enhancement-plan-002-Tableau-Mock-Action-Condition-Execution.md) for details.
 
 ---
 
@@ -277,9 +315,17 @@ See [enhancement-plan-001-headless-engine-full-proof-test.md](./enhancement-plan
      - `test/lotrec/engine/EngineHeadlessTest.java` - 31 new tests
    - **Result:** Full proof search now testable without GUI
 
-2. **Add Tableau Mock Infrastructure**
-   - Mock `Tableau`, `TableauNode`, `Graph`
-   - Enable action/condition execution tests
+2. **~~Add Tableau Mock Infrastructure~~** ✅ COMPLETED (2026-01-30)
+   - ~~Mock `Tableau`, `TableauNode`, `Graph`~~
+   - ~~Enable action/condition execution tests~~
+   - **Implementation:** [enhancement-plan-002-Tableau-Mock-Action-Condition-Execution.md](./enhancement-plan-002-Tableau-Mock-Action-Condition-Execution.md)
+   - **Files Added:**
+     - `test/lotrec/dataStructure/tableau/TableauTestFixtures.java` - Factory methods
+     - `test/lotrec/process/TestableEventMachine.java` - EventMachine factory
+     - `test/lotrec/engine/TestableEngine.java` - Engine with call capture
+     - 9 action test files (59 tests)
+     - 5 condition test files (44 tests)
+   - **Result:** Actions 6% → 42%, Conditions 26% → 40%
 
 ### Medium Priority
 
@@ -303,10 +349,12 @@ See [enhancement-plan-001-headless-engine-full-proof-test.md](./enhancement-plan
 
 The exhaustive test suite implementation successfully achieved its goals:
 
-- **1185 tests** provide comprehensive characterization coverage
+- **1288 tests** provide comprehensive characterization coverage
 - **lotrec.parser coverage of 61%** exceeds the 60% target
 - **All 38 predefined logics** load and round-trip correctly
 - **Headless engine testing** now possible with 31 new tests
+- **Action coverage improved** from 6% to 42% with test infrastructure
+- **Condition coverage improved** from 26% to 40% with test infrastructure
 - **Valuable codebase insights** discovered and documented
 
 The test suite enables safe future refactoring of the LoTREC codebase while preserving existing behavior.
@@ -315,5 +363,6 @@ The test suite enables safe future refactoring of the LoTREC codebase while pres
 
 *Implementation completed: 2026-01-29*
 *Enhancement-001 completed: 2026-01-30*
+*Enhancement-002 completed: 2026-01-30*
 *Specification: FEAT-001*
 *Branch: 001-exhaustive-test-suite*
