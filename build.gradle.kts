@@ -37,15 +37,19 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // AssertJ for fluent assertions
-    testImplementation("org.assertj:assertj-core:$assertjVersion")
-
-    // JUnit 4 compatibility (for existing tests)
-    testImplementation("junit:junit:4.13.2")
-    testRuntimeOnly("org.junit.vintage:junit-vintage-engine")
+    testImplementation("org.assertj:assertj-core:$assertjVersion")    
 }
 
 application {
     mainClass.set("lotrec.Launcher")
+}
+
+distributions {
+    main {
+        contents {
+            from("README.md")
+        }
+    }
 }
 
 sourceSets {
@@ -120,32 +124,6 @@ tasks.register<Jar>("fatJar") {
     })
 }
 
-// Task to copy dependencies to dist/lib folder (matches original Ant build)
-tasks.register<Copy>("copyDependencies") {
-    from(configurations.runtimeClasspath)
-    into(layout.buildDirectory.dir("dist/lib"))
-}
-
-// Task to create distribution similar to original Ant build
-tasks.register<Copy>("createDistribution") {
-    dependsOn(tasks.jar, "copyDependencies")
-
-    from(tasks.jar)
-    from("src/lotrec/dist/README.TXT")
-    from("src/lotrec/dist/run.bat")
-    into(layout.buildDirectory.dir("dist"))
-}
-
-// Task to create distribution ZIP (matches original Ant -post-jar)
-tasks.register<Zip>("packageZip") {
-    dependsOn("createDistribution")
-
-    archiveFileName.set("LoTREC-distribution.zip")
-    destinationDirectory.set(layout.projectDirectory)
-
-    from(layout.buildDirectory.dir("dist"))
-}
-
 // JaCoCo configuration for test coverage
 jacoco {
     toolVersion = "0.8.11"
@@ -161,7 +139,7 @@ tasks.jacocoTestReport {
 
 // Clean task extension
 tasks.clean {
-    delete("LoTREC-distribution.zip")
+    // Other cleaning actions can be added here if needed
 }
 
 // Default tasks

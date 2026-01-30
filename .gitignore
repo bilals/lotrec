@@ -1,26 +1,24 @@
-# Created by https://www.gitignore.io/api/netbeans
-
-### NetBeans ###
-nbproject/private/
-nbbuild/
-dist/
-nbdist/
-.nb-gradle/
-nbactions.xml
-
-# End of https://www.gitignore.io/api/netbeans
-
 ### Gradle ###
 build/
 .gradle/
 
-# End of Gradle
+### IDE ###
+.idea/
+*.iml
+.vscode/
+*.code-workspace
 
-# LoTREC changes:
-# Added:
+### OS ###
 **/Thumbs.db
-# Removed:
+.DS_Store
 
-# Claude Code and SpecKit local files
-.claude
-.specify
+### Claude Code ###
+# Keep project skills and settings, ignore user-specific
+.claude/settings.local.json
+.claude/cache/
+.claude/*.log
+
+### SpecKit ###
+# Commit specs, plans, and roadmaps
+# Add exclusions here if needed for generated/temp files
+# .specify/temp/
