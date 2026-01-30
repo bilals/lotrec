@@ -8,8 +8,8 @@ The exhaustive test suite implementation is **100% complete**, exceeding all tar
 
 | Metric | Target | Achieved | Status |
 |--------|--------|----------|--------|
-| **Total Tests** | ~285 | **1301** | ✅ 4.6x exceeded |
-| **Test Files Created** | 21 | **38** | ✅ Complete |
+| **Total Tests** | ~285 | **1332** | ✅ 4.7x exceeded |
+| **Test Files Created** | 21 | **42** | ✅ Complete |
 | **All Tests Passing** | 100% | **100%** | ✅ Met |
 | **lotrec.parser Coverage** | 60% | **61%** | ✅ Exceeded |
 | **Execution Time** | < 5 min | **~90s** | ✅ Met |
@@ -19,6 +19,7 @@ The exhaustive test suite implementation is **100% complete**, exceeding all tar
 | **Action Coverage** | 60% | **42%** | ⚠️ Improved (was 6%) |
 | **Condition Coverage** | 60% | **40%** | ⚠️ Improved (was 26%) |
 | **Missing Parser Methods** | N/A | **9** | ✅ Implemented |
+| **Integration Tests** | N/A | **31** | ✅ Added |
 
 ---
 
@@ -84,6 +85,15 @@ The exhaustive test suite implementation is **100% complete**, exceeding all tar
 | LauncherBenchmarkTest.java | `test/lotrec/engine/` | 87 |
 | SatisfiabilityTest.java | `test/lotrec/logics/` | 234 |
 
+### Integration Tests (Enhancement-004)
+
+| File | Location | Tests |
+|------|----------|-------|
+| RuleTestHelper.java | `test/lotrec/integration/` | Utility class |
+| RuleApplicationIntegrationTest.java | `test/lotrec/integration/` | 9 |
+| ConditionChainIntegrationTest.java | `test/lotrec/integration/` | 12 |
+| TableauStateIntegrationTest.java | `test/lotrec/integration/` | 10 |
+
 ---
 
 ## Test Count by Category
@@ -94,14 +104,15 @@ The exhaustive test suite implementation is **100% complete**, exceeding all tar
 | Tableau/Rule/Conditions/Actions | 146 | 11% |
 | Parser (Expression, Strategy, XML) | 140 | 11% |
 | Process/Strategy Execution | 69 | 5% |
-| Logic Loading/Saving | 203 | 16% |
-| Engine/Satisfiability | 321 | 25% |
+| Logic Loading/Saving | 203 | 15% |
+| Engine/Satisfiability | 321 | 24% |
 | Engine Headless (Enhancement-001) | 31 | 2% |
-| Action Execution (Enhancement-002) | 59 | 5% |
+| Action Execution (Enhancement-002) | 59 | 4% |
 | Condition Execution (Enhancement-002) | 44 | 3% |
 | Parser Methods (Enhancement-003) | 9 | 1% |
+| Integration Tests (Enhancement-004) | 31 | 2% |
 | Existing Tests (preserved) | ~78 | 6% |
-| **TOTAL** | **1301** | **100%** |
+| **TOTAL** | **1332** | **100%** |
 
 ---
 
@@ -216,7 +227,7 @@ Total: **13 parallel subagents** completed all test implementation
 
 ## Files Modified
 
-### Test Files Created (38 new files)
+### Test Files Created (42 new files)
 
 ```
 test/
@@ -247,7 +258,12 @@ test/
 │   ├── engine/
 │   │   ├── LauncherBenchmarkTest.java       [NEW]
 │   │   ├── EngineHeadlessTest.java          [NEW] ← Enhancement-001
-│   │   └── TestableEngine.java              [NEW] ← Enhancement-002
+│   │   └── TestableEngine.java              [NEW] ← Enhancement-002, Modified Enhancement-004
+│   ├── integration/
+│   │   ├── RuleTestHelper.java              [NEW] ← Enhancement-004
+│   │   ├── RuleApplicationIntegrationTest.java [NEW] ← Enhancement-004
+│   │   ├── ConditionChainIntegrationTest.java [NEW] ← Enhancement-004
+│   │   └── TableauStateIntegrationTest.java [NEW] ← Enhancement-004
 │   └── logics/
 │       ├── PredefinedLogicsLoadTest.java    [NEW]
 │       ├── PredefinedLogicsSaveTest.java    [NEW]
@@ -309,6 +325,23 @@ See [enhancement-plan-002-Tableau-Mock-Action-Condition-Execution.md](./enhancem
 
 See [enhancement-plan-003-Parser-Condition-Action.md](./enhancement-plan-003-Parser-Condition-Action.md) for details.
 
+**Enhancement-004 (2026-01-30):** Added integration tests for rule application:
+```
+test/lotrec/integration/
+├── RuleTestHelper.java                    [NEW] ← Test utility class (~340 lines)
+├── RuleApplicationIntegrationTest.java    [NEW] ← 9 tests
+├── ConditionChainIntegrationTest.java     [NEW] ← 12 tests
+└── TableauStateIntegrationTest.java       [NEW] ← 10 tests
+```
+
+Test infrastructure modified:
+```
+test/lotrec/engine/
+└── TestableEngine.java                    [MODIFIED] ← Added shouldPause(), shouldStop(), isRunningBySteps()
+```
+
+See [enhancement-plan-004-Middle-Integration-Tests.md](./enhancement-plan-004-Middle-Integration-Tests.md) for details.
+
 ---
 
 ## Recommendations for Future Work
@@ -352,9 +385,18 @@ See [enhancement-plan-003-Parser-Condition-Action.md](./enhancement-plan-003-Par
      - `test/lotrec/dataStructure/tableau/condition/ConditionRegistryTest.java` - Added 6 parsing tests
    - **Result:** All registered conditions and actions now parseable
 
-4. **Add Integration Tests**
-   - Test complete rule application with minimal tableau
-   - Verify condition matching with actual nodes
+4. **~~Add Integration Tests~~** ✅ COMPLETED (2026-01-30)
+   - ~~Test complete rule application with minimal tableau~~
+   - ~~Verify condition matching with actual nodes~~
+   - **Implementation:** [enhancement-plan-004-Middle-Integration-Tests.md](./enhancement-plan-004-Middle-Integration-Tests.md)
+   - **Files Added:**
+     - `test/lotrec/integration/RuleTestHelper.java` - Test utility class
+     - `test/lotrec/integration/RuleApplicationIntegrationTest.java` - 9 tests
+     - `test/lotrec/integration/ConditionChainIntegrationTest.java` - 12 tests
+     - `test/lotrec/integration/TableauStateIntegrationTest.java` - 10 tests
+   - **Files Modified:**
+     - `test/lotrec/engine/TestableEngine.java` - Added shouldPause(), shouldStop(), isRunningBySteps() overrides
+   - **Result:** 31 integration tests covering complete rule application workflow
 
 ### Low Priority
 
@@ -368,13 +410,14 @@ See [enhancement-plan-003-Parser-Condition-Action.md](./enhancement-plan-003-Par
 
 The exhaustive test suite implementation successfully achieved its goals:
 
-- **1301 tests** provide comprehensive characterization coverage
+- **1332 tests** provide comprehensive characterization coverage
 - **lotrec.parser coverage of 61%** exceeds the 60% target
 - **All 38 predefined logics** load and round-trip correctly
 - **Headless engine testing** now possible with 31 new tests
 - **Action coverage improved** from 6% to 42% with test infrastructure
 - **Condition coverage improved** from 26% to 40% with test infrastructure
 - **All 9 missing parser methods** implemented (6 conditions, 3 actions)
+- **31 integration tests** cover complete rule application workflow
 - **Valuable codebase insights** discovered and documented
 
 The test suite enables safe future refactoring of the LoTREC codebase while preserving existing behavior.
@@ -385,5 +428,6 @@ The test suite enables safe future refactoring of the LoTREC codebase while pres
 *Enhancement-001 completed: 2026-01-30*
 *Enhancement-002 completed: 2026-01-30*
 *Enhancement-003 completed: 2026-01-30*
+*Enhancement-004 completed: 2026-01-30*
 *Specification: FEAT-001*
 *Branch: 001-exhaustive-test-suite*

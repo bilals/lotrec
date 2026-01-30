@@ -6,13 +6,14 @@
 
 | Metric | Result |
 |--------|--------|
-| **Total Tests** | 1301 |
-| **Test Files Created** | 38 |
+| **Total Tests** | 1332 |
+| **Test Files Created** | 42 |
 | **All Tests Passing** | Yes |
 | **Execution Time** | ~90 seconds |
 | **Parser Coverage** | 61% ✅ |
 | **Headless Engine Tests** | 31 ✅ (Enhancement-001) |
 | **Parser Methods Added** | 9 ✅ (Enhancement-003) |
+| **Integration Tests** | 31 ✅ (Enhancement-004) |
 
 ---
 
@@ -86,11 +87,21 @@
 
 **Result**: Condition coverage improved from 26% to **40%** with 44 new tests across 5 condition classes.
 
-### 4. Event Machine Testing
+### 4. ~~Event Machine Testing~~ ✅ RESOLVED
 
 **Issue**: `EventMachine` requires complex setup with rules, conditions, actions, and tableau context.
 
-**Impact**: Strategy execution testing is limited to worker management, not actual rule application.
+**~~Impact~~**: ~~Strategy execution testing is limited to worker management, not actual rule application.~~
+
+**Resolution**: Implemented `RuleTestHelper` utility class for integration testing:
+- `createRule()` builds rules programmatically with conditions and actions
+- `applyRule()` executes complete rule application workflow via EventMachine
+- `triggerExistingExpressionEvents()` triggers events for condition matching
+- Factory methods for conditions (`hasElement`, `hasNotElement`, `isLinked`, etc.)
+- Factory methods for actions (`addExpression`, `mark`, `createNewNode`, `link`)
+- **See:** [enhancement-plan-004-Middle-Integration-Tests.md](./enhancement-plan-004-Middle-Integration-Tests.md)
+
+**Result**: Full rule application now testable with 31 integration tests covering condition matching and action execution.
 
 ### 5. ~~Missing Parser Methods~~ ✅ RESOLVED
 
@@ -171,10 +182,13 @@ Created for strategy testing:
 
 ### Medium Priority
 
-3. **Add Integration Tests**
-   - Test complete rule application with minimal tableau
-   - Verify condition matching with actual nodes
-   - Test action effects on tableau state
+3. **~~Add Integration Tests~~** ✅ COMPLETED
+   - ~~Test complete rule application with minimal tableau~~
+   - ~~Verify condition matching with actual nodes~~
+   - ~~Test action effects on tableau state~~
+   - **See:** [enhancement-plan-004-Middle-Integration-Tests.md](./enhancement-plan-004-Middle-Integration-Tests.md)
+   - **Implementation:** Added `RuleTestHelper` utility class and 3 integration test classes
+   - **Result:** 31 new integration tests covering complete rule application workflow
 
 4. **Performance Benchmarks**
    - Add timeout tests for proof search
@@ -293,9 +307,29 @@ test/lotrec/dataStructure/tableau/
     └── ConditionRegistryTest.java   [MODIFIED] ← Added 6 parsing tests
 ```
 
+### Integration Test Files (Enhancement-004)
+
+Added for middle-layer integration testing (see [enhancement-plan-004](./enhancement-plan-004-Middle-Integration-Tests.md)):
+
+```
+test/lotrec/integration/
+├── RuleTestHelper.java                    [NEW] ← Test utility class (~340 lines)
+├── RuleApplicationIntegrationTest.java    [NEW] ← 9 tests
+├── ConditionChainIntegrationTest.java     [NEW] ← 12 tests
+└── TableauStateIntegrationTest.java       [NEW] ← 10 tests
+```
+
+### Test Infrastructure Updates (Enhancement-004)
+
+```
+test/lotrec/engine/
+└── TestableEngine.java              [MODIFIED] ← Added shouldPause(), shouldStop(), isRunningBySteps() overrides
+```
+
 ---
 
 *Document created: 2026-01-29*
 *Updated: 2026-01-30 (Enhancement-001 completed)*
 *Updated: 2026-01-30 (Enhancement-002 completed)*
 *Updated: 2026-01-30 (Enhancement-003 completed)*
+*Updated: 2026-01-30 (Enhancement-004 completed)*

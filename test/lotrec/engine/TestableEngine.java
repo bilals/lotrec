@@ -150,6 +150,33 @@ public class TestableEngine extends Engine {
         // No-op in tests
     }
 
+    /**
+     * Override to prevent pause behavior in tests.
+     * Always returns false so EventMachine.work() doesn't block.
+     */
+    @Override
+    public boolean shouldPause() {
+        return false;
+    }
+
+    /**
+     * Override to prevent stop behavior in tests.
+     * Always returns false so EventMachine.work() completes normally.
+     */
+    @Override
+    public boolean shouldStop() {
+        return false;
+    }
+
+    /**
+     * Override to prevent issues when EventMachine calls synchronized on engine.
+     * Always returns false since we're not running by steps in tests.
+     */
+    @Override
+    public boolean isRunningBySteps() {
+        return false;
+    }
+
     // ========== Test Verification Methods ==========
 
     /**
