@@ -28,7 +28,7 @@
 - Removed obsolete test JARs (`junit-4.12.jar`, `hamcrest-core-1.3.jar`)
 - Removed old distribution files (`src/lotrec/dist/`)
 
-**See**: `.specify/memory/migration-history.md` for full details
+**See**: `.specify/memory/roadmap-implementation-details/00-build-migration.md` for full details
 
 ---
 
@@ -59,6 +59,8 @@
 - `lotrec/dataStructure/tableau/Rule.java`
 - `lotrec/engine/Engine.java`
 - `gi/transformers/PriorityInfixToPrefix.java`
+
+**See**: `.specify/memory/roadmap-implementation-details/01-remaining-testing-tasks.md` for full details
 
 ---
 
