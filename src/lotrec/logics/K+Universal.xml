@@ -11,7 +11,7 @@ Semantically, this logics looks like a logic with two modalities 1 and 2:
 2 is a S5 operator, plus the axiom: [2] phi -&gt; [1] phi
 Recall:
 S5 := S4 + B or T + E (i.e. 5)
-Author: Lilac Team
+Author: Bilal Said, Lilac Team
 Last update: April 2008</description>
     <connector>
         <connector-name>not</connector-name>

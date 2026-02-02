@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logic>
     <parser-version>2.1</parser-version>
-    <description>Linear-time Temporal Logic
+    <description>Linear-time Temporal Logic (LTL)
 Syntax: p,~p, A &amp; B, A v B, A-&gt; B, A &lt;-&gt; B, &lt;&gt; A, [] A, X A, A U B
 Semantics: a worlds is labelled with a natural number i € |N
 for all i&gt;=0, the world i is linked to i+1
@@ -9,7 +9,7 @@ M,i |= &lt;&gt; A iff there exists j&gt;=i s.t. M,j |= A
 M,i |= [] A iff for all j&gt;=i  M,j |= A
 M,i |= X A iff M,i+1 |= A
 M,i |= A U B iff M,i |= &lt;&gt; B and for all j&gt;=i ( M,j |= B or M,j |= A &amp; X (A U B) )
-Author: Lilac Team
+Author: Bilal Said, Lilac Team
 Last update: February 2009</description>
     <connector>
         <connector-name>not</connector-name>

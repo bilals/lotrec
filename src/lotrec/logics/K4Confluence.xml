@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logic>
     <parser-version>2.1</parser-version>
-    <description>K4 + Confluence. Implement the optimized algorithm of Gasquet and Farinas 1999.
-Author: Lilac Team
+    <description>K4 + Confluence. This version implements the optimized algorithm of Gasquet and Farinas 1999.
+Author: Bilal Said, Lilac Team
 Last update: June 2007</description>
     <connector>
         <connector-name>and</connector-name>

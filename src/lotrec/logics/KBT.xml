@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logic>
     <parser-version>2.1</parser-version>
-    <description>The moadl logic KBT
-Author: Lilac Team
+    <description>Modal logic KBT with axioms B and T (Symmetry and Reflexivity) semantics.
+Author: Bilal Said, Lilac Team
 Last update: June 2007</description>
     <connector>
         <connector-name>not</connector-name>

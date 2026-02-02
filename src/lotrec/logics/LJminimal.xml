@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logic>
     <parser-version>2.1</parser-version>
-    <description>intuitionistic logic LJ (without ~)
-Author: Lilac Team
+    <description>Intuitionistic logic LJ (without ~)
+Author: Bilal Said, Lilac Team
 Last update: June 2007</description>
     <connector>
         <connector-name>and</connector-name>

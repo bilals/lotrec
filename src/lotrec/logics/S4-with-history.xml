@@ -6,8 +6,9 @@ The transitivity may introduce a loop (e.g. []&lt;&gt;A)
 We achieve the loop test by disactivating the &lt;&gt;A in a node N when:
 1- A is already in the same node
 2- there is no new  []B in the node N that do not appear in its ancestors
-Author: Lilac Team
-Last update: January 2009</description>
+Author: Bilal Said, Lilac Team
+Last update: January 2009
+    </description>
     <connector>
         <connector-name>not</connector-name>
         <arity>1</arity>

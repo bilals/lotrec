@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logic>
     <parser-version>2.1</parser-version>
-    <description>StIt logic with the next operator X
+    <description>StIt logic with the next operator X.
 Author: François Schwarzentruber - Lilac Team
 Last update: June 2007</description>
     <connector>

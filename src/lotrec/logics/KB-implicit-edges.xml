@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logic>
     <parser-version>2.1</parser-version>
-    <description>The basic modal logic K
-Author: Lilac Team
+    <description>Modal logic K with axiom B where the semantics of axiom B are implicitly handled through the propagation rules, without making the accessibility relation reflexive and symmetric.
+Author: Bilal Said, Lilac Team
 Last update: March 2009</description>
     <connector>
         <connector-name>not</connector-name>

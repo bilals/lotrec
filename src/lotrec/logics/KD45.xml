@@ -3,7 +3,7 @@
     <parser-version>2.1</parser-version>
     <description>KD45 with ~, &amp;, v, -&gt;, [], &lt;&gt;. We must add the constant Root to the tested formula in order to be able to identify the root node.
 For example, to test the formule "nec P" we should put "and Root nec P".
-Author: Lilac Team
+Author: Bilal Said, Lilac Team
 Last update: Novembre 2008</description>
     <connector>
         <connector-name>not</connector-name>

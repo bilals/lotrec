@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logic>
     <parser-version>2.1</parser-version>
-    <description>The basic modal logic K
-Author: Lilac Team
-Last update: March 2009</description>
+    <description>Modal logic S5 axiom K, T and 5 (or KT with axioms B and 4). Semantics are explicitly taken into consideration by making the accessibility relation an equivalence relation (i.e., reflexive, transitive, and symmetric).
+Author: Bilal Said, Lilac Team
+Last update: March 2009
+    </description>
     <connector>
         <connector-name>not</connector-name>
         <arity>1</arity>

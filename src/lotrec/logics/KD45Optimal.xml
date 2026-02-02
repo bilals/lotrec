@@ -2,7 +2,7 @@
 <logic>
     <parser-version>2.1</parser-version>
     <description>KD45 with ~, &amp;, v, -&gt;, [], &lt;&gt;. OPTIMISED VERSION -- ONE DEPTH GRAPH. We must conjoin the constant Root to the tested formula, ex: and Root nec P.
-Author: Lilac Team
+Author: Bilal Said, Lilac Team
 Last update: June 2007</description>
     <connector>
         <connector-name>not</connector-name>

@@ -2,8 +2,9 @@
 <logic>
     <parser-version>2.1</parser-version>
     <description>S4 with the minimal set of connectors: not, and, nec
-Author: Lilac Team
-Last update: June 2007</description>
+Author: Bilal Said, Lilac Team
+Last update: June 2007
+    </description>
     <connector>
         <connector-name>not</connector-name>
         <arity>1</arity>

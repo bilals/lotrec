@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logic>
     <parser-version>2.1</parser-version>
-    <description>Modal logic KB5
-Author: Lilac Team
+    <description>Modal logic KB5 with axioms B and 5 (Symmetry and Euclideanity) semantics.
+Author: Bilal Said, Lilac Team
 Last update: June 2007</description>
     <connector>
         <connector-name>and</connector-name>

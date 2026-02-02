@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logic>
     <parser-version>2.1</parser-version>
-    <description>Intuitionistic Logic
+    <description>Intuitionistic Logic.
 Author: Marcio Moretto Ribeiro, Bilal Said
 Last update: July 2009</description>
     <connector>

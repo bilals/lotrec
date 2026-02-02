@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logic>
     <parser-version>2.1</parser-version>
-    <description>The multi-modal logic Kn: n modal operators each one of them is a K-like operator
-Author: Lilac Team
+    <description>Multi-modal logic S5 with Public Announcement Logic (PAL) operators.
+Author: Bilal Said, Lilac Team
 Last update: March 2009</description>
     <connector>
         <connector-name>not</connector-name>

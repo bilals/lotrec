@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logic>
     <parser-version>2.1</parser-version>
-    <description>
-Author: LILaC Team
+    <description>Modela Checking for Monomodal Logic K with ~, &amp;, v, [], &lt;&gt;.
+Author: Bilal Said, Lilac Team
 Last update: March 2009</description>
     <connector>
         <connector-name>not</connector-name>

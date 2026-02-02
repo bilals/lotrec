@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logic>
     <parser-version>2.1</parser-version>
-    <description>Propositional Dynamic Logic with sequence, union, and star. It lacks the test. As an overview, we construct the tableaux as usual (rules defined before loopTest). We avoid endless loops by performing equality test between a leaf w and one of its ancestors (loopTest rule). For looping open tableaux, we test if all "&lt;phi*&gt; psi" are satisfied by post-processing the tableau in a model-checking way. Author: Lilac Team Last update: November 2008</description>
+    <description>Propositional Dynamic Logic with sequence, union, and star. It lacks the test. As an overview, we construct the tableaux as usual (rules defined before loopTest). We avoid endless loops by performing equality test between a leaf w and one of its ancestors (loopTest rule). For looping open tableaux, we test if all "&lt;phi*&gt; psi" are satisfied by post-processing the tableau in a model-checking way. 
+    Author: Bilal Said, Lilac Team 
+    Last update: November 2008
+    </description>
     <connector>
         <connector-name>and</connector-name>
         <arity>2</arity>

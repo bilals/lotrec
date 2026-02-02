@@ -3,8 +3,9 @@
     <parser-version>2.1</parser-version>
     <description>S4 with all connectors. Optimal implementation using cut rules.
 NOTE: it loops with (and (nec pos A) (nec pos not A))
-Author: Lilac Team
-Last update: Novembre 2008</description>
+Author: Bilal Said, Lilac Team
+Last update: Novembre 2008
+    </description>
     <connector>
         <connector-name>not</connector-name>
         <arity>1</arity>

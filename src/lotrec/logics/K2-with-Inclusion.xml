@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logic>
     <parser-version>2.1</parser-version>
-    <description>The multi-modal logic Kn: n modal operators each one of them is A K-like operator
-Author: Lilac Team
+    <description>The multi-modal logic Kn with inclusion. Showcased on K2 with inclusion between the two modalities J and I (cf. rule Nec_J_To_I_Successors).
+Author: Bilal Said, Lilac Team
 Last update: March 2009</description>
     <connector>
         <connector-name>not</connector-name>

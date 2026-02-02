@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logic>
     <parser-version>2.1</parser-version>
-    <description>MODAL LOGIC K5 with not, or, and, box, pos
-Author: Lilac Team
+    <description>Modal Logic K5 with axiom 5 (Euclideanity) semantics.
+Author: Bilal Said, Lilac Team
 Last update: June 2007</description>
     <connector>
         <connector-name>and</connector-name>

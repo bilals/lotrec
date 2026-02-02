@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logic>
     <parser-version>2.1</parser-version>
-    <description>The basic modal logic k : simple nec and pos modal operators with default krepke semantics.
-Author: Lilac Team
+    <description>The basic modal logic k : minimal set of operators (not, and, nec) with default Kripke semantics.
+Author: Bilal Said, Lilac Team
 Last update: June 2007</description>
     <connector>
         <connector-name>not</connector-name>

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logic>
     <parser-version>2.1</parser-version>
-    <description>The basic modal logic K
-Author: Lilac Team
+    <description>Modal logic S5 axiom K, T and 5 (or KT with axioms B and 4). Semantics are implicitly taken into consideration into the propagation rules by simulating an equivalence relation (i.e., reflexive, transitive, and symmetric), without explicitly creatign the corresponding edges.
+Author: Bilal Said, Lilac Team
 Last update: March 2009</description>
     <connector>
         <connector-name>not</connector-name>

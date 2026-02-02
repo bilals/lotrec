@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <logic>
     <parser-version>2.1</parser-version>
-    <description>The modal Logic KBD
-Author: Lilac Team
+    <description>Modal Logic KBD with axioms B and D (Symmetry and Seriality) semantics.
+Author: Bilal Said, Lilac Team
 Last update: June 2007</description>
     <connector>
         <connector-name>not</connector-name>

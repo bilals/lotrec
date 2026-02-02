@@ -2,7 +2,7 @@
 <logic>
     <parser-version>2.1</parser-version>
     <description>K45 with ~, &amp;, v, -&gt;, [], &lt;&gt;. OPTIMISED VERSION -- ONE DEPTH GRAPH. Requires conjoining a special constant "Root" to the formula, example: and Root (not nec nec P)
-Author: Lilac Team
+Author: Bilal Said, Lilac Team
 Last update: June 2007</description>
     <connector>
         <connector-name>not</connector-name>

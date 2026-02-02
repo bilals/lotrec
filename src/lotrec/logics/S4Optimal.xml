@@ -2,8 +2,9 @@
 <logic>
     <parser-version>2.1</parser-version>
     <description>Modal logic S4 also known as KT4: axiom K + T ([]p-&gt;p:of reflexivity) + 4 ([]p-&gt;[][]p:of transitivity)
-Author: Lilac Team
-Last update: February 2009</description>
+Author: Bilal Said, Lilac Team
+Last update: February 2009
+    </description>
     <connector>
         <connector-name>not</connector-name>
         <arity>1</arity>
