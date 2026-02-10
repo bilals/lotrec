@@ -64,7 +64,21 @@
 
 ---
 
-### Phase 2: Code Quality (Safe with tests in place) 
+### Phase 2: Code Quality (Safe with tests in place)
+
+> **Scope**: Focus on **non-GUI code only**. GUI packages (`lotrec.gui.*`, `cytoscape.*`) will be addressed during their respective migration phases (Phase 3 and 4), avoiding wasted effort on code that will be rewritten.
+
+#### Target Packages
+| Package | Include in Phase 2 |
+|---------|-------------------|
+| `lotrec.dataStructure.*` | Yes |
+| `lotrec.parser` | Yes |
+| `lotrec.process` | Yes |
+| `lotrec.engine` | Yes |
+| `lotrec.resources` | Yes |
+| `gi.*` | Yes |
+| `lotrec.gui.*` | **No** (Phase 3) |
+| `cytoscape.*` | **No** (Phase 4) |
 
 #### 2.1 Resolve Compilation Warnings
 **Priority**: HIGH
@@ -72,12 +86,12 @@
 
 **Steps**:
 1. Enable `-Xlint:all` in Gradle
-2. Fix raw type warnings (add generics)
-3. Fix deprecation warnings
-4. Fix unused variable warnings
-5. Fix unchecked cast warnings
+2. Fix raw type warnings (add generics) in target packages
+3. Fix deprecation warnings in target packages
+4. Fix unused variable warnings in target packages
+5. Fix unchecked cast warnings in target packages
 
-**Estimated Issues**: ~500-1000 warnings (based on project size)
+**Estimated Issues**: ~300-500 warnings (non-GUI code subset)
 
 ---
 
@@ -87,9 +101,10 @@
 
 **Plan**:
 1. Add SpotBugs and Checkstyle to Gradle
-2. Fix critical/blocker issues first
-3. Incrementally address major issues
-4. Establish coding standards for new code
+2. Configure to scan only target packages (exclude `lotrec.gui.*`, `cytoscape.*`)
+3. Fix critical/blocker issues first
+4. Incrementally address major issues
+5. Establish coding standards for new code
 
 **Focus Areas**:
 - Remove dead code

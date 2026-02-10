@@ -19,17 +19,32 @@ Provide a flexible, educational, and research-oriented tool for exploring non-cl
 
 ## 2. Locked Technology Stack
 
-> **NON-NEGOTIABLE**: These technologies are frozen. Do not propose upgrades or alternatives.
+> Technologies marked **Locked** are frozen. Technologies marked **Unlocked** have approved migration paths.
 
-| Component | Version | Configuration |
-|-----------|---------|---------------|
-| **Java** | 1.8 | `sourceCompatibility = JavaVersion.VERSION_1_8` |
-| **Build System** | Gradle (Kotlin DSL) | `build.gradle.kts` at project root |
-| **GUI Framework** | Swing/AWT | Standard Java desktop toolkit |
-| **Graph Visualization** | Cytoscape 2.x | `cytoscape.jar` in `lib/` |
-| **Testing** | JUnit 5 | With AssertJ for fluent assertions |
-| **Coverage** | JaCoCo | Reports in `build/reports/jacoco/` |
-| **Parser Generator** | JavaCC | For expression parsing |
+| Component | Version | Configuration | Status |
+|-----------|---------|---------------|--------|
+| **Java** | 1.8 | `sourceCompatibility = JavaVersion.VERSION_1_8` | Locked |
+| **Build System** | Gradle (Kotlin DSL) | `build.gradle.kts` at project root | Locked |
+| **GUI Framework** | Swing/AWT → JavaFX | Migration planned (Phase 3) | **Unlocked** |
+| **Graph Visualization** | Cytoscape 2.x → TBD | Migration planned (Phase 4) | **Unlocked** |
+| **Testing** | JUnit 5 | With AssertJ for fluent assertions | Locked |
+| **Coverage** | JaCoCo | Reports in `build/reports/jacoco/` | Locked |
+| **Parser Generator** | JavaCC | For expression parsing | Locked |
+
+### GUI Framework Migration (Phase 3)
+The GUI framework is unlocked to allow incremental migration from Swing/AWT to JavaFX:
+1. Hybrid approach: Embed JavaFX panels within Swing using `JFXPanel`
+2. Migrate dialogs and simpler panels first
+3. Migrate complex panels (LogicsPanel, TableauxPanel) last
+4. Eventually remove Swing entirely
+
+During the transition period, both Swing and JavaFX code may coexist.
+
+### Graph Visualization Migration (Phase 4)
+Cytoscape 2.x is unlocked to allow migration to a modern graph visualization library:
+- Candidate libraries: JGraphX, Cytoscape.js (via embedded browser), GraphStream
+- Final choice to be determined after prototyping in Phase 4
+- Must preserve: hierarchical layout, auto-adapting node width, pan/zoom, export capabilities
 
 ### Build Commands
 ```bash
@@ -45,10 +60,17 @@ Provide a flexible, educational, and research-oriented tool for exploring non-cl
 
 **Note**: On Windows, use `gradlew.bat` instead of `./gradlew`.
 
-### Why Locked?
-- Java 1.8: Maximum compatibility with existing deployments
-- Cytoscape 2.x: Deep integration with visualization layer
-- Gradle: Modern build system with better dependency management and IDE support
+### Why Locked/Unlocked?
+
+**Locked:**
+- **Java 1.8**: Maximum compatibility with existing deployments
+- **Gradle**: Modern build system with better dependency management and IDE support
+- **JUnit 5 / JaCoCo**: Standard modern testing infrastructure
+- **JavaCC**: Deeply integrated with expression parsing
+
+**Unlocked:**
+- **GUI Framework**: Swing/AWT is aging; JavaFX provides modern UI capabilities, better CSS styling, and improved developer experience
+- **Graph Visualization**: Cytoscape 2.x is unmaintained; modern alternatives offer better performance and maintainability
 
 ---
 
