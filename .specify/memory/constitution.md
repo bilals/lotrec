@@ -23,7 +23,7 @@ Provide a flexible, educational, and research-oriented tool for exploring non-cl
 
 | Component | Version | Configuration | Status |
 |-----------|---------|---------------|--------|
-| **Java** | 1.8 | `sourceCompatibility = JavaVersion.VERSION_1_8` | Locked |
+| **Java** | 1.8 | Migration planned (Phase 3)  | **Unlocked** |
 | **Build System** | Gradle (Kotlin DSL) | `build.gradle.kts` at project root | Locked |
 | **GUI Framework** | Swing/AWT → JavaFX | Migration planned (Phase 3) | **Unlocked** |
 | **Graph Visualization** | Cytoscape 2.x → TBD | Migration planned (Phase 4) | **Unlocked** |
@@ -38,7 +38,7 @@ The GUI framework is unlocked to allow incremental migration from Swing/AWT to J
 3. Migrate complex panels (LogicsPanel, TableauxPanel) last
 4. Eventually remove Swing entirely
 
-During the transition period, both Swing and JavaFX code may coexist.
+During the transition period, both Swing and JavaFX code may coexist. Java version might be increased to 17+ to better support JavaFX.
 
 ### Graph Visualization Migration (Phase 4)
 Cytoscape 2.x is unlocked to allow migration to a modern graph visualization library:
@@ -294,7 +294,7 @@ CLASSES_KEYWORDS.put("myNewAction", MyNewAction.class);
 | Topic | Location |
 |-------|----------|
 | Full Architecture | `.claude/skills/brownfield-developer-lotrec/references/architecture.md` |
-| Technology Stack | `.claude/skills/brownfield-developer-lotrec/references/tech-stack.md` |
+| Technology Stack | Updated Version `CLAUDE.md` ~~Old Version `.claude/skills/brownfield-developer-lotrec/references/tech-stack.md`~~ |
 | Module Structure | `.claude/skills/brownfield-developer-lotrec/references/module-structure.md` |
 | Coding Conventions | `.claude/skills/brownfield-developer-lotrec/references/coding-conventions.md` |
 | Development Patterns | `.claude/skills/brownfield-developer-lotrec/references/development-patterns.md` |

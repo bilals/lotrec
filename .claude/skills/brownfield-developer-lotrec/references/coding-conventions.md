@@ -128,15 +128,12 @@ import lotrec.parser.OldiesTokenizer;
 
 ## Comment Standards
 
-### File Headers (NetBeans Template)
+### File Headers (NetBeans-like Template)
 ```java
 /*
  * ClassName.java
  *
  * Created on [date]
- *
- * To change this template, choose Tools | Template Manager
- * and open the template in the editor.
  */
 ```
 
@@ -145,7 +142,7 @@ import lotrec.parser.OldiesTokenizer;
 /**
  * Defines an expression used in all the Lotrec project.
  * An expression must be able to compute all the matching and instancing actions.
- * @author David Fauthoux
+ * @author Bilal SAID
  */
 public interface Expression extends java.io.Serializable {
 
