@@ -77,6 +77,36 @@ tasks.register<JavaExec>("captureSwingBaseline") {
     description = "Capture Swing GUI baseline screenshots for visual comparison"
     classpath = sourceSets.main.get().runtimeClasspath
     mainClass.set("lotrec.guifx.validation.SwingBaselineCapture")
+    args("build/screenshots/swing-baseline")
+}
+
+// Capture JavaFX current screenshots for visual migration validation
+tasks.register<JavaExec>("captureJavaFXBaseline") {
+    group = "verification"
+    description = "Capture JavaFX GUI screenshots for visual comparison"
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("lotrec.guifx.validation.JavaFXBaselineCapture")
+    args("build/screenshots/javafx-current")
+    doFirst {
+        // The javafx plugin only configures the 'run' task; for custom JavaExec tasks
+        // we must manually set up the module path so the JavaFX runtime loads.
+        val fxJars = classpath.files.filter { it.name.startsWith("javafx-") || it.name.startsWith("javafx.") }
+        val modulePath = fxJars.joinToString(File.pathSeparator) { it.absolutePath }
+        jvmArgs(
+            "--module-path", modulePath,
+            "--add-modules", "javafx.controls,javafx.swing",
+            "--add-opens", "javafx.graphics/com.sun.javafx.application=ALL-UNNAMED",
+            "--add-opens", "javafx.graphics/com.sun.glass.ui=ALL-UNNAMED"
+        )
+    }
+}
+
+// Compare Swing and JavaFX screenshots and generate report
+tasks.register<JavaExec>("compareVisuals") {
+    group = "verification"
+    description = "Compare Swing and JavaFX screenshots and generate report"
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("lotrec.guifx.validation.ValidationRunner")
 }
 
 distributions {

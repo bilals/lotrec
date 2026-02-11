@@ -40,7 +40,7 @@ public class SwingBaselineCapture {
     private static int capturedCount = 0;
 
     public static void main(String[] args) throws Exception {
-        Path outputDir = Paths.get("specs/001-javafx-gui-migration/screenshots/swing-baseline/programmatic");
+        Path outputDir = Paths.get("build/screenshots/swing-baseline");
         if (args.length > 0) {
             outputDir = Paths.get(args[0]);
         }
