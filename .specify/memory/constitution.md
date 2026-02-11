@@ -33,12 +33,12 @@ Provide a flexible, educational, and research-oriented tool for exploring non-cl
 
 ### GUI Framework Migration (Phase 3)
 The GUI framework is unlocked to allow incremental migration from Swing/AWT to JavaFX:
-1. Hybrid approach: Embed JavaFX panels within Swing using `JFXPanel`
+1. JavaFX-first approach: Build new JavaFX application, bridge Cytoscape via `SwingNode`
 2. Migrate dialogs and simpler panels first
 3. Migrate complex panels (LogicsPanel, TableauxPanel) last
 4. Eventually remove Swing entirely
 
-During the transition period, both Swing and JavaFX code may coexist. Java version might be increased to 17+ to better support JavaFX.
+During the transition period, both Swing and JavaFX code coexist in separate packages (`lotrec.gui` and `lotrec.guifx`). Java 21 (LTS) is the minimum version for JavaFX support.
 
 ### Graph Visualization Migration (Phase 4)
 Cytoscape 2.x is unlocked to allow migration to a modern graph visualization library:
@@ -63,12 +63,12 @@ Cytoscape 2.x is unlocked to allow migration to a modern graph visualization lib
 ### Why Locked/Unlocked?
 
 **Locked:**
-- **Java 1.8**: Maximum compatibility with existing deployments
 - **Gradle**: Modern build system with better dependency management and IDE support
 - **JUnit 5 / JaCoCo**: Standard modern testing infrastructure
 - **JavaCC**: Deeply integrated with expression parsing
 
 **Unlocked:**
+- **Java**: Unlocked from 1.8 to enable Java 21 (LTS) upgrade; required for JavaFX support and modern language features (8+ years of improvements: records, sealed classes, pattern matching, modern GC)
 - **GUI Framework**: Swing/AWT is aging; JavaFX provides modern UI capabilities, better CSS styling, and improved developer experience
 - **Graph Visualization**: Cytoscape 2.x is unmaintained; modern alternatives offer better performance and maintainability
 
@@ -86,7 +86,9 @@ Cytoscape 2.x is unlocked to allow migration to a modern graph visualization lib
 | Core Logic | `lotrec.dataStructure.*` | Java standard library only |
 | Parser | `lotrec.parser` | Core Logic, JavaCC runtime |
 | Process Engine | `lotrec.process` | Core Logic |
-| GUI | `lotrec.gui.*` | All layers, Swing/AWT |
+| Engine Orchestrator | `lotrec.engine` | Core Logic, Process Engine; listener implementations may reference GUI layer |
+| GUI (Swing) | `lotrec.gui.*` | All layers, Swing/AWT |
+| GUI (JavaFX) | `lotrec.guifx.*` | All layers, JavaFX, Swing (bridge only) |
 | Visualization | `cytoscape.*` | Cytoscape API, GUI |
 | Resources | `lotrec.resources` | None (data only) |
 
@@ -122,11 +124,19 @@ Is it parsing-related?
   NO ↓
 
 Is it GUI-related?
-  YES → Which aspect?
-    - Main frames/dialogs → lotrec.gui
-    - Tableaux visualization → lotrec.gui.tableau
-    - Graph display → lotrec.gui.graph
-    - Logic editing → lotrec.gui.logicspane
+  YES → Which toolkit?
+    JavaFX (new) → Which aspect?
+      - Main frames/dialogs → lotrec.guifx
+      - Tableaux visualization → lotrec.guifx (TableauxPane)
+      - Graph display → lotrec.guifx.graph
+      - Logic editing → lotrec.guifx.logicspane
+      - Dialogs → lotrec.guifx.dialogs
+      - Visual validation → lotrec.guifx.validation
+      - CSS styles → lotrec.guifx.styles
+    Swing (legacy) → Which aspect?
+      - Main frames/dialogs → lotrec.gui
+      - Graph display → lotrec.gui.graph
+      - Logic editing → lotrec.gui.logicspane
   NO ↓
 
 Is it file I/O or resources?
@@ -281,11 +291,19 @@ CLASSES_KEYWORDS.put("myNewAction", MyNewAction.class);
 - **Comments**: Javadoc for public APIs, inline for complex logic
 - **Error Handling**: Specific exceptions, meaningful messages
 
-### Swing/AWT Conventions
+### Swing/AWT Conventions (Legacy)
 
 - Use `SwingUtilities.invokeLater()` for UI updates from background threads
 - Prefer `ActionListener` lambdas where Java 8 is available
 - Follow existing dialog patterns in `lotrec.gui`
+
+### JavaFX Conventions (New)
+
+- Use `Platform.runLater()` for UI updates from background threads
+- Use property binding for reactive UI updates where applicable
+- Build UI programmatically (no FXML) — LoTREC's dynamic panels require programmatic construction
+- Apply visual styling via external CSS stylesheets in `lotrec.guifx.styles`
+- Follow existing pane patterns in `lotrec.guifx`
 
 ---
 
