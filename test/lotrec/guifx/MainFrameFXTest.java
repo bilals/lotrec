@@ -62,15 +62,27 @@ class MainFrameFXTest {
     }
 
     @Test
-    @DisplayName("should provide left pane accessor")
-    void shouldProvideLeftPane(FxRobot robot) {
-        assertThat(mainFrame.getLeftPane()).isNotNull();
+    @DisplayName("should provide loaded logics pane accessor")
+    void shouldProvideLoadedLogicsPane(FxRobot robot) {
+        assertThat(mainFrame.getLoadedLogicsPane()).isNotNull();
     }
 
     @Test
-    @DisplayName("should provide right pane accessor")
-    void shouldProvideRightPane(FxRobot robot) {
-        assertThat(mainFrame.getRightPane()).isNotNull();
+    @DisplayName("should provide tableaux pane accessor")
+    void shouldProvideTableauxPane(FxRobot robot) {
+        assertThat(mainFrame.getTableauxPane()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("should provide controls pane accessor")
+    void shouldProvideControlsPane(FxRobot robot) {
+        assertThat(mainFrame.getControlsPane()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("should provide premodel settings pane accessor")
+    void shouldProvidePremodelSettingsPane(FxRobot robot) {
+        assertThat(mainFrame.getPremodelSettingsPane()).isNotNull();
     }
 
     @Test

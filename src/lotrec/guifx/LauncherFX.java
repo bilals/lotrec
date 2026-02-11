@@ -11,8 +11,13 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import lotrec.Lotrec;
+import lotrec.guifx.dialogs.TaskPaneDialog;
+import lotrec.guifx.dialogs.PredefinedLogicsDialog;
+import lotrec.guifx.dialogs.FileDialogs;
 
+import java.io.File;
 import java.io.InputStream;
+import java.util.Optional;
 
 public class LauncherFX extends Application {
 
@@ -38,10 +43,51 @@ public class LauncherFX extends Application {
                 if (splashStage != null) {
                     splashStage.close();
                 }
+                showTaskPaneDialog(primaryStage);
             });
         });
         initThread.setDaemon(true);
         initThread.start();
+    }
+
+    private void showTaskPaneDialog(Stage primaryStage) {
+        TaskPaneDialog dlg = new TaskPaneDialog(primaryStage);
+        Optional<String> result = dlg.showAndWait();
+        result.ifPresent(choice -> {
+            switch (choice) {
+                case "Open Predefined Logic":
+                    PredefinedLogicsDialog predDlg = new PredefinedLogicsDialog(primaryStage);
+                    Optional<String> logicName = predDlg.showAndWait();
+                    logicName.ifPresent(name -> {
+                        String fileName = name + ".xml";
+                        lotrec.FileUtils.extractPredefinedLogicFile(
+                            lotrec.PredefinedLogicsLoader.JAR_PATH, fileName);
+                        String completeFileName = lotrec.FileUtils.PREDEFINED_HOME +
+                            System.getProperty("file.separator") + fileName;
+                        lotrec.dataStructure.Logic logic =
+                            Lotrec.openLogicFile(completeFileName);
+                        if (logic != null) {
+                            mainFrame.getLoadedLogicsPane().addLogic(logic);
+                        }
+                    });
+                    break;
+                case "Open Existing File":
+                    FileDialogs fileDialogs = new FileDialogs(primaryStage);
+                    File file = fileDialogs.showOpenLogicDialog();
+                    if (file != null) {
+                        lotrec.dataStructure.Logic logic =
+                            Lotrec.openLogicFile(file.getAbsolutePath());
+                        if (logic != null) {
+                            mainFrame.getLoadedLogicsPane().addLogic(logic);
+                        }
+                    }
+                    break;
+                case "Create New Logic":
+                    mainFrame.getLoadedLogicsPane().addLogic(
+                        lotrec.dataStructure.Logic.getNewEmptyLogic());
+                    break;
+            }
+        });
     }
 
     private void showSplash() {
