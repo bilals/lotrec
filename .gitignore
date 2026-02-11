@@ -18,6 +18,9 @@ build/
 .claude/cache/
 .claude/*.log
 
+### Tools temp files ###
+tools/.diagnostics-raw.json
+
 ### SpecKit ###
 # Commit specs, plans, and roadmaps
 # Add exclusions here if needed for generated/temp files
