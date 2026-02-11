@@ -56,7 +56,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.net.MalformedURLException;
 import javax.swing.JOptionPane;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import java.util.StringTokenizer;
 

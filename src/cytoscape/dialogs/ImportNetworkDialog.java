@@ -34,7 +34,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.SwingUtilities;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import cytoscape.Cytoscape;
 //import cytoscape.actions.ExportAsGMLTask;

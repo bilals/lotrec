@@ -4,21 +4,28 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build Commands
 
-This project uses Gradle with Kotlin DSL. Run commands from the `lotrec/` directory:
+This project uses Gradle with Kotlin DSL. Claude Code runs bash on Windows, so use
+the full path to `gradlew.bat` with forward slashes:
 
 ```bash
-./gradlew build           # Build project (compile + test + jar)
-./gradlew test            # Run all tests
-./gradlew test --tests "ClassName"  # Run single test class
-./gradlew test --tests "**/parser/*"  # Run tests matching pattern
-./gradlew run             # Run the application
-./gradlew fatJar          # Create fat JAR with all dependencies
-./gradlew packageZip      # Create distribution ZIP
-./gradlew clean           # Clean build artifacts
-./gradlew jacocoTestReport  # Generate test coverage report
+# Shorthand (set GW at the start of a session):
+GW="C:/Users/bsaid/Downloads/LoTREC-Claude/lotrec/gradlew.bat"
+
+$GW build                          # Build project (compile + test + jar)
+$GW test                           # Run all tests
+$GW test --tests "ClassName"       # Run single test class
+$GW test --tests "**/parser/*"     # Run tests matching pattern
+$GW run                            # Run the JavaFX GUI (background recommended)
+$GW runSwing                       # Run the legacy Swing GUI (background recommended)
+$GW fatJar                         # Create fat JAR with all dependencies
+$GW packageZip                     # Create distribution ZIP
+$GW clean                          # Clean build artifacts
+$GW jacocoTestReport               # Generate test coverage report
 ```
 
-**Note**: On Windows, use `gradlew.bat` instead of `./gradlew`.
+**Running the GUI**: Use `run_in_background: true` since the GUI blocks until closed.
+- `$GW run` — launches the JavaFX GUI (`lotrec.guifx.LauncherFX`)
+- `$GW runSwing` — launches the legacy Swing GUI (`lotrec.Launcher`)
 
 ## Testing
 
@@ -223,13 +230,18 @@ Do not include the email address in the "Co-Authored-By" line in commit messages
 
 ## Quick Reference
 
+```bash
+GW="C:/Users/bsaid/Downloads/LoTREC-Claude/lotrec/gradlew.bat"
+```
+
 | Task | Command |
 |------|---------|
-| Build and test | `./gradlew build` |
-| Run application | `./gradlew run` |
-| Run specific test | `./gradlew test --tests "OldiesTokenizerTest"` |
-| Generate coverage | `./gradlew jacocoTestReport` |
-| Create distribution | `./gradlew packageZip` |
+| Build and test | `$GW build` |
+| Run JavaFX GUI | `$GW run` (background) |
+| Run Swing GUI | `$GW runSwing` (background) |
+| Run specific test | `$GW test --tests "OldiesTokenizerTest"` |
+| Generate coverage | `$GW jacocoTestReport` |
+| Create distribution | `$GW packageZip` |
 
 ### Key Files
 

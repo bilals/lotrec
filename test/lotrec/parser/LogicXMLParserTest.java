@@ -648,7 +648,7 @@ class LogicXMLParserTest {
             Logic logic = TestFixtures.loadLogic("Monomodal-K");
 
             assertThat(logic.getDescription()).isNotNull();
-            assertThat(logic.getDescription()).contains("modal logic K");
+            assertThat(logic.getDescription()).contains("Modal logic K");
         }
 
         @Test

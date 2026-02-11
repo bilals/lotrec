@@ -62,9 +62,9 @@ import java.util.zip.ZipInputStream;
 
 import javax.swing.JInternalFrame;
 import javax.swing.SwingUtilities;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 
 import cytoscape.CyEdge;
 import cytoscape.CyNetwork;

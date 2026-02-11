@@ -12,9 +12,9 @@ import cytoscape.bookmarks.Category;
 import cytoscape.bookmarks.DataSource;
 import cytoscape.data.readers.BookmarkReader;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 
 /**
  * Utility methods for getting entries in the bookmark object.

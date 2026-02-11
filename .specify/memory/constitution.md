@@ -23,7 +23,7 @@ Provide a flexible, educational, and research-oriented tool for exploring non-cl
 
 | Component | Version | Configuration | Status |
 |-----------|---------|---------------|--------|
-| **Java** | 1.8 | Migration planned (Phase 3)  | **Unlocked** |
+| **Java** | 21 (LTS) | Upgraded from 1.8 (FEAT-001 Phase 2) | Locked |
 | **Build System** | Gradle (Kotlin DSL) | `build.gradle.kts` at project root | Locked |
 | **GUI Framework** | Swing/AWT → JavaFX | Migration planned (Phase 3) | **Unlocked** |
 | **Graph Visualization** | Cytoscape 2.x → TBD | Migration planned (Phase 4) | **Unlocked** |
@@ -68,7 +68,7 @@ Cytoscape 2.x is unlocked to allow migration to a modern graph visualization lib
 - **JavaCC**: Deeply integrated with expression parsing
 
 **Unlocked:**
-- **Java**: Unlocked from 1.8 to enable Java 21 (LTS) upgrade; required for JavaFX support and modern language features (8+ years of improvements: records, sealed classes, pattern matching, modern GC)
+- **Java**: Locked at Java 21 (LTS); upgrade from 1.8 completed in FEAT-001 Phase 2. Provides JavaFX support, modern language features (records, sealed classes, pattern matching, modern GC)
 - **GUI Framework**: Swing/AWT is aging; JavaFX provides modern UI capabilities, better CSS styling, and improved developer experience
 - **Graph Visualization**: Cytoscape 2.x is unmaintained; modern alternatives offer better performance and maintainability
 

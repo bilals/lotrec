@@ -22,7 +22,7 @@ import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import cytoscape.Cytoscape;
 import cytoscape.bookmarks.Bookmarks;

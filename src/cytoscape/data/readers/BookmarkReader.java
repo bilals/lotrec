@@ -3,9 +3,9 @@ package cytoscape.data.readers;
 import java.io.IOException;
 import java.net.URL;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Unmarshaller;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Unmarshaller;
 
 import cytoscape.Cytoscape;
 import cytoscape.bookmarks.Bookmarks;

@@ -5,5 +5,5 @@
 // Generated on: 2007.01.16 at 04:02:45 PM PST 
 //
 
-@javax.xml.bind.annotation.XmlSchema(namespace = "http://www.cs.rpi.edu/XGMML", elementFormDefault = javax.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.cs.rpi.edu/XGMML", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
 package cytoscape.generated2;

@@ -2,14 +2,15 @@ plugins {
     java
     application
     jacoco
+    id("org.openjfx.javafxplugin") version "0.1.0"
 }
 
 group = "lotrec"
 version = "3.0"
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
 }
 
 repositories {
@@ -19,6 +20,11 @@ repositories {
 // Define dependency versions
 val junitVersion = "5.10.2"
 val assertjVersion = "3.25.3"
+
+javafx {
+    version = "21.0.5"
+    modules("javafx.controls", "javafx.swing")
+}
 
 dependencies {
     // Local JARs - Cytoscape libs (these don't have Maven equivalents)
@@ -31,17 +37,46 @@ dependencies {
     implementation(files("lib/jtopas.jar"))
     implementation(files("lib/servlet-api.jar"))
 
+    // Jakarta JAXB (replaces javax.xml.bind removed in Java 11)
+    implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.2")
+    runtimeOnly("com.sun.xml.bind:jaxb-impl:4.0.5")
+
     // JUnit 5 for testing
     testImplementation(platform("org.junit:junit-bom:$junitVersion"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
     // AssertJ for fluent assertions
-    testImplementation("org.assertj:assertj-core:$assertjVersion")    
+    testImplementation("org.assertj:assertj-core:$assertjVersion")
+
+    // TestFX (JavaFX UI testing)
+    testImplementation("org.testfx:testfx-core:4.0.18")
+    testImplementation("org.testfx:testfx-junit5:4.0.18")
+    testRuntimeOnly("org.testfx:openjfx-monocle:21.0.2")
 }
 
 application {
+    mainClass.set("lotrec.guifx.LauncherFX")
+    applicationDefaultJvmArgs = listOf(
+        "--add-opens", "javafx.graphics/com.sun.javafx.application=ALL-UNNAMED",
+        "--add-opens", "javafx.graphics/com.sun.glass.ui=ALL-UNNAMED"
+    )
+}
+
+// Swing GUI task (on demand, for regression testing)
+tasks.register<JavaExec>("runSwing") {
+    group = "application"
+    description = "Launch the legacy Swing GUI"
+    classpath = sourceSets.main.get().runtimeClasspath
     mainClass.set("lotrec.Launcher")
+}
+
+// Capture Swing baseline screenshots for visual migration validation
+tasks.register<JavaExec>("captureSwingBaseline") {
+    group = "verification"
+    description = "Capture Swing GUI baseline screenshots for visual comparison"
+    classpath = sourceSets.main.get().runtimeClasspath
+    mainClass.set("lotrec.guifx.validation.SwingBaselineCapture")
 }
 
 distributions {
@@ -84,6 +119,18 @@ tasks.test {
     testLogging {
         events("passed", "skipped", "failed")
     }
+    // JavaFX classpath access for TestFX headless testing
+    jvmArgs(
+        "--add-opens", "javafx.graphics/com.sun.javafx.application=ALL-UNNAMED",
+        "--add-opens", "javafx.graphics/com.sun.glass.ui=ALL-UNNAMED"
+    )
+    // Enable headless TestFX via Monocle
+    systemProperty("testfx.robot", "glass")
+    systemProperty("testfx.headless", "true")
+    systemProperty("glass.platform", "Monocle")
+    systemProperty("monocle.platform", "Headless")
+    systemProperty("prism.order", "sw")
+    systemProperty("prism.text", "t2k")
 }
 
 tasks.jar {

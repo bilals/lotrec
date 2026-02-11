@@ -1,0 +1,103 @@
+/* LoTREC JavaFX Default Stylesheet */
+
+/* Root */
+.root {
+    -fx-font-family: "System";
+    -fx-font-size: 13px;
+}
+
+/* Main frame */
+.main-frame {
+    -fx-background-color: #f0f0f0;
+}
+
+/* Menu bar */
+.menu-bar {
+    -fx-background-color: #e8e8e8;
+    -fx-border-color: transparent transparent #c0c0c0 transparent;
+}
+
+.menu-bar .menu {
+    -fx-padding: 4 8 4 8;
+}
+
+/* Split pane */
+.split-pane {
+    -fx-padding: 0;
+}
+
+.split-pane > .split-pane-divider {
+    -fx-padding: 0 3 0 3;
+    -fx-background-color: #d0d0d0;
+}
+
+/* Pane placeholders */
+.left-pane, .right-pane, .controls-pane {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 1;
+}
+
+/* Tab pane */
+.tab-pane {
+    -fx-tab-min-height: 30;
+}
+
+.tab-pane > .tab-header-area > .tab-header-background {
+    -fx-background-color: #e8e8e8;
+}
+
+/* Buttons */
+.button {
+    -fx-background-color: #e0e0e0;
+    -fx-border-color: #b0b0b0;
+    -fx-border-radius: 3;
+    -fx-background-radius: 3;
+    -fx-padding: 5 15 5 15;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #d0d0d0;
+}
+
+.button:pressed {
+    -fx-background-color: #c0c0c0;
+}
+
+/* Text fields */
+.text-field {
+    -fx-border-color: #b0b0b0;
+    -fx-border-radius: 2;
+    -fx-background-radius: 2;
+    -fx-padding: 4 8 4 8;
+}
+
+/* Labels */
+.label {
+    -fx-text-fill: #333333;
+}
+
+/* List view */
+.list-view {
+    -fx-border-color: #d0d0d0;
+}
+
+/* Table view */
+.table-view {
+    -fx-border-color: #d0d0d0;
+}
+
+/* Tree view */
+.tree-view {
+    -fx-border-color: #d0d0d0;
+}
+
+/* Dialogs */
+.dialog-pane {
+    -fx-background-color: #f5f5f5;
+}
+
+.dialog-pane > .button-bar > .container {
+    -fx-padding: 10;
+}

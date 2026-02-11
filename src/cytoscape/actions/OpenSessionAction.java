@@ -42,7 +42,7 @@ import java.io.File;
 import java.io.IOException;
 
 import javax.swing.JOptionPane;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import cytoscape.Cytoscape;
 import cytoscape.data.readers.CytoscapeSessionReader;

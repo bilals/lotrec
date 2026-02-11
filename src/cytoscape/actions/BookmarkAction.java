@@ -46,7 +46,7 @@ import java.awt.event.ActionEvent;
 import java.io.IOException;
 
 import javax.swing.JFrame;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import cytoscape.Cytoscape;
 import cytoscape.dialogs.preferences.BookmarkDialog;

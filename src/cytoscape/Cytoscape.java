@@ -60,7 +60,7 @@ import java.net.InetSocketAddress;
 
 import javax.swing.JOptionPane;
 import javax.swing.event.SwingPropertyChangeSupport;
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import cytoscape.actions.SaveSessionAction;
 import cytoscape.data.CyAttributes;
