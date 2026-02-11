@@ -25,3 +25,8 @@ tools/.diagnostics-raw.json
 # Commit specs, plans, and roadmaps
 # Add exclusions here if needed for generated/temp files
 # .specify/temp/
+
+### TEMP Settings ###
+bin/
+screenshot.png
+take_screenshot.ps1
