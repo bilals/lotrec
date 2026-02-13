@@ -1716,6 +1716,9 @@ public class MainFrame extends javax.swing.JFrame {
     }
 
     public static String getSelectedLayout() {
+        if (rdbtnHirerachic == null) {
+            return "Hierarchic";
+        }
         return rdbtnHirerachic.isSelected() ? rdbtnHirerachic.getActionCommand() : rdbtnCircular.getActionCommand();
     }
 

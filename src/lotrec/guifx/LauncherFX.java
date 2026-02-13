@@ -15,6 +15,12 @@ import lotrec.guifx.dialogs.TaskPaneDialog;
 import lotrec.guifx.dialogs.PredefinedLogicsDialog;
 import lotrec.guifx.dialogs.FileDialogs;
 
+import cytoscape.CyMain;
+import cytoscape.Cytoscape;
+import cytoscape.view.cytopanels.CytoPanelState;
+import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
+
 import java.io.File;
 import java.io.InputStream;
 import java.util.Optional;
@@ -36,9 +42,12 @@ public class LauncherFX extends Application {
         // Initialize in background
         Thread initThread = new Thread(() -> {
             Lotrec.initialize(Lotrec.GUI_RUN_MODE);
+            initializeCytoscape();
 
             Platform.runLater(() -> {
                 mainFrame = new MainFrameFX(primaryStage);
+                // Embed Cytoscape desktop pane into the bridge
+                mainFrame.getTableauxPane().getCytoscapeBridge().initCytoscape();
                 primaryStage.show();
                 if (splashStage != null) {
                     splashStage.close();
@@ -88,6 +97,40 @@ public class LauncherFX extends Application {
                     break;
             }
         });
+    }
+
+    private void initializeCytoscape() {
+        try {
+            String[] cyArgs = new String[]{
+                "-p", "csplugins.quickfind.plugin.QuickFindPlugIn",
+                "-p", "browser.AttributeBrowserPlugin",
+                "-p", "GraphMerge.GraphMerge",
+                "-p", "cytoscape.editor.CytoscapeEditorPlugin",
+                "-p", "org.cytoscape.coreplugin.cpath.plugin.CPathPlugIn",
+                "-p", "filter.cytoscape.CsFilter",
+                "-p", "org.cytoscape.coreplugin.psi_mi.plugin.PsiMiPlugIn",
+                "-p", "org.mskcc.biopax_plugin.plugin.BioPaxPlugIn",
+                "-p", "csplugins.contextmenu.yeast.YeastPlugin",
+                "-p", "edu.ucsd.bioeng.coreplugin.tableImport.TableImportPlugin",
+                "-p", "sbmlreader.SBMLReaderPlugin",
+                "-p", "csplugins.layout.LayoutPlugin",
+                "-p", "ManualLayout.ManualLayoutPlugin",
+                "-p", "yfiles.YFilesLayoutPlugin"
+            };
+            SwingUtilities.invokeAndWait(() -> {
+                try {
+                    new CyMain(cyArgs);
+                    Cytoscape.getDesktop().getCyMenus().getToolBar().setVisible(false);
+                    Cytoscape.getDesktop().getCytoPanel(SwingConstants.WEST).setState(CytoPanelState.HIDE);
+                    Cytoscape.getDesktop().getCytoPanel(SwingConstants.SOUTH).setState(CytoPanelState.HIDE);
+                    Cytoscape.getDesktop().clearStatusBar();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            });
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
     private void showSplash() {

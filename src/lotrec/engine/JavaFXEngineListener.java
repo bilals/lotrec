@@ -29,8 +29,9 @@ public class JavaFXEngineListener implements EngineListener {
                 mainFrameFX.getControlsPane().enableControls();
                 mainFrameFX.getControlsPane().setStatus("Building...");
             }
-            if (mainFrameFX.getTableauxPane() != null) {
-                mainFrameFX.getTableauxPane().clearPremodels();
+            if (mainFrameFX.getTableauxPane() != null && mainFrameFX.getEngine() != null) {
+                mainFrameFX.getTableauxPane().wireSelectionListener(mainFrameFX.getEngine());
+                mainFrameFX.getTableauxPane().fillTabListAndDisplayFirst(mainFrameFX.getEngine());
             }
         });
     }
@@ -41,6 +42,9 @@ public class JavaFXEngineListener implements EngineListener {
             if (mainFrameFX.getControlsPane() != null) {
                 mainFrameFX.getControlsPane().disableControls();
                 mainFrameFX.getControlsPane().setStatus(wasStopped ? "Stopped" : "Finished");
+            }
+            if (mainFrameFX.getTableauxPane() != null && mainFrameFX.getEngine() != null) {
+                mainFrameFX.getTableauxPane().fillTabListAndDisplayLastChosenOnes(mainFrameFX.getEngine());
             }
         });
     }
@@ -116,6 +120,9 @@ public class JavaFXEngineListener implements EngineListener {
             if (mainFrameFX.getControlsPane() != null) {
                 mainFrameFX.getControlsPane().enableControls();
             }
+            if (mainFrameFX.getTableauxPane() != null && mainFrameFX.getEngine() != null) {
+                mainFrameFX.getTableauxPane().fillTabListAndDisplayLastChosenOnes(mainFrameFX.getEngine());
+            }
         });
     }
 
@@ -133,6 +140,9 @@ public class JavaFXEngineListener implements EngineListener {
         Platform.runLater(() -> {
             if (mainFrameFX.getControlsPane() != null) {
                 mainFrameFX.getControlsPane().enableStepControls();
+            }
+            if (mainFrameFX.getTableauxPane() != null && mainFrameFX.getEngine() != null) {
+                mainFrameFX.getTableauxPane().fillTabListAndDisplayLastChosenOnes(mainFrameFX.getEngine());
             }
         });
     }
@@ -159,12 +169,20 @@ public class JavaFXEngineListener implements EngineListener {
 
     @Override
     public void refreshTableauxDisplay() {
-        // Will be connected to TableauxPane.fillList() in full integration
+        Platform.runLater(() -> {
+            if (mainFrameFX.getTableauxPane() != null && mainFrameFX.getEngine() != null) {
+                mainFrameFX.getTableauxPane().fillTabListAndDisplayFirst(mainFrameFX.getEngine());
+            }
+        });
     }
 
     @Override
     public void refreshLastChosenTableaux() {
-        // Will be connected to TableauxPane display refresh in full integration
+        Platform.runLater(() -> {
+            if (mainFrameFX.getTableauxPane() != null && mainFrameFX.getEngine() != null) {
+                mainFrameFX.getTableauxPane().fillTabListAndDisplayLastChosenOnes(mainFrameFX.getEngine());
+            }
+        });
     }
 
     public MainFrameFX getMainFrameFX() { return mainFrameFX; }

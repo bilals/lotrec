@@ -79,7 +79,9 @@ public class BirdsEyeViewAction extends CytoscapeAction implements
 			};
 			Cytoscape.getDesktop().getNetworkPanel().setNavigator(bev);
                         //Bilal Change
-                        Launcher.getTheMainFrame().getTableauxPanel().setNavigator(bev);
+                        if (Launcher.getTheMainFrame() != null) {
+                            Launcher.getTheMainFrame().getTableauxPanel().setNavigator(bev);
+                        }
                         //End Bilal Change
 			Cytoscape.getDesktop().getSwingPropertyChangeSupport()
 					.addPropertyChangeListener(this);
@@ -94,7 +96,9 @@ public class BirdsEyeViewAction extends CytoscapeAction implements
 					Cytoscape.getDesktop().getNetworkPanel()
 							.getNavigatorPanel());
                         //Bilal Change
-                        Launcher.getTheMainFrame().getTableauxPanel().setNavigator(null);
+                        if (Launcher.getTheMainFrame() != null) {
+                            Launcher.getTheMainFrame().getTableauxPanel().setNavigator(null);
+                        }
                         //End Bilal Change
 			Cytoscape.getDesktop().getSwingPropertyChangeSupport()
 					.removePropertyChangeListener(this);

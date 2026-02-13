@@ -5,6 +5,7 @@ import javafx.embed.swing.SwingNode;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 
+import cytoscape.Cytoscape;
 import javax.swing.*;
 import java.awt.*;
 
@@ -31,6 +32,27 @@ public class CytoscapeSwingBridge extends StackPane {
             JPanel placeholder = new JPanel(new BorderLayout());
             placeholder.setBackground(Color.WHITE);
             swingNode.setContent(placeholder);
+        });
+    }
+
+    /**
+     * Embeds the live Cytoscape desktop pane into this bridge.
+     * Must be called after Cytoscape has been initialized via CyMain.
+     */
+    public void initCytoscape() {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                JDesktopPane desktopPane = Cytoscape.getDesktop()
+                    .getNetworkViewManager().getDesktopPane();
+                desktopPane.setBackground(Color.WHITE);
+                swingNode.setContent(desktopPane);
+                Platform.runLater(() -> {
+                    errorLabel.setVisible(false);
+                    showingError = false;
+                });
+            } catch (Exception ex) {
+                Platform.runLater(() -> showError("Failed to initialize Cytoscape: " + ex.getMessage()));
+            }
         });
     }
 

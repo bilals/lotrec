@@ -46,12 +46,24 @@ public class CyTableauDisplayer {
         }
     }
 
+    private static String getNodeFilterValue() {
+        if (TableauxPanel.cmbxNodeFilter == null) {
+            return "None";
+        }
+        Object item = TableauxPanel.cmbxNodeFilter.getSelectedItem();
+        return item != null ? item.toString() : "None";
+    }
+
+    private static boolean isNodeVisible(TableauNode n) {
+        String filter = getNodeFilterValue();
+        return filter.equals("None") || !n.getMarks().contains(filter);
+    }
+
     private static void displayTableau(Tableau t) {
         ArrayList nodes = new ArrayList();
         for (Enumeration enum_ = t.getNodesEnumeration(); enum_.hasMoreElements();) {
             TableauNode n = (TableauNode) enum_.nextElement();
-            if (TableauxPanel.cmbxNodeFilter.getSelectedItem().equals("None") ||
-                    !n.getMarks().contains(TableauxPanel.cmbxNodeFilter.getSelectedItem())) {
+            if (isNodeVisible(n)) {
                 CyNode node = Cytoscape.getCyNode(n.getName(), true);
                 ArrayList formulas = new ArrayList();
                 for (Enumeration enum__ = n.getMarkedExpressionsEnum(); enum__.hasMoreElements();) {
@@ -78,13 +90,11 @@ public class CyTableauDisplayer {
         ArrayList edges = new ArrayList();
         for (Enumeration enum_ = t.getNodesEnumeration(); enum_.hasMoreElements();) {
             TableauNode n = (TableauNode) enum_.nextElement();
-            if (TableauxPanel.cmbxNodeFilter.getSelectedItem().equals("None") ||
-                    !n.getMarks().contains(TableauxPanel.cmbxNodeFilter.getSelectedItem())) {
+            if (isNodeVisible(n)) {
                 for (Enumeration enum__ = n.getNextEdgesEnum(); enum__.hasMoreElements();) {
                     TableauEdge e = (TableauEdge) enum__.nextElement();
                     TableauNode endNode = (TableauNode) e.getEndNode();
-                    if (TableauxPanel.cmbxNodeFilter.getSelectedItem().equals("None") ||
-                            !endNode.getMarks().contains(TableauxPanel.cmbxNodeFilter.getSelectedItem())) {
+                    if (isNodeVisible(endNode)) {
                         CyEdge edge = Cytoscape.getCyEdge(Cytoscape.getCyNode(e.getBeginNode().getName()),
                                 Cytoscape.getCyNode(endNode.getName()),
                                 Semantics.INTERACTION, e.getRelation().toString(), true, true);

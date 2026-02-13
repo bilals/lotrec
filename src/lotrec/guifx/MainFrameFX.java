@@ -31,6 +31,7 @@ public class MainFrameFX {
     private final ControlsPane controlsPane;
     private final TableauxPane tableauxPane;
     private Engine engine;
+    private ToggleGroup layoutToggleGroup;
 
     public MainFrameFX(Stage stage) {
         this.stage = stage;
@@ -192,6 +193,12 @@ public class MainFrameFX {
     public ControlsPane getControlsPane() { return controlsPane; }
     public TableauxPane getTableauxPane() { return tableauxPane; }
     public Engine getEngine() { return engine; }
+    public String getSelectedLayout() {
+        if (layoutToggleGroup != null && layoutToggleGroup.getSelectedToggle() != null) {
+            return ((RadioMenuItem) layoutToggleGroup.getSelectedToggle()).getText();
+        }
+        return "Hierarchic";
+    }
 
     // --- Menu bar ---
 
@@ -328,9 +335,9 @@ public class MainFrameFX {
         RadioMenuItem hierarchicLayout = new RadioMenuItem("Hierarchic");
         hierarchicLayout.setSelected(true);
         RadioMenuItem circularLayout = new RadioMenuItem("Circular");
-        ToggleGroup layoutGroup = new ToggleGroup();
-        hierarchicLayout.setToggleGroup(layoutGroup);
-        circularLayout.setToggleGroup(layoutGroup);
+        layoutToggleGroup = new ToggleGroup();
+        hierarchicLayout.setToggleGroup(layoutToggleGroup);
+        circularLayout.setToggleGroup(layoutToggleGroup);
         Menu layoutMenu = new Menu("Premodels Layout");
         layoutMenu.getItems().addAll(hierarchicLayout, circularLayout);
 

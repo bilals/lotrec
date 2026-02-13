@@ -262,3 +262,62 @@ The list population (JavaFX ListView) stays on the FX thread; only Cytoscape ren
 4. Selecting a tableau should render its graph in the Cytoscape area
 5. Selecting "Tableaux Tree" should show the tree of all tableaux
 6. Step-by-step mode should update display at each pause
+
+---
+
+## Implementation Summary
+
+**Status: IMPLEMENTED AND VERIFIED** — Build successful, all tests passing, tableaux display correctly in FX GUI with logic K.
+
+### What Was Done
+
+#### Step 1: Cytoscape Initialization in LauncherFX
+- Added `initializeCytoscape()` method in `LauncherFX.java` that calls `new CyMain(cyArgs)` with the same plugin arguments as the Swing `Launcher.java`
+- Runs on the AWT EDT via `SwingUtilities.invokeAndWait()` since Cytoscape is Swing-based
+- Hides Cytoscape's toolbar, west panel, and south panel (same as Swing)
+- Called from the background init thread, before the FX stage is shown
+
+#### Step 2: Cytoscape Desktop Pane Embedding
+- Added `initCytoscape()` method to `CytoscapeSwingBridge.java`
+- Gets `Cytoscape.getDesktop().getNetworkViewManager().getDesktopPane()` and sets it as the SwingNode content
+- Called from `LauncherFX.start()` after Cytoscape init, on the FX thread
+
+#### Step 3: Wallet Display Methods in TableauxPane
+- Added `TABLEAU_TREE` constant, `lastSelectedIndices`/`lastSelectedTabs` tracking
+- `fillTableauxList(Engine)` — reads wallet, populates ListView with "Tableaux Tree" + tableau names, respects filter checkbox
+- `fillTabListAndDisplayFirst(Engine)` — fills list, selects first tableau (or tree), displays
+- `fillTabListAndDisplayLastChosenOnes(Engine)` — fills list, restores previous selection, displays
+- `displaySelectedTableau(Engine)` — dispatches `CyTableauDisplayer.flush()` + render to Swing EDT
+- `wireSelectionListener(Engine)` — adds click listener to display selected tableau
+- Selection change listener tracks `lastSelectedIndices`/`lastSelectedTabs`
+
+#### Step 4: Engine Listener Wiring
+- `onBuildStart()` — now calls `wireSelectionListener()` + `fillTabListAndDisplayFirst()`
+- `onBuildEnd()` — now calls `fillTabListAndDisplayLastChosenOnes()`
+- `onPause()` — now calls `fillTabListAndDisplayLastChosenOnes()`
+- `onStepPause()` — now calls `fillTabListAndDisplayLastChosenOnes()`
+- `refreshTableauxDisplay()` — now calls `fillTabListAndDisplayFirst()`
+- `refreshLastChosenTableaux()` — now calls `fillTabListAndDisplayLastChosenOnes()`
+
+#### Additional Fixes
+- **`MainFrame.getSelectedLayout()`** — added null guard for `rdbtnHirerachic` (null when FX GUI runs without Swing MainFrame)
+- **`CyTableauDisplayer`** — extracted `getNodeFilterValue()` and `isNodeVisible()` helpers to handle null `TableauxPanel.cmbxNodeFilter` (not instantiated in FX mode)
+- **`MainFrameFX`** — promoted layout `ToggleGroup` to field, added `getSelectedLayout()` method
+
+### Files Modified
+
+| File | Changes |
+|------|---------|
+| `src/lotrec/guifx/LauncherFX.java` | Added Cytoscape init, imports, bridge wiring |
+| `src/lotrec/guifx/graph/CytoscapeSwingBridge.java` | Added `initCytoscape()` to embed desktop pane |
+| `src/lotrec/guifx/TableauxPane.java` | Full wallet display pipeline with thread-safe Cytoscape rendering |
+| `src/lotrec/engine/JavaFXEngineListener.java` | Implemented all 6 display callback methods |
+| `src/lotrec/guifx/MainFrameFX.java` | Added `layoutToggleGroup` field + `getSelectedLayout()` |
+| `src/lotrec/gui/MainFrame.java` | Null guard in `getSelectedLayout()` for FX mode |
+| `src/lotrec/gui/CyTableauDisplayer.java` | Null-safe node filter helpers for FX mode |
+| `src/cytoscape/actions/BirdsEyeViewAction.java` | Null guard for `Launcher.getTheMainFrame()` in FX mode |
+
+### Thread Safety Design
+- **FX Thread** (Platform.runLater): ListView population, selection management, status labels
+- **Swing EDT** (SwingUtilities.invokeLater): CyTableauDisplayer.flush(), displayTableauInCy(), displayTableauxTreeInCy()
+- The engine callbacks arrive on the Engine thread → dispatch to FX thread → FX thread dispatches Cytoscape calls to Swing EDT
