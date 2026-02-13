@@ -18,11 +18,6 @@ Transform screenshot taking into command, destination folder "build/gui-screensh
 - share project settings via Git
 
 # ALL
-Put Add/Edit/Delete buttons to the left to gain more space?
-Simplify list of Actions and Conditions (non-collapsable list, large space by default)
-Verify all menu items are functional
-
-Create in .specify/memoryReference V3 JavaFX screenshots for the GUI right after Migration
 
 Finalize/complete:
 
@@ -31,6 +26,15 @@ Finalize/complete:
   ├──────┼──────────────────────────────────────────────────────────┤
   │ T075 │ Remove Swing GUI — blocked by T066-T074                  │
   └──────┴──────────────────────────────────────────────────────────┘
+
+Update CLAUDE, Constitution, roadmap... after this GUI Maigration
+
+# Next
+Put Add/Edit/Delete buttons to the left to gain more space?
+Simplify list of Actions and Conditions (non-collapsable list, large space by default)
+Verify all menu items are functional
+
+Create in .specify/memoryReference V3 JavaFX screenshots for the GUI right after Migration
 
 # Current
 
