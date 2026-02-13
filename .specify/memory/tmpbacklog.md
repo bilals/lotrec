@@ -18,6 +18,15 @@ Transform screenshot taking into command, destination folder "build/gui-screensh
 - share project settings via Git
 
 # ALL
+Make sure tableaux are built and displayable (make sure GraphViz is displayed correctly)
+
+Iterate on GUI Testing / enhancements...
+- Make labels and textfields on the same row in Connector tab
+- Make formula code appears in text area
+- Verify all menu items
+
+
+Reference screenshots for the GUI right after Migration
 
 Finalize/complete:
 
