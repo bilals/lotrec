@@ -21,7 +21,11 @@ public class ConditionDialog extends Dialog<ConditionDialog.ConditionResult> {
     private final VBox paramsBox;
 
     public ConditionDialog(Stage owner) {
-        setTitle("Add Condition");
+        this(owner, null);
+    }
+
+    public ConditionDialog(Stage owner, ConditionResult existing) {
+        setTitle(existing == null ? "Add Condition" : "Edit Condition");
         initOwner(owner);
 
         GridPane grid = new GridPane();
@@ -55,6 +59,16 @@ public class ConditionDialog extends Dialog<ConditionDialog.ConditionResult> {
 
         // When condition type changes, discover parameters via reflection
         conditionTypeCombo.setOnAction(e -> updateParameterFields());
+
+        // Pre-populate if editing existing condition
+        if (existing != null) {
+            conditionTypeCombo.setValue(existing.getKeyword());
+            updateParameterFields();
+            List<String> params = existing.getParameters();
+            for (int i = 0; i < params.size() && i < paramFields.size(); i++) {
+                paramFields.get(i).setText(params.get(i));
+            }
+        }
 
         getDialogPane().setContent(grid);
         getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);

@@ -21,7 +21,11 @@ public class ActionDialog extends Dialog<ActionDialog.ActionResult> {
     private final VBox paramsBox;
 
     public ActionDialog(Stage owner) {
-        setTitle("Add Action");
+        this(owner, null);
+    }
+
+    public ActionDialog(Stage owner, ActionResult existing) {
+        setTitle(existing == null ? "Add Action" : "Edit Action");
         initOwner(owner);
 
         GridPane grid = new GridPane();
@@ -55,6 +59,16 @@ public class ActionDialog extends Dialog<ActionDialog.ActionResult> {
 
         // When action type changes, discover parameters via reflection
         actionTypeCombo.setOnAction(e -> updateParameterFields());
+
+        // Pre-populate if editing existing action
+        if (existing != null) {
+            actionTypeCombo.setValue(existing.getKeyword());
+            updateParameterFields();
+            List<String> params = existing.getParameters();
+            for (int i = 0; i < params.size() && i < paramFields.size(); i++) {
+                paramFields.get(i).setText(params.get(i));
+            }
+        }
 
         getDialogPane().setContent(grid);
         getDialogPane().getButtonTypes().addAll(ButtonType.OK, ButtonType.CANCEL);
