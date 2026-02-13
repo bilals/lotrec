@@ -2,10 +2,12 @@ package lotrec.guifx;
 
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
@@ -16,7 +18,12 @@ import lotrec.engine.Engine;
 import lotrec.engine.JavaFXEngineListener;
 import lotrec.guifx.dialogs.*;
 import lotrec.parser.OldiesTokenizer;
+import lotrec.process.AbstractWorker;
+import lotrec.process.EventMachine;
+import lotrec.process.Routine;
 import lotrec.process.Strategy;
+
+import java.util.ArrayList;
 
 import java.io.File;
 import java.util.Optional;
@@ -30,6 +37,7 @@ public class MainFrameFX {
     private final PremodelSettingsPane premodelSettingsPane;
     private final ControlsPane controlsPane;
     private final TableauxPane tableauxPane;
+    private final VBox rightPanel;
     private Engine engine;
     private ToggleGroup layoutToggleGroup;
 
@@ -56,22 +64,32 @@ public class MainFrameFX {
         // Create menu bar (after panels exist so handlers can reference them)
         menuBar = createMenuBar();
 
-        // Left side: vertically split LoadedLogics (top) + Controls (bottom)
-        VBox controlsArea = new VBox();
-        controlsArea.getStyleClass().add("controls-pane");
-        controlsArea.getChildren().addAll(premodelSettingsPane, controlsPane);
-        VBox.setVgrow(premodelSettingsPane, Priority.ALWAYS);
-
+        // Left side: just the LoadedLogicsPane
         leftSplitPane = new SplitPane();
         leftSplitPane.setOrientation(javafx.geometry.Orientation.VERTICAL);
-        leftSplitPane.getItems().addAll(loadedLogicsPane, controlsArea);
-        leftSplitPane.setDividerPositions(0.6);
+        leftSplitPane.getItems().add(loadedLogicsPane);
 
-        // Main horizontal split: left (logics+controls) | right (tableaux)
+        // Right side: top row (PremodelSettings + controls | PremodelsList) + graph + status
+        // Append runtime controls to PremodelSettingsPane
+        premodelSettingsPane.getChildren().add(controlsPane);
+
+        HBox rightTopRow = new HBox(5, premodelSettingsPane, tableauxPane.getPremodelsListBox());
+        HBox.setHgrow(premodelSettingsPane, Priority.ALWAYS);
+        HBox.setHgrow(tableauxPane.getPremodelsListBox(), Priority.ALWAYS);
+
+        rightPanel = new VBox(5);
+        rightPanel.getChildren().addAll(
+            rightTopRow,
+            tableauxPane.getGraphDisplayArea(),
+            tableauxPane.getStatusBar()
+        );
+        VBox.setVgrow(tableauxPane.getGraphDisplayArea(), Priority.ALWAYS);
+
+        // Main horizontal split: left (logics+controls) | right (settings+tableaux)
         mainSplitPane = new SplitPane();
         mainSplitPane.setOrientation(javafx.geometry.Orientation.HORIZONTAL);
-        mainSplitPane.getItems().addAll(leftSplitPane, tableauxPane);
-        mainSplitPane.setDividerPositions(0.4);
+        mainSplitPane.getItems().addAll(leftSplitPane, rightPanel);
+        mainSplitPane.setDividerPositions(0.35);
 
         // Root layout
         BorderPane root = new BorderPane();
@@ -90,14 +108,20 @@ public class MainFrameFX {
 
         stage.setScene(scene);
         stage.setTitle("LoTREC \u2014 Tableaux Theorem Prover");
+        try {
+            stage.getIcons().add(new Image(getClass().getResourceAsStream("/lotrec/images/lotrecIcon.GIF")));
+        } catch (Exception e) {
+            // Icon not found - continue without it
+        }
         stage.setMaximized(true);
     }
 
     // --- Engine wiring ---
 
     private void wireEngineControls() {
-        premodelSettingsPane.getBuildButton().setOnAction(e -> startEngine(false));
-        premodelSettingsPane.getStepButton().setOnAction(e -> startEngine(true));
+        premodelSettingsPane.getBuildButton().setOnAction(e -> startEngine());
+        premodelSettingsPane.getStepButton().setOnAction(e -> showStepByStepDialog());
+        premodelSettingsPane.getSatCheckButton().setOnAction(e -> showSatCheckDialog());
         controlsPane.getStopButton().setOnAction(e -> {
             if (engine != null) {
                 engine.stopWork();
@@ -110,24 +134,26 @@ public class MainFrameFX {
         });
     }
 
-    private void startEngine(boolean stepByStep) {
+    /**
+     * Validates formula and strategy, returns a prepared (but not started) Engine,
+     * or null if validation failed (error dialogs shown to user).
+     */
+    private Engine validateAndCreateEngine() {
         Logic logic = loadedLogicsPane.getSelectedLogic();
         if (logic == null) {
             DialogsFactory.errorDialog(stage, "No Logic", "Please load a logic first.");
-            return;
+            return null;
         }
 
-        // Parse formula
         MarkedExpression formula;
         try {
             formula = premodelSettingsPane.parseFormula();
         } catch (Exception ex) {
             DialogsFactory.errorDialog(stage, "Parse Error",
                 "Formula parse error:\n" + ex.getMessage());
-            return;
+            return null;
         }
 
-        // Parse main strategy
         Strategy strategy;
         try {
             OldiesTokenizer tokenizer = new OldiesTokenizer(logic);
@@ -136,23 +162,52 @@ public class MainFrameFX {
             if (mainStrat == null) {
                 DialogsFactory.errorDialog(stage, "No Strategy",
                     "No main strategy defined for this logic.");
-                return;
+                return null;
             }
             strategy = tokenizer.parseStrategy(mainStrat.getCode());
             tokenizer.verifyCodeEnd();
         } catch (Exception ex) {
             DialogsFactory.errorDialog(stage, "Strategy Error",
                 "Strategy parse error:\n" + ex.getMessage());
-            return;
+            return null;
         }
 
-        // Create and start engine
-        engine = new Engine(logic, strategy, formula, new JavaFXEngineListener(this));
-        if (stepByStep) {
-            engine.setRunningBySteps(true);
-        }
+        return new Engine(logic, strategy, formula, new JavaFXEngineListener(this));
+    }
+
+    private void startEngine() {
+        engine = validateAndCreateEngine();
+        if (engine == null) return;
         engine.buildTableaux();
         engine.start();
+    }
+
+    private void showStepByStepDialog() {
+        engine = validateAndCreateEngine();
+        if (engine == null) return;
+
+        BreakPointsDialog dlg = new BreakPointsDialog(stage);
+        dlg.populateFromStrategy(engine.getStrategy());
+        Optional<ArrayList<Integer>> result = dlg.showAndWait();
+        result.ifPresent(breakPoints -> {
+            engine.setRunningBySteps(true);
+            engine.setRulesBreakPoints(breakPoints);
+            engine.buildTableaux();
+            engine.start();
+        });
+    }
+
+    private void showSatCheckDialog() {
+        engine = validateAndCreateEngine();
+        if (engine == null) return;
+
+        SatisfiabilityDialog dlg = new SatisfiabilityDialog(stage);
+        Optional<Integer> result = dlg.showAndWait();
+        result.ifPresent(action -> {
+            engine.setOpenTableauAction(action);
+            engine.buildTableaux();
+            engine.start();
+        });
     }
 
     // --- Logic loading helpers ---
@@ -219,29 +274,18 @@ public class MainFrameFX {
         CheckMenuItem showControls = new CheckMenuItem("Controls");
         showControls.setSelected(true);
         showControls.setOnAction(e -> {
-            VBox controlsArea = (VBox) leftSplitPane.getItems().stream()
-                .filter(n -> n.getStyleClass().contains("controls-pane"))
-                .findFirst().orElse(null);
-            if (showControls.isSelected()) {
-                if (controlsArea == null) {
-                    VBox area = new VBox(premodelSettingsPane, controlsPane);
-                    area.getStyleClass().add("controls-pane");
-                    VBox.setVgrow(premodelSettingsPane, Priority.ALWAYS);
-                    leftSplitPane.getItems().add(area);
-                }
-            } else if (controlsArea != null) {
-                leftSplitPane.getItems().remove(controlsArea);
-            }
+            controlsPane.setVisible(showControls.isSelected());
+            controlsPane.setManaged(showControls.isSelected());
         });
         CheckMenuItem showTableaux = new CheckMenuItem("Tableaux");
         showTableaux.setSelected(true);
         showTableaux.setOnAction(e -> {
             if (showTableaux.isSelected()) {
-                if (!mainSplitPane.getItems().contains(tableauxPane)) {
-                    mainSplitPane.getItems().add(tableauxPane);
+                if (!mainSplitPane.getItems().contains(rightPanel)) {
+                    mainSplitPane.getItems().add(rightPanel);
                 }
             } else {
-                mainSplitPane.getItems().remove(tableauxPane);
+                mainSplitPane.getItems().remove(rightPanel);
             }
         });
         Menu showHideMenu = new Menu("Show/Hide Panels");

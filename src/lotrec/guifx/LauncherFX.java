@@ -163,6 +163,11 @@ public class LauncherFX extends Application {
 
         Scene splashScene = new Scene(splashLayout);
         splashStage.setScene(splashScene);
+        try {
+            splashStage.getIcons().add(new Image(getClass().getResourceAsStream("/lotrec/images/lotrecIcon.GIF")));
+        } catch (Exception e) {
+            // Icon not found - continue without it
+        }
         splashStage.centerOnScreen();
         splashStage.show();
     }

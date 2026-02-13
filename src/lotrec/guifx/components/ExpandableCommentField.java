@@ -1,44 +1,29 @@
 package lotrec.guifx.components;
 
-import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TitledPane;
 import javafx.scene.layout.VBox;
 
 /**
- * A collapsible comment field: a TextArea with a toggle button
- * that switches between 1-row (collapsed) and 4-row (expanded) views.
+ * A collapsible comment field using a TitledPane that wraps a TextArea.
+ * Collapsed by default; matches the LogicDefTab description pattern.
  */
 public class ExpandableCommentField extends VBox {
 
     private final TextArea textArea;
-    private final Button toggleButton;
-    private boolean expanded = false;
+    private final TitledPane titledPane;
 
     public ExpandableCommentField() {
-        setSpacing(2);
-
         textArea = new TextArea();
-        textArea.setPrefRowCount(1);
+        textArea.setPrefRowCount(3);
         textArea.setWrapText(true);
         textArea.setEditable(false);
         textArea.setPromptText("Comment");
 
-        toggleButton = new Button("Comment \u25BC");
-        toggleButton.setStyle("-fx-font-size: 10px; -fx-padding: 1 6;");
-        toggleButton.setOnAction(e -> toggleExpanded());
+        titledPane = new TitledPane("Comment", textArea);
+        titledPane.setExpanded(false);
 
-        getChildren().addAll(toggleButton, textArea);
-    }
-
-    private void toggleExpanded() {
-        expanded = !expanded;
-        if (expanded) {
-            textArea.setPrefRowCount(4);
-            toggleButton.setText("Comment \u25B2");
-        } else {
-            textArea.setPrefRowCount(1);
-            toggleButton.setText("Comment \u25BC");
-        }
+        getChildren().add(titledPane);
     }
 
     public void setText(String text) {

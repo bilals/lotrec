@@ -59,6 +59,7 @@ public class RulesTabPane extends VBox {
         TreeItem<String> condRoot = new TreeItem<>("Conditions");
         condRoot.setExpanded(true);
         conditionsTree = new TreeView<>(condRoot);
+        conditionsTree.setShowRoot(false);
         conditionsTree.setPrefHeight(120);
 
         // Condition buttons
@@ -74,6 +75,7 @@ public class RulesTabPane extends VBox {
         TreeItem<String> actRoot = new TreeItem<>("Actions");
         actRoot.setExpanded(true);
         actionsTree = new TreeView<>(actRoot);
+        actionsTree.setShowRoot(false);
         actionsTree.setPrefHeight(120);
 
         // Action buttons
@@ -95,7 +97,7 @@ public class RulesTabPane extends VBox {
         VBox.setVgrow(actionsTree, Priority.SOMETIMES);
 
         getChildren().addAll(
-            new Label("Rules:"), rulesList, ruleButtons, commentField,
+            rulesList, ruleButtons, commentField,
             new Label("Conditions:"), conditionsTree, condButtons,
             new Label("Actions:"), actionsTree, actButtons
         );

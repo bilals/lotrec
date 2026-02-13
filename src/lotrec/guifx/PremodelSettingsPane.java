@@ -1,7 +1,5 @@
 package lotrec.guifx;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -13,9 +11,6 @@ import lotrec.dataStructure.expression.MarkedExpression;
 import lotrec.parser.OldiesTokenizer;
 import lotrec.parser.exceptions.ParseException;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class PremodelSettingsPane extends VBox {
 
     private final TextArea formulaField;
@@ -23,39 +18,24 @@ public class PremodelSettingsPane extends VBox {
     private final Button buildButton;
     private final Button stepButton;
     private final Button satCheckButton;
-    private final ComboBox<String> testingFormulaeCombo;
     private Logic currentLogic;
-    private final List<TestingFormula> formulaRefs = new ArrayList<>();
 
     public PremodelSettingsPane() {
         setSpacing(10);
         setPadding(new Insets(10));
 
-        // Formula input (must be created before combo handler references it)
+        // Formula input
         formulaField = new TextArea();
+        formulaField.setPromptText("Enter formula in prefix notation (e.g., and p q)");
+        formulaField.setPrefRowCount(3);
+        formulaField.setWrapText(true);
+        VBox.setVgrow(formulaField, Priority.SOMETIMES);
 
         // Infix display field
         infixField = new TextField();
         infixField.setEditable(false);
         infixField.setStyle("-fx-background-color: #f4f4f4;");
         infixField.setPromptText("Infix display will appear here");
-
-        // Testing formulae dropdown
-        testingFormulaeCombo = new ComboBox<>();
-        testingFormulaeCombo.setPromptText("Select predefined formula...");
-        testingFormulaeCombo.setMaxWidth(Double.MAX_VALUE);
-        testingFormulaeCombo.setOnAction(e -> {
-            int index = testingFormulaeCombo.getSelectionModel().getSelectedIndex();
-            if (index >= 0 && index < formulaRefs.size()) {
-                TestingFormula tf = formulaRefs.get(index);
-                formulaField.setText(tf.getCode());
-                infixField.setText(tf.getDisplayName());
-            }
-        });
-        formulaField.setPromptText("Enter formula in prefix notation (e.g., and p q)");
-        formulaField.setPrefRowCount(3);
-        formulaField.setWrapText(true);
-        VBox.setVgrow(formulaField, Priority.SOMETIMES);
 
         // Try to parse and show infix when focus leaves the formula field
         formulaField.focusedProperty().addListener((obs, wasFocused, isFocused) -> {
@@ -71,7 +51,6 @@ public class PremodelSettingsPane extends VBox {
         HBox buttonBar = new HBox(5, buildButton, stepButton, satCheckButton);
 
         getChildren().addAll(
-            new Label("Testing Formulae:"), testingFormulaeCombo,
             new Label("Formula Code:"), formulaField,
             new Label("Display Format:"), infixField,
             buttonBar
@@ -80,19 +59,17 @@ public class PremodelSettingsPane extends VBox {
 
     public void setLogic(Logic logic) {
         this.currentLogic = logic;
-        formulaRefs.clear();
-        ObservableList<String> formulae = FXCollections.observableArrayList();
-        if (logic != null && logic.getTestingFormulae() != null) {
-            for (Object obj : logic.getTestingFormulae()) {
-                if (obj instanceof TestingFormula) {
-                    TestingFormula tf = (TestingFormula) obj;
-                    formulaRefs.add(tf);
-                    formulae.add(tf.getDisplayName());
-                }
+        formulaField.clear();
+        infixField.clear();
+        // Auto-populate from first testing formula
+        if (logic != null && logic.getTestingFormulae() != null && !logic.getTestingFormulae().isEmpty()) {
+            Object first = logic.getTestingFormulae().get(0);
+            if (first instanceof TestingFormula) {
+                TestingFormula tf = (TestingFormula) first;
+                formulaField.setText(tf.getCode());
+                updateInfixFromCode();
             }
         }
-        testingFormulaeCombo.setItems(formulae);
-        infixField.clear();
     }
 
     private void updateInfixFromCode() {
@@ -129,6 +106,5 @@ public class PremodelSettingsPane extends VBox {
     public Button getBuildButton() { return buildButton; }
     public Button getStepButton() { return stepButton; }
     public Button getSatCheckButton() { return satCheckButton; }
-    public ComboBox<String> getTestingFormulaeCombo() { return testingFormulaeCombo; }
     public Logic getCurrentLogic() { return currentLogic; }
 }

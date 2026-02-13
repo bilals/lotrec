@@ -33,6 +33,7 @@ public class DialogsFactory {
         Alert alert = new Alert(Alert.AlertType.INFORMATION, message, ButtonType.OK);
         alert.setTitle(title);
         alert.initOwner(owner);
+        alert.setResizable(true);
         alert.showAndWait();
     }
 }

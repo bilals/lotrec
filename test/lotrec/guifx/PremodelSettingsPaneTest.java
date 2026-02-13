@@ -54,10 +54,11 @@ class PremodelSettingsPaneTest {
     }
 
     @Test
-    @DisplayName("should have testing formulae combo box")
-    void shouldHaveTestingFormulaeCombo(FxRobot robot) {
+    @DisplayName("should have step-by-step and sat check buttons")
+    void shouldHaveEngineButtons(FxRobot robot) {
         AtomicReference<PremodelSettingsPane> ref = new AtomicReference<>();
         robot.interact(() -> ref.set(new PremodelSettingsPane()));
-        assertThat(ref.get().getTestingFormulaeCombo()).isNotNull();
+        assertThat(ref.get().getStepButton()).isNotNull();
+        assertThat(ref.get().getSatCheckButton()).isNotNull();
     }
 }

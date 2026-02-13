@@ -2,6 +2,7 @@ package lotrec.guifx.dialogs;
 
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.util.Arrays;
@@ -17,10 +18,19 @@ public class TaskPaneDialog extends Dialog<String> {
     public TaskPaneDialog(Stage owner) {
         setTitle("How do you prefer to start?");
         initOwner(owner);
+        setResizable(true);
+        setOnShown(evt -> {
+            try {
+                Stage dialogStage = (Stage) getDialogPane().getScene().getWindow();
+                dialogStage.getIcons().add(new Image(getClass().getResourceAsStream("/lotrec/images/lotrecIcon.GIF")));
+            } catch (Exception ignored) {}
+        });
 
         VBox content = new VBox(15);
-        content.setAlignment(Pos.CENTER);
-        content.setStyle("-fx-padding: 20;");
+        content.setAlignment(Pos.CENTER_LEFT);
+        content.setStyle("-fx-padding: 30;");
+        content.setMinWidth(350);
+        content.setMinHeight(200);
 
         Label titleLabel = new Label("Welcome to LoTREC");
         titleLabel.setStyle("-fx-font-size: 16; -fx-font-weight: bold;");

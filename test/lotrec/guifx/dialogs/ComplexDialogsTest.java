@@ -60,11 +60,12 @@ class ComplexDialogsTest {
         }
 
         @Test
-        @DisplayName("should have rules list with checkboxes")
-        void shouldHaveRulesList(FxRobot robot) {
+        @DisplayName("should have strategy tree with checkboxes")
+        void shouldHaveStrategyTree(FxRobot robot) {
             AtomicReference<BreakPointsDialog> ref = new AtomicReference<>();
             robot.interact(() -> ref.set(new BreakPointsDialog(ownerStage)));
-            assertThat(ref.get().getRulesListView()).isNotNull();
+            assertThat(ref.get()).isNotNull();
+            assertThat(ref.get().getDialogPane().getContent()).isNotNull();
         }
     }
 

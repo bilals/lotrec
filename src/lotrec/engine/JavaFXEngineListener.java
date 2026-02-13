@@ -27,7 +27,9 @@ public class JavaFXEngineListener implements EngineListener {
         Platform.runLater(() -> {
             if (mainFrameFX.getControlsPane() != null) {
                 mainFrameFX.getControlsPane().enableControls();
-                mainFrameFX.getControlsPane().setStatus("Building...");
+            }
+            if (mainFrameFX.getTableauxPane() != null) {
+                mainFrameFX.getTableauxPane().setEngineStatus("Building...");
             }
             if (mainFrameFX.getTableauxPane() != null && mainFrameFX.getEngine() != null) {
                 mainFrameFX.getTableauxPane().wireSelectionListener(mainFrameFX.getEngine());
@@ -41,7 +43,9 @@ public class JavaFXEngineListener implements EngineListener {
         Platform.runLater(() -> {
             if (mainFrameFX.getControlsPane() != null) {
                 mainFrameFX.getControlsPane().disableControls();
-                mainFrameFX.getControlsPane().setStatus(wasStopped ? "Stopped" : "Finished");
+            }
+            if (mainFrameFX.getTableauxPane() != null) {
+                mainFrameFX.getTableauxPane().setEngineStatus(wasStopped ? "Stopped" : "Finished");
             }
             if (mainFrameFX.getTableauxPane() != null && mainFrameFX.getEngine() != null) {
                 mainFrameFX.getTableauxPane().fillTabListAndDisplayLastChosenOnes(mainFrameFX.getEngine());
@@ -52,9 +56,6 @@ public class JavaFXEngineListener implements EngineListener {
     @Override
     public void onStatusChanged(EngineStatus status) {
         Platform.runLater(() -> {
-            if (mainFrameFX.getControlsPane() != null) {
-                mainFrameFX.getControlsPane().setStatus(status.toString());
-            }
             if (mainFrameFX.getTableauxPane() != null) {
                 mainFrameFX.getTableauxPane().setEngineStatus(status.toString());
             }
@@ -73,9 +74,6 @@ public class JavaFXEngineListener implements EngineListener {
     @Override
     public void onElapsedTimeChanged(long elapsedMs) {
         Platform.runLater(() -> {
-            if (mainFrameFX.getControlsPane() != null) {
-                mainFrameFX.getControlsPane().setElapsedTime(elapsedMs + " ms");
-            }
             if (mainFrameFX.getTableauxPane() != null) {
                 mainFrameFX.getTableauxPane().setElapsedTime(elapsedMs + " ms");
             }
@@ -85,8 +83,8 @@ public class JavaFXEngineListener implements EngineListener {
     @Override
     public void onAppliedRulesChanged(int appliedRules) {
         Platform.runLater(() -> {
-            if (mainFrameFX.getControlsPane() != null) {
-                mainFrameFX.getControlsPane().setAppliedRules(String.valueOf(appliedRules));
+            if (mainFrameFX.getTableauxPane() != null) {
+                mainFrameFX.getTableauxPane().setAppliedRules(String.valueOf(appliedRules));
             }
         });
     }
@@ -94,8 +92,8 @@ public class JavaFXEngineListener implements EngineListener {
     @Override
     public void onTotalAppliedRulesChanged(int total) {
         Platform.runLater(() -> {
-            if (mainFrameFX.getControlsPane() != null) {
-                mainFrameFX.getControlsPane().setAppliedRules(total + " total");
+            if (mainFrameFX.getTableauxPane() != null) {
+                mainFrameFX.getTableauxPane().setAppliedRules(total + " total");
             }
         });
     }
@@ -108,8 +106,8 @@ public class JavaFXEngineListener implements EngineListener {
     @Override
     public void onPausedAtRule(String ruleName) {
         Platform.runLater(() -> {
-            if (mainFrameFX.getControlsPane() != null) {
-                mainFrameFX.getControlsPane().setStatus("Paused at: " + ruleName);
+            if (mainFrameFX.getTableauxPane() != null) {
+                mainFrameFX.getTableauxPane().setEngineStatus("Paused at: " + ruleName);
             }
         });
     }

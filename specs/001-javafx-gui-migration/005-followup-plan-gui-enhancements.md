@@ -215,3 +215,54 @@ After each item, run `$GW run` (in background) and verify:
 8. Predefined Formulas tab has no redundant label
 9. "Step By Step..." shows breakpoints dialog, then starts engine
 10. "Satisfiability Check..." shows options dialog with Stop/Pause, then starts engine
+
+---
+
+## Implementation Summary
+
+**Status: COMPLETE** — All 10 items implemented. Build compiles, all tests pass.
+
+15 files changed (+389, -144 lines):
+
+| Item | Description | Files Changed |
+|------|-------------|---------------|
+| **1** | Main Frame Icon | `MainFrameFX.java`, `LauncherFX.java` — Added `lotrecIcon.GIF` to both stages |
+| **2** | TaskPaneDialog | `TaskPaneDialog.java` — Added `setResizable(true)` + icon via `setOnShown` |
+| **3** | Layout Restructure | `MainFrameFX.java`, `PremodelSettingsPane.java`, `TableauxPane.java` — PremodelSettings + PremodelsList now side-by-side at top of right panel; left side has only LogicsPane + ControlsPane |
+| **4** | Auto-populate Formula | `PremodelSettingsPane.java` — `setLogic()` now auto-fills from first testing formula |
+| **5** | Logic Description | `LogicDefTab.java` — Changed from `TabPane` to `VBox` with collapsible `TitledPane("Description")` above sub-tabs; added `getSelectionModel()` delegate for backward compat |
+| **6** | Rules Tab Cleanup | `RulesTabPane.java` — Removed "Rules:" label, set `showRoot(false)` on conditions/actions trees |
+| **7** | Condition/Action Dialogs | `ConditionDialog.java`, `ActionDialog.java` — Resizable, `sizeToScene()` on type change, info icon buttons with tooltips and click-to-show descriptions |
+| **8** | Predefined Formulas Label | `TestingFormulaePane.java` — Removed redundant "Predefined Formulas:" label |
+| **9** | Step By Step Fix | `BreakPointsDialog.java`, `MainFrameFX.java` — Full strategy tree with `CheckBoxTreeItem`, Select All/Invert buttons, "Start" button; step button now shows dialog first |
+| **10** | Satisfiability Check | `SatisfiabilityDialog.java`, `MainFrameFX.java` — Stop/Pause radio buttons, "Start" button, wired to engine with `setOpenTableauAction()` |
+
+### Key refactoring
+
+- Extracted `validateAndCreateEngine()` helper in `MainFrameFX` — shared by `startEngine()`, `showStepByStepDialog()`, and `showSatCheckDialog()`
+- Removed `testingFormulaeCombo` and `formulaRefs` from `PremodelSettingsPane` (replaced by auto-populate)
+- `TableauxPane` now exposes `getPremodelsListBox()`, `getStatusBar()`, `getGraphDisplayArea()` for external layout composition
+- Updated 3 test files to match API changes: `PremodelSettingsPaneTest`, `ComplexDialogsTest`, `LogicPanelsIntegrationTest`
+
+---
+
+## Followup Polish (Batch 2)
+
+**Status: COMPLETE** — All 6 items implemented. Build compiles, all tests pass.
+
+| # | Description | Files Changed |
+|---|-------------|---------------|
+| **11** | Make About dialog resizable | `DialogsFactory.java` — Added `setResizable(true)` to `infoDialog()` |
+| **12** | Enlarge TaskPaneDialog + left-align buttons | `TaskPaneDialog.java` — Changed alignment to `CENTER_LEFT`, added `minWidth(350)` / `minHeight(200)`, padding 30 |
+| **13** | Move runtime controls next to build buttons | `ControlsPane.java`, `MainFrameFX.java` — ControlsPane rewritten as `HBox` with just 3 buttons (Next Step, Pause, Stop); removed from left panel, appended to `PremodelSettingsPane` in right panel |
+| **14** | Move appliedRulesLabel to status bar | `TableauxPane.java`, `JavaFXEngineListener.java` — Added `appliedRulesLabel` to `TableauxPane` status bar; engine listener routes rule counts to `TableauxPane.setAppliedRules()` |
+| **15** | Remove redundant status/time labels from ControlsPane | `ControlsPane.java`, `JavaFXEngineListener.java` — Removed `statusLabel`, `elapsedTimeLabel`, `appliedRulesLabel` and all setter/getter methods from ControlsPane; all status updates now routed exclusively to `TableauxPane` status bar |
+| **16** | Collapsible TitledPane for comment fields | `ExpandableCommentField.java` — Replaced toggle-button + TextArea with `TitledPane("Comment", textArea)` collapsed by default, matching `LogicDefTab` description pattern; same API preserved so no changes needed in `ConnTabPane`, `RulesTabPane`, `StratTabPane`, `TestingFormulaePane` |
+
+### Key changes
+
+- `ControlsPane` simplified from `VBox` with labels to `HBox` with just 3 buttons
+- Show/Hide Controls menu now toggles `setVisible`/`setManaged` instead of add/remove from parent
+- `JavaFXEngineListener` no longer references any ControlsPane label methods — all status, elapsed time, and applied rules updates go to `TableauxPane` only
+- `ExpandableCommentField` now uses `TitledPane` internally (same public API: `setText`, `getText`, `setEditable`, `clear`)
+- Fixed `ControlsPaneTest` — replaced test for removed `getStatusLabel()` with `disableControls()` round-trip test

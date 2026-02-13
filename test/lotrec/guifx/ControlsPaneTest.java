@@ -59,10 +59,17 @@ class ControlsPaneTest {
     }
 
     @Test
-    @DisplayName("should display engine status label")
-    void shouldDisplayEngineStatusLabel(FxRobot robot) {
+    @DisplayName("should disable controls after disableControls()")
+    void shouldDisableControlsAfterDisable(FxRobot robot) {
         AtomicReference<ControlsPane> ref = new AtomicReference<>();
-        robot.interact(() -> ref.set(new ControlsPane()));
-        assertThat(ref.get().getStatusLabel()).isNotNull();
+        robot.interact(() -> {
+            ControlsPane pane = new ControlsPane();
+            pane.enableControls();
+            pane.disableControls();
+            ref.set(pane);
+        });
+        assertThat(ref.get().getNextStepButton().isDisabled()).isTrue();
+        assertThat(ref.get().getPauseResumeButton().isDisabled()).isTrue();
+        assertThat(ref.get().getStopButton().isDisabled()).isTrue();
     }
 }

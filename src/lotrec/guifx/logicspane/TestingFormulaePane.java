@@ -53,7 +53,7 @@ public class TestingFormulaePane extends VBox {
             (obs, oldVal, newVal) -> showFormulaDetails(newVal.intValue())
         );
 
-        getChildren().addAll(new Label("Predefined Formulas:"), formulaList,
+        getChildren().addAll(formulaList,
             new Label("Formula Code:"), codeArea, commentField, buttonBar);
         refreshList();
     }

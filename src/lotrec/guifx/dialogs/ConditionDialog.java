@@ -3,11 +3,17 @@ package lotrec.guifx.dialogs;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import lotrec.dataStructure.tableau.condition.AbstractCondition;
+import lotrec.guifx.DialogsFactory;
 
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +24,7 @@ public class ConditionDialog extends Dialog<ConditionDialog.ConditionResult> {
     private final ComboBox<String> conditionTypeCombo;
     private final List<TextField> paramFields = new ArrayList<>();
     private final List<Label> paramLabels = new ArrayList<>();
+    private final List<Button> infoButtons = new ArrayList<>();
     private final VBox paramsBox;
 
     public ConditionDialog(Stage owner) {
@@ -27,6 +34,7 @@ public class ConditionDialog extends Dialog<ConditionDialog.ConditionResult> {
     public ConditionDialog(Stage owner, ConditionResult existing) {
         setTitle(existing == null ? "Add Condition" : "Edit Condition");
         initOwner(owner);
+        setResizable(true);
 
         GridPane grid = new GridPane();
         grid.setHgap(10);
@@ -51,9 +59,16 @@ public class ConditionDialog extends Dialog<ConditionDialog.ConditionResult> {
             TextField tf = new TextField();
             tf.setVisible(false);
             tf.setManaged(false);
+            HBox.setHgrow(tf, Priority.ALWAYS);
+            Button infoBtn = createInfoButton("");
+            infoBtn.setVisible(false);
+            infoBtn.setManaged(false);
             paramLabels.add(lbl);
             paramFields.add(tf);
-            paramsBox.getChildren().addAll(lbl, tf);
+            infoButtons.add(infoBtn);
+            HBox row = new HBox(5, lbl, tf, infoBtn);
+            row.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
+            paramsBox.getChildren().add(row);
         }
         grid.add(paramsBox, 0, 1, 2, 1);
 
@@ -88,6 +103,32 @@ public class ConditionDialog extends Dialog<ConditionDialog.ConditionResult> {
         });
     }
 
+    private Button createInfoButton(String description) {
+        Button btn = new Button();
+        btn.setMinSize(24, 24);
+        btn.setMaxSize(24, 24);
+        try {
+            InputStream is = getClass().getResourceAsStream("/lotrec/images/info.png");
+            if (is != null) {
+                ImageView iv = new ImageView(new Image(is, 16, 16, true, true));
+                btn.setGraphic(iv);
+            } else {
+                btn.setText("?");
+            }
+        } catch (Exception e) {
+            btn.setText("?");
+        }
+        btn.setTooltip(new Tooltip(description));
+        btn.setOnAction(e -> {
+            String text = btn.getTooltip() != null ? btn.getTooltip().getText() : "";
+            if (!text.isEmpty()) {
+                Stage stage = (Stage) getDialogPane().getScene().getWindow();
+                DialogsFactory.infoDialog(stage, "Parameter Info", text);
+            }
+        });
+        return btn;
+    }
+
     private void updateParameterFields() {
         // Hide all first
         for (int i = 0; i < 4; i++) {
@@ -96,6 +137,8 @@ public class ConditionDialog extends Dialog<ConditionDialog.ConditionResult> {
             paramFields.get(i).setVisible(false);
             paramFields.get(i).setManaged(false);
             paramFields.get(i).clear();
+            infoButtons.get(i).setVisible(false);
+            infoButtons.get(i).setManaged(false);
         }
 
         String keyword = conditionTypeCombo.getValue();
@@ -132,18 +175,29 @@ public class ConditionDialog extends Dialog<ConditionDialog.ConditionResult> {
                     if (typeNames != null && i < typeNames.length) {
                         label = typeNames[i];
                     }
+                    String desc = "";
                     if (descriptions != null && i < descriptions.length) {
-                        paramFields.get(i).setPromptText(descriptions[i]);
+                        desc = descriptions[i];
+                        paramFields.get(i).setPromptText(desc);
                     }
                     paramLabels.get(i).setText(label + ":");
                     paramLabels.get(i).setVisible(true);
                     paramLabels.get(i).setManaged(true);
                     paramFields.get(i).setVisible(true);
                     paramFields.get(i).setManaged(true);
+                    if (!desc.isEmpty()) {
+                        infoButtons.get(i).setTooltip(new Tooltip(desc));
+                        infoButtons.get(i).setVisible(true);
+                        infoButtons.get(i).setManaged(true);
+                    }
                 }
             }
         } catch (ClassNotFoundException ignored) {
             // Class not found - no parameters to show
+        }
+
+        if (getDialogPane().getScene() != null && getDialogPane().getScene().getWindow() != null) {
+            getDialogPane().getScene().getWindow().sizeToScene();
         }
     }
 

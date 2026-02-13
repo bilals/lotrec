@@ -50,7 +50,11 @@ class LogicPanelsIntegrationTest {
 
         LogicDefTab defTab = (LogicDefTab) logicTab.getContent();
         // LogicDefTab should have 4 sub-tabs: Connectors, Rules, Strategies, Formulas
-        assertThat(defTab.getTabs()).hasSize(4);
+        assertThat(defTab.getSelectionModel()).isNotNull();
+        assertThat(defTab.getConnTabPane()).isNotNull();
+        assertThat(defTab.getRulesTabPane()).isNotNull();
+        assertThat(defTab.getStratTabPane()).isNotNull();
+        assertThat(defTab.getTestingFormulaePane()).isNotNull();
 
         // Verify connector count matches what Monomodal-K defines
         assertThat(logic.getConnectors()).isNotNull();
