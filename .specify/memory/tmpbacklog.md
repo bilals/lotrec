@@ -13,20 +13,15 @@ Transform screenshot taking into command, destination folder "build/gui-screensh
 - update SpecKit (re-run init?)
 - simplify skills
 - remove unused repomix MCP
+- remove brownfiled files and merge in .specify/memory constitution, etc.
+- update SpecKit (re-run init?)
+- simplify skills
+- remove unused repomix MCP
 - facilitate auto-running commands
     * Learn how to run lotrec (for future tests)
 - share project settings via Git
 
 # ALL
-Make sure tableaux are built and displayable (make sure GraphViz is displayed correctly)
-
-Iterate on GUI Testing / enhancements...
-- Make labels and textfields on the same row in Connector tab
-- Make formula code appears in text area
-- Verify all menu items
-
-
-Reference screenshots for the GUI right after Migration
 
 Finalize/complete:
 
@@ -48,9 +43,27 @@ Create in .specify/memoryReference V3 JavaFX screenshots for the GUI right after
 # Current
 
  Make sure tableaux are built and displayable (make sure Cytoscape is displayed correctly)
+ Make sure tableaux are built and displayable (make sure Cytoscape is displayed correctly)
 
 # DONE
 
+Follow up 003
+Solve UI Mismatch/Gaps in report `semantic-analysis-report.md`.  
+After running "/visual-check" you generated Swing and FX screenshots, compared them and generated the following report specs\001-javafx-gui-migration\002-semantic-analysis-report.md
+Plan the following modificaions of the FX GUI as follows:
+- Under "Formula Code" the infix format of the selected formula must be displayed 
+- Connectors Tab: auto-select first connector and populate detail fields, use inline labels, add back the "Edit" button between "Add" and "Delete", add a "Comment" field (one line by default but expandable)
+- Rules tab: auto-select first rule, display the actions and conditions instead of their objects IDs(currently we see object IDs), add back the "Edit" button between "Add" and "Delete", add a "Comment" field (one line by default but expandable), add "Add/Edit/Delete" buttons to both Actions and Condtions
+- Strategy tab: auto-select and display main strategy, allow to select main strategy, add a "Comment" field (one line by default but expandable)
+- Formula tab: populate the list with formulas DisplayName (pretty print infix format from 
+  TestingFormula.getDisplayName()), auto-select first formula, display the formula's Code in an editable and expandable text area, add a "Comment" field (one line by default but expandable)                                                                                               
+If this list seems too long to track in a single planning and implementation run, let me know to chunk it in small peices. If you find it better to make all needed changes in FX GUI code then test once for all, then proceed.
+
+Let me know what you think, ask me questions if you need, especially on the right choice for the comment field (expandable / foldable, or text area with a scroll and a handle to enlarge in case it is needed). 
+
+===============
+
+Follow up 002
 Follow up 003
 Solve UI Mismatch/Gaps in report `semantic-analysis-report.md`.  
 After running "/visual-check" you generated Swing and FX screenshots, compared them and generated the following report specs\001-javafx-gui-migration\002-semantic-analysis-report.md
